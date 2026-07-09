@@ -65,7 +65,7 @@ export default function Page() {
   return (
     <main style={{ minHeight: "100vh" }}>
       <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 6vw", borderBottom: "1px solid var(--line)" }}>
-                  <div style={{ fontFamily: "var(--font-serif), serif", fontSize: 22, letterSpacing: 2, fontWeight: 600 }}><img src="/logo.png" alt="Curated Fit" style={{ height: 44 }} /></div>
+                  <div style={{ fontFamily: "var(--font-serif), serif", fontSize: 22, letterSpacing: 2, fontWeight: 600 }}><img src="/logo.png" alt="Curated Fit" style={{ height: 64 }} /></div>
         <span style={{ background: "var(--ink)", color: "var(--field)", borderRadius: 999, padding: "12px 22px", fontSize: 15 }}>Join the waitlist</span>
       </nav>
 
