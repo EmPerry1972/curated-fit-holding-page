@@ -135,6 +135,7 @@ export default function Page() {
       <footer style={{ borderTop: "1px solid var(--line)", padding: "40px 6vw", color: "var(--muted)", fontSize: 14 }}>
                   <div style={{ fontFamily: "var(--font-serif), serif", fontSize: 18, letterSpacing: 2, color: "var(--ink)", marginBottom: 8 }}><img src="/logo.png" alt="Curated Fit" style={{ height: 34 }} /></div>
         A Curated Wellness platform.
+          <div style={{ marginTop: 4 }}>Proudly NZ made</div>
       </footer>
     </main>
   );
