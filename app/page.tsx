@@ -3,9 +3,9 @@
 import { useState } from "react";
 
 const SPECIALITIES = [
-  "Strength & conditioning", "Reformer Pilates", "Mobility & longevity",
-  "Injury rehab", "Women's health", "Fat loss & composition",
-  "Online coaching", "Pre/post-natal",
+    "Build strength and muscle", "Lose fat, change composition",
+    "GLP-1 exercise support programme", "General fitness and health",
+    "Recover from injury", "Mobility and longevity",
 ];
 
 const EXPERIENCE = ["Less than 2 years", "2\u20135 years", "5\u201310 years", "10+ years"];
