@@ -14,6 +14,7 @@ export async function POST(request) {
       "Name": data.fullName || "",
       "Email": data.email || "",
       "Phone": data.phone || "",
+      "Country code": data.countryCode || "",
       "Location": data.location || "",
       "Experience": data.experience || "",
       "Registration": data.registration || "",
