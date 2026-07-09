@@ -10,10 +10,11 @@ const SPECIALITIES = [
 
 const EXPERIENCE = ["Less than 2 years", "2\u20135 years", "5\u201310 years", "10+ years"];
 const REGISTRATION = ["Yes - REPs registered", "Yes - other recognised body", "Not yet"];
+const COUNTRY_CODES = ["+64 New Zealand", "+61 Australia", "+1 US / Canada", "+44 United Kingdom", "+353 Ireland", "+91 India", "+27 South Africa", "+65 Singapore", "+971 UAE", "+49 Germany", "+33 France", "+81 Japan", "+86 China", "+55 Brazil", "+52 Mexico", "+31 Netherlands", "+46 Sweden", "+41 Switzerland", "+34 Spain", "+39 Italy", "Other"];
 
 export default function Page() {
   const [form, setForm] = useState({
-    fullName: "", email: "", phone: "", location: "",
+            fullName: "", email: "", phone: "", location: "", countryCode: "+64 New Zealand",
     experience: "", registration: "", about: "",
   });
   const [specialities, setSpecialities] = useState<string[]>([]);
@@ -85,7 +86,8 @@ export default function Page() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
               <div><label style={label}>Full name</label><input style={field} value={form.fullName} onChange={set("fullName")} /></div>
               <div><label style={label}>Email</label><input style={field} type="email" value={form.email} onChange={set("email")} /></div>
-                                                                          <div><label style={label}>Phone</label><input style={field} type="tel" value={form.phone} onChange={set("phone")} /></div>
+                    <div><label style={label}>Country code</label><select style={field} value={form.countryCode} onChange={set("countryCode")}>{COUNTRY_CODES.map((c) => <option key={c} value={c}>{c}</option>)}</select></div>
+                <div><label style={label}>Phone</label><input style={field} type="tel" value={form.phone} onChange={set("phone")} /></div>
               <div><label style={label}>Where are you based?</label><input style={field} placeholder="e.g. Ponsonby, Auckland" value={form.location} onChange={set("location")} /></div>
               <div><label style={label}>Years of experience</label>
                 <select style={field} value={form.experience} onChange={set("experience")}>
