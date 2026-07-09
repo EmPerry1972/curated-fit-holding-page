@@ -77,7 +77,7 @@ export default function Page() {
         ) : (
           <>
             <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)", marginBottom: 20 }}>Apply as a trainer</p>
-            <h1 style={{ fontFamily: "var(--font-serif), serif", fontSize: 66, lineHeight: 1.05, fontWeight: 500, marginBottom: 24 }}>Coach with Curated Fit.</h1>
+            <h1 style={{ fontFamily: "var(--font-serif), serif", fontSize: 66, lineHeight: 1.05, fontWeight: 500, marginBottom: 24 }}>A carefully selected standard.</h1>
             <p style={{ fontSize: 20, lineHeight: 1.6, color: "var(--muted)", maxWidth: 620, marginBottom: 48 }}>
               Curated Fit works with a limited number of selected exercise professionals, each considered against one clear standard. Join the waitlist and we'll be in touch if it is the right fit.
             </p>
