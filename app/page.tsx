@@ -26,8 +26,8 @@ export default function Page() {
     setSpecialities((p) => (p.includes(s) ? p.filter((x) => x !== s) : [...p, s]));
 
   async function submit() {
-            if (!form.fullName || !form.email || !form.about) {
-                setError("Please add your name and email, and tell us about your coaching.");
+                    if (!form.fullName || !form.email || !form.phone || !form.location || !form.experience || !form.registration || !form.about || specialities.length === 0) {
+                            setError("Please complete all fields before submitting.");
       return;
     }
     setSubmitting(true);
@@ -85,7 +85,7 @@ export default function Page() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
               <div><label style={label}>Full name</label><input style={field} value={form.fullName} onChange={set("fullName")} /></div>
               <div><label style={label}>Email</label><input style={field} type="email" value={form.email} onChange={set("email")} /></div>
-              <div><label style={label}>Phone <span style={{ color: "var(--muted)", fontWeight: 400 }}>Optional</span></label><input style={field} type="tel" value={form.phone} onChange={set("phone")} /></div>
+                                                                          <div><label style={label}>Phone</label><input style={field} type="tel" value={form.phone} onChange={set("phone")} /></div>
               <div><label style={label}>Where are you based?</label><input style={field} placeholder="e.g. Ponsonby, Auckland" value={form.location} onChange={set("location")} /></div>
               <div><label style={label}>Years of experience</label>
                 <select style={field} value={form.experience} onChange={set("experience")}>
