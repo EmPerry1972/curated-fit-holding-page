@@ -26,8 +26,8 @@ export default function Page() {
     setSpecialities((p) => (p.includes(s) ? p.filter((x) => x !== s) : [...p, s]));
 
   async function submit() {
-    if (!form.fullName || !form.email) {
-      setError("Please add your name and email.");
+    if (!form.fullName || !form.email || !form.about) {
+      setError("Please add your name and email, and tell us about your coaching.");
       return;
     }
     setSubmitting(true);
@@ -64,7 +64,7 @@ export default function Page() {
   return (
     <main style={{ minHeight: "100vh" }}>
       <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 6vw", borderBottom: "1px solid var(--line)" }}>
-        <div style={{ fontFamily: "var(--font-serif), serif", fontSize: 22, letterSpacing: 2, fontWeight: 600 }}>CURATED FIT</div>
+        <div style={{ fontFamily: "var(--font-serif), serif", fontSize: 22, letterSpacing: 2, fontWeight: 600 }}><img src="/logo.png" alt="Curated Fit" style={{ height: 44 }} />/div>
         <span style={{ background: "var(--ink)", color: "var(--field)", borderRadius: 999, padding: "12px 22px", fontSize: 15 }}>Join the waitlist</span>
       </nav>
 
@@ -111,7 +111,7 @@ export default function Page() {
             </div>
 
             <div style={{ marginBottom: 32 }}>
-              <label style={label}>Tell us about your coaching <span style={{ color: "var(--muted)", fontWeight: 400 }}>Optional</span></label>
+              <label style={label}>Tell us about your coaching</label>
               <textarea style={{ ...field, minHeight: 120, resize: "vertical" }} placeholder="Your approach, who you work best with, and what a first session feels like." value={form.about} onChange={set("about")} />
             </div>
 
@@ -129,7 +129,7 @@ export default function Page() {
       </section>
 
       <footer style={{ borderTop: "1px solid var(--line)", padding: "40px 6vw", color: "var(--muted)", fontSize: 14 }}>
-        <div style={{ fontFamily: "var(--font-serif), serif", fontSize: 18, letterSpacing: 2, color: "var(--ink)", marginBottom: 8 }}>CURATED FIT</div>
+        <div style={{ fontFamily: "var(--font-serif), serif", fontSize: 18, letterSpacing: 2, color: "var(--ink)", marginBottom: 8 }}><img src="/logo.png" alt="Curated Fit" style={{ height: 34 }} /></div>
         A Curated Wellness platform.
       </footer>
     </main>
