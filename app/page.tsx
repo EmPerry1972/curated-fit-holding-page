@@ -14,7 +14,7 @@ const COUNTRY_CODES = ["+64 New Zealand", "+61 Australia", "+1 US / Canada", "+4
 
 export default function Page() {
   const [form, setForm] = useState({
-            fullName: "", email: "", phone: "", location: "", countryCode: "+64 New Zealand",
+                    fullName: "", email: "", phone: "", city: "", postcode: "", country: "", countryCode: "+64 New Zealand",
     experience: "", registration: "", about: "",
   });
   const [specialities, setSpecialities] = useState<string[]>([]);
@@ -27,7 +27,7 @@ export default function Page() {
     setSpecialities((p) => (p.includes(s) ? p.filter((x) => x !== s) : [...p, s]));
 
   async function submit() {
-                    if (!form.fullName || !form.email || !form.phone || !form.location || !form.experience || !form.registration || !form.about || specialities.length === 0) {
+                    if (!form.fullName || !form.email || !form.phone || !form.city || !form.postcode || !form.country || !form.experience || !form.registration || !form.about || specialities.length === 0) {
                             setError("Please complete all fields before submitting.");
       return;
     }
@@ -88,7 +88,9 @@ export default function Page() {
               <div><label style={label}>Email</label><input style={field} type="email" value={form.email} onChange={set("email")} /></div>
                     <div><label style={label}>Country code</label><select style={field} value={form.countryCode} onChange={set("countryCode")}>{COUNTRY_CODES.map((c) => <option key={c} value={c}>{c}</option>)}</select></div>
                 <div><label style={label}>Phone</label><input style={field} type="tel" value={form.phone} onChange={set("phone")} /></div>
-              <div><label style={label}>Where are you based?</label><input style={field} placeholder="e.g. Ponsonby, Auckland" value={form.location} onChange={set("location")} /></div>
+                                            <div><label style={label}>City</label><input style={field} value={form.city} onChange={set("city")} /></div>
+                          <div><label style={label}>Postcode</label><input style={field} value={form.postcode} onChange={set("postcode")} /></div>
+                          <div><label style={label}>Country</label><input style={field} value={form.country} onChange={set("country")} /></div>
               <div><label style={label}>Years of experience</label>
                 <select style={field} value={form.experience} onChange={set("experience")}>
                   <option value="">Select&hellip;</option>
