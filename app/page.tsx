@@ -16,16 +16,39 @@ const COUNTRIES = ["New Zealand", "Australia", "United States", "Canada", "Unite
 export default function Page() {
   const [form, setForm] = useState({
                     fullName: "", email: "", phone: "", city: "", postcode: "", country: "", countryCode: "+64 New Zealand",
-    experience: "", registration: "", about: "", otherSpeciality: "",
+    experience: "", registration: "", about: "", otherSpeciality: "", photoUrl: "",
   });
   const [specialities, setSpecialities] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
+    const [photoUploading, setPhotoUploading] = useState(false);
+    const [photoName, setPhotoName] = useState("");
 
   const set = (k: string) => (e: any) => setForm((f) => ({ ...f, [k]: e.target.value }));
   const toggleSpec = (s: string) =>
     setSpecialities((p) => (p.includes(s) ? p.filter((x) => x !== s) : [...p, s]));
+    async function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (!["image/jpeg", "image/png"].includes(file.type)) { setError("Photo must be a JPG or PNG."); return; }
+        if (file.size > 5 * 1024 * 1024) { setError("Photo must be under 5 MB."); return; }
+        const dims = await new Promise<{ w: number; h: number }>((resolve) => { const img = new Image(); img.onload = () => resolve({ w: img.width, h: img.height }); img.src = URL.createObjectURL(file); });
+        if (dims.w < 600 || dims.h < 600) { setError("Photo must be at least 600x600 pixels."); return; }
+        setError("");
+        setPhotoUploading(true);
+        try {
+            const res = await fetch("/api/upload", { method: "POST", headers: { "Content-Type": file.type, "x-filename": file.name }, body: file });
+            if (!res.ok) throw new Error("failed");
+            const { url } = await res.json();
+            setForm((f) => ({ ...f, photoUrl: url }));
+            setPhotoName(file.name);
+        } catch {
+            setError("Photo upload failed. Please try again.");
+        } finally {
+            setPhotoUploading(false);
+        }
+    }
 
   async function submit() {
                     if (!form.fullName || !form.email || !form.phone || !form.city || !form.postcode || !form.country || !form.experience || !form.registration || !form.about || specialities.length === 0) {
@@ -121,6 +144,13 @@ export default function Page() {
               <label style={label}>Tell us about your coaching</label>
               <textarea style={{ ...field, minHeight: 120, resize: "vertical" }} placeholder="Your approach, who you work best with, and what a first session feels like." value={form.about} onChange={set("about")} />
             </div>
+              <div style={{ marginBottom: 32 }}>
+                  <label style={label}>Upload your picture</label>
+                  <p style={{ color: "var(--muted)", fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>Black and white photos only. Please upload a clear, recent headshot on a neutral background, JPG or PNG, at least 600x600 pixels, under 5 MB.</p>
+                  <input type="file" accept="image/png, image/jpeg" onChange={handlePhoto} style={field} />
+                  {photoUploading && <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 6 }}>Uploading...</p>}
+                  {form.photoUrl && !photoUploading && <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 6 }}>Uploaded: {photoName}</p>}
+              </div>
 
             {error && <p style={{ color: "#a33", marginBottom: 16 }}>{error}</p>}
 
