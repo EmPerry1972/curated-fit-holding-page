@@ -12,6 +12,7 @@ export async function POST(request) {
 
     const fields = {
       "Name": data.fullName || "",
+      ...(data.photoUrl ? { "Attachments": [{ url: data.photoUrl }] } : {}),
       "Email": data.email || "",
       "Phone": data.phone || "",
       "Country code": data.countryCode || "",
