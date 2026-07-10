@@ -22,6 +22,7 @@ export async function POST(request) {
       "Registration": data.registration || "",
       "Specialities": Array.isArray(data.specialities) ? data.specialities.join(", ") : (data.specialities || ""),
       "About": data.about || "",
+      "Other speciality": data.otherSpeciality || "",
     };
 
     const res = await fetch(
