@@ -5,7 +5,7 @@ import { useState } from "react";
 const SPECIALITIES = [
     "Build strength and muscle", "Lose fat, change composition",
     "GLP-1 exercise support programme", "General fitness and health",
-    "Recover from injury", "Mobility and longevity",
+    "Recover from injury", "Mobility and longevity", "Other",
 ];
 
 const EXPERIENCE = ["Less than 2 years", "2\u20135 years", "5\u201310 years", "10+ years"];
@@ -15,7 +15,7 @@ const COUNTRY_CODES = ["+64 New Zealand", "+61 Australia", "+1 US / Canada", "+4
 export default function Page() {
   const [form, setForm] = useState({
                     fullName: "", email: "", phone: "", city: "", postcode: "", country: "", countryCode: "+64 New Zealand",
-    experience: "", registration: "", about: "",
+    experience: "", registration: "", about: "", otherSpeciality: "",
   });
   const [specialities, setSpecialities] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -31,6 +31,7 @@ export default function Page() {
                             setError("Please complete all fields before submitting.");
       return;
     }
+      if (specialities.includes("Other") && !form.otherSpeciality) { setError("Please add your other speciality."); return; }
     setSubmitting(true);
     setError("");
     try {
