@@ -33,8 +33,8 @@ export default function Page() {
         if (!file) return;
         if (!["image/jpeg", "image/png"].includes(file.type)) { setError("Photo must be a JPG or PNG."); return; }
         if (file.size > 5 * 1024 * 1024) { setError("Photo must be under 5 MB."); return; }
-        const dims = await new Promise<{ w: number; h: number }>((resolve) => { const img = new Image(); img.onload = () => resolve({ w: img.width, h: img.height }); img.src = URL.createObjectURL(file); });
-        if (dims.w < 600 || dims.h < 600) { setError("Photo must be at least 600x600 pixels."); return; }
+        const imgEl = await new Promise<HTMLImageElement>((resolve) => { const img = new Image(); img.onload = () => resolve(img); img.src = URL.createObjectURL(file); }); const dims = { w: imgEl.width, h: imgEl.height };
+        if (dims.w < 600 || dims.h < 600) { setError("Photo must be at least 600x600 pixels."); return; } const sc = 80; const cv = document.createElement("canvas"); cv.width = sc; cv.height = sc; const cx = cv.getContext("2d"); let colourPct = 0; if (cx) { cx.drawImage(imgEl, 0, 0, sc, sc); const d = cx.getImageData(0, 0, sc, sc).data; let coloured = 0; const total = sc * sc; for (let i = 0; i < d.length; i += 4) { const mx = Math.max(d[i], d[i + 1], d[i + 2]); const mn = Math.min(d[i], d[i + 1], d[i + 2]); if (mx - mn > 28) coloured++; } colourPct = coloured / total; } if (colourPct > 0.12) { setError("Photo must be black and white. Please upload a greyscale headshot."); return; }
         setError("");
         setPhotoUploading(true);
         try {
