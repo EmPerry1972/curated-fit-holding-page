@@ -11,6 +11,7 @@ const SPECIALITIES = [
 const EXPERIENCE = ["Less than 2 years", "2\u20135 years", "5\u201310 years", "10+ years"];
 const REGISTRATION = ["Yes - REPs registered", "Yes - other recognised body", "Not yet"];
 const COUNTRY_CODES = ["+64 New Zealand", "+61 Australia", "+1 US / Canada", "+44 United Kingdom", "+353 Ireland", "+91 India", "+27 South Africa", "+65 Singapore", "+971 UAE", "+49 Germany", "+33 France", "+81 Japan", "+86 China", "+55 Brazil", "+52 Mexico", "+31 Netherlands", "+46 Sweden", "+41 Switzerland", "+34 Spain", "+39 Italy", "Other"];
+const COUNTRIES = ["New Zealand", "Australia", "United States", "Canada", "United Kingdom", "Ireland", "India", "South Africa", "Singapore", "United Arab Emirates", "Germany", "France", "Japan", "China", "Brazil", "Mexico", "Netherlands", "Sweden", "Switzerland", "Spain", "Italy", "Other"];
 
 export default function Page() {
   const [form, setForm] = useState({
@@ -91,7 +92,7 @@ export default function Page() {
                 <div><label style={label}>Phone</label><input style={field} type="tel" value={form.phone} onChange={set("phone")} /></div>
                                             <div><label style={label}>City</label><input style={field} value={form.city} onChange={set("city")} /></div>
                           <div><label style={label}>Postcode</label><input style={field} value={form.postcode} onChange={set("postcode")} /></div>
-                          <div><label style={label}>Country</label><input style={field} value={form.country} onChange={set("country")} /></div>
+                          <div><label style={label}>Country</label><select style={field} value={form.country} onChange={set("country")}><option value="">Select&hellip;</option>{COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}</select></div>
               <div><label style={label}>Years of experience</label>
                 <select style={field} value={form.experience} onChange={set("experience")}>
                   <option value="">Select&hellip;</option>
@@ -113,6 +114,7 @@ export default function Page() {
                   <button type="button" key={s} style={pill(specialities.includes(s))} onClick={() => toggleSpec(s)}>{s}</button>
                 ))}
               </div>
+                {specialities.includes("Other") && <input style={{ ...field, marginTop: 10 }} placeholder="Please specify your speciality" value={form.otherSpeciality} onChange={set("otherSpeciality")} />}
             </div>
 
             <div style={{ marginBottom: 32 }}>
