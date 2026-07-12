@@ -66,25 +66,25 @@ export default function Page() {
     about: "",
     otherSpeciality: "",
   });
-  const [specialities, setSpecialities] = useState([]);
-  const [formats, setFormats] = useState([]);
+  const [specialities, setSpecialities] = useState<string[]>([]);
+  const [formats, setFormats] = useState<string[]>([]);
   const [consent, setConsent] = useState(false);
   const [marketing, setMarketing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
   const [photoName, setPhotoName] = useState("");
   const [photoUploading, setPhotoUploading] = useState(false);
   const formRef = useRef<any>(null);
 
-  const set = (k, val) => setForm((f) => ({ ...f, [k]: val }));
+  const set = (k: string, val: any) => setForm((f) => ({ ...f, [k]: val }));
 
-  const toggle = (list, setList, value) =>
-    setList((cur) => (cur.includes(value) ? cur.filter((x) => x !== value) : [...cur, value]));
+  const toggle = (list: string[], setList: any, value: string) =>
+    setList((cur: string[]) => (cur.includes(value) ? cur.filter((x) => x !== value) : [...cur, value]));
 
-  const track = (event) => {
+  const track = (event: string) => {
     try {
       if (typeof window !== "undefined" && typeof (window as any).gtag === "function") (window as any).gtag("event", event);
     } catch (e) {}
@@ -96,7 +96,7 @@ export default function Page() {
   };
 
 
-  async function onFile(e) {
+  async function onFile(e: any) {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
     setErrors((x) => ({ ...x, photo: "" }));
@@ -127,7 +127,7 @@ export default function Page() {
   }
 
   function validate() {
-    const next = {};
+    const next: Record<string, string> = {};
     if (!form.fullName.trim()) next.fullName = "Please enter your full name.";
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email.trim())) next.email = "Please enter a valid email address.";
     const digits = form.phone.replace(/[^0-9]/g, "");
@@ -150,7 +150,7 @@ export default function Page() {
   }
 
 
-  async function submit(e) {
+  async function submit(e: any) {
     e.preventDefault();
     setFormError("");
     const next = validate();
