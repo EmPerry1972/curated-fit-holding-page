@@ -104,7 +104,7 @@ export default function Page() {
           <>
             <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)", marginBottom: 20 }}>Apply as a trainer</p>
             <h1 style={{ fontFamily: "var(--font-serif), serif", fontSize: 66, lineHeight: 1.05, fontWeight: 500, marginBottom: 24 }}>A carefully selected standard.</h1>
-                        <p style={{ fontSize: 20, lineHeight: 1.6, color: "var(--muted)", maxWidth: 620, marginBottom: 20 }}>Curated Fit is building a selected network of exercise professionals for women who want the right support for how they exercise, live, and want to fee</p>p>
+                        <p style={{ fontSize: 20, lineHeight: 1.6, color: "var(--muted)", maxWidth: 620, marginBottom: 20 }}>Curated Fit is building a selected network of exercise professionals for women who want the right support for how they exercise, live, and want to feel.</p>
               <p style={{ fontSize: 20, lineHeight: 1.6, color: "var(--muted)", maxWidth: 620, marginBottom: 20 }}>We welcome applications from experienced professionals who provide thoughtful, individual support. Every application is reviewed against one consistent Curated standard.</p>
               <p style={{ fontSize: 20, lineHeight: 1.6, color: "var(--muted)", maxWidth: 620, marginBottom: 48 }}>If your experience and approach align with Curated Fit, we will contact you to complete your professional profile.</p>
 
