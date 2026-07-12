@@ -77,7 +77,7 @@ export default function Page() {
   const [photoUrl, setPhotoUrl] = useState("");
   const [photoName, setPhotoName] = useState("");
   const [photoUploading, setPhotoUploading] = useState(false);
-  const formRef = useRef(null);
+  const formRef = useRef<any>(null);
 
   const set = (k, val) => setForm((f) => ({ ...f, [k]: val }));
 
@@ -86,7 +86,7 @@ export default function Page() {
 
   const track = (event) => {
     try {
-      if (typeof window !== "undefined" && typeof window.gtag === "function") window.gtag("event", event);
+      if (typeof window !== "undefined" && typeof (window as any).gtag === "function") (window as any).gtag("event", event);
     } catch (e) {}
   };
 
