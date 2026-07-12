@@ -293,7 +293,7 @@ export default function Page() {
             <span style={{ display: "flex", gap: 20 }}>
               <a href="/privacy">Privacy Policy</a>
               <a href="/terms">Terms</a>
-              <a href="mailto:hello@curatedfit.co.nz">Contact</a>
+              <a href="mailto:emma@curatedfit.co.nz">Contact</a>
             </span>
           </div>
         </footer>
@@ -643,7 +643,7 @@ export default function Page() {
           <span style={{ display: "flex", gap: 20 }}>
             <a href="/privacy">Privacy Policy</a>
             <a href="/terms">Terms</a>
-            <a href="mailto:hello@curatedfit.co.nz">Contact</a>
+            <a href="mailto:emma@curatedfit.co.nz">Contact</a>
           </span>
         </div>
       </footer>
