@@ -6,8 +6,9 @@ const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" });
 const fraunces = Fraunces({ subsets: ["latin"], weight: ["500", "600"], variable: "--font-serif" });
 
 export const metadata: Metadata = {
-  title: "Curated Fit — Join the waitlist",
-  description: "We work with a small number of vetted coaches held to one Curated standard. Join the waitlist.",
+  title: "Apply as an Exercise Professional | Curated Fit",
+  description:
+    "Apply to join Curated Fit's selected network of exercise professionals. Considered profiles and matched introductions ahead of the Auckland launch.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
