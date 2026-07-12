@@ -104,9 +104,9 @@ export default function Page() {
           <>
             <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)", marginBottom: 20 }}>Apply as a trainer</p>
             <h1 style={{ fontFamily: "var(--font-serif), serif", fontSize: 66, lineHeight: 1.05, fontWeight: 500, marginBottom: 24 }}>A carefully selected standard.</h1>
-            <p style={{ fontSize: 20, lineHeight: 1.6, color: "var(--muted)", maxWidth: 620, marginBottom: 48 }}>
-              Curated Fit works with a limited number of selected exercise professionals, each considered against one clear standard. Join the waitlist and we'll be in touch if it is the right fit.
-            </p>
+                        <p style={{ fontSize: 20, lineHeight: 1.6, color: "var(--muted)", maxWidth: 620, marginBottom: 20 }}>Curated Fit is building a selected network of exercise professionals for women who want the right support for how they exercise, live, and want to fee</p>p>
+              <p style={{ fontSize: 20, lineHeight: 1.6, color: "var(--muted)", maxWidth: 620, marginBottom: 20 }}>We welcome applications from experienced professionals who provide thoughtful, individual support. Every application is reviewed against one consistent Curated standard.</p>
+              <p style={{ fontSize: 20, lineHeight: 1.6, color: "var(--muted)", maxWidth: 620, marginBottom: 48 }}>If your experience and approach align with Curated Fit, we will contact you to complete your professional profile.</p>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
               <div><label style={label}>Full name</label><input style={field} value={form.fullName} onChange={set("fullName")} /></div>
@@ -157,7 +157,7 @@ export default function Page() {
             <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
               <button type="button" onClick={submit} disabled={submitting}
                 style={{ background: "var(--ink)", color: "var(--field)", border: "none", borderRadius: 999, padding: "15px 26px", fontSize: 15, cursor: submitting ? "default" : "pointer", opacity: submitting ? 0.6 : 1, fontFamily: "inherit" }}>
-                {submitting ? "Submitting\u2026" : "Join the waitlist"}
+                  {submitting ? "Submitting\u2026" : "Apply to Curated Fit"}
               </button>
               <span style={{ color: "var(--muted)", fontSize: 14 }}>We review every application against one Curated standard.</span>
             </div>
