@@ -289,7 +289,7 @@ export default function Page() {
         </section>
         <footer style={{ borderTop: "1px solid var(--line)" }}>
           <div style={{ ...wrap, maxWidth: 1080, display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center", justifyContent: "space-between", padding: "28px 24px", fontSize: 14, color: "var(--muted)" }}>
-            <span>© {new Date().getFullYear()} Curated Fit · Founded in New Zealand</span>
+            <span>Â© {new Date().getFullYear()} Curated Fit Â· Founded in New Zealand</span>
             <span style={{ display: "flex", gap: 20 }}>
               <a href="/privacy">Privacy Policy</a>
               <a href="/terms">Terms</a>
@@ -305,7 +305,7 @@ export default function Page() {
   return (
     <main>
       <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 24px", maxWidth: 1080, margin: "0 auto" }}>
-        <img src="/logo.png" alt="Curated Fit" style={{ height: 26 }} />
+        <img src="/logo.png" alt="Curated Fit" style={{ height: 44 }} />
         <button type="button" onClick={scrollToForm} style={{ ...cta, padding: "10px 20px", fontSize: 14 }}>
           <span style={{ display: "none" }} className="cta-full">Apply to Curated Fit</span>
           <span>Apply to Curated Fit</span>
@@ -471,7 +471,7 @@ export default function Page() {
               <div data-field="experience">
                 <label htmlFor="experience" style={labelStyle}>Years of professional experience <span style={{ color: "var(--muted)" }}>*</span></label>
                 <select id="experience" style={field} value={form.experience} onChange={(e) => set("experience", e.target.value)}>
-                  <option value="">Select…</option>
+                  <option value="">Selectâ¦</option>
                   {EXPERIENCE.map((o) => <option key={o} value={o}>{o}</option>)}
                 </select>
                 {errors.experience && <p style={errStyle} role="alert">{errors.experience}</p>}
@@ -480,7 +480,7 @@ export default function Page() {
               <div data-field="registration">
                 <label htmlFor="registration" style={labelStyle}>Current registration body <span style={{ color: "var(--muted)" }}>*</span></label>
                 <select id="registration" style={field} value={form.registration} onChange={(e) => set("registration", e.target.value)}>
-                  <option value="">Select…</option>
+                  <option value="">Selectâ¦</option>
                   {REGISTRATION.map((o) => <option key={o} value={o}>{o}</option>)}
                 </select>
                 {errors.registration && <p style={errStyle} role="alert">{errors.registration}</p>}
@@ -509,7 +509,7 @@ export default function Page() {
               <div data-field="acceptingClients">
                 <label htmlFor="acceptingClients" style={labelStyle}>Currently accepting new clients <span style={{ color: "var(--muted)" }}>*</span></label>
                 <select id="acceptingClients" style={field} value={form.acceptingClients} onChange={(e) => set("acceptingClients", e.target.value)}>
-                  <option value="">Select…</option>
+                  <option value="">Selectâ¦</option>
                   {AVAILABILITY.map((o) => <option key={o} value={o}>{o}</option>)}
                 </select>
                 {errors.acceptingClients && <p style={errStyle} role="alert">{errors.acceptingClients}</p>}
@@ -563,7 +563,7 @@ export default function Page() {
                 <label htmlFor="photo" style={labelStyle}>Professional headshot</label>
                 <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 8 }}>Upload a recent head-and-shoulders photograph with a clean, uncluttered background. The image should clearly show your face and be suitable for a professional Curated Fit profile.</p>
                 <input id="photo" type="file" accept="image/jpeg,image/jpg,image/png,image/webp" onChange={onFile} style={{ fontFamily: "inherit", fontSize: 14 }} />
-                {photoUploading && <p style={{ fontSize: 13, color: "var(--muted)", marginTop: 8 }}>Uploading…</p>}
+                {photoUploading && <p style={{ fontSize: 13, color: "var(--muted)", marginTop: 8 }}>Uploadingâ¦</p>}
                 {photoName && !photoUploading && <p style={{ fontSize: 13, color: "var(--muted)", marginTop: 8 }}>Uploaded: {photoName}</p>}
                 {errors.photo && <p style={errStyle} role="alert">{errors.photo}</p>}
               </div>
@@ -583,11 +583,11 @@ export default function Page() {
 
             <div style={{ display: "flex", flexWrap: "wrap", gap: "8px 20px", fontSize: 13, color: "var(--muted)" }}>
               <span>Individually reviewed applications</span>
-              <span>·</span>
+              <span>Â·</span>
               <span>Selected professionals only</span>
-              <span>·</span>
+              <span>Â·</span>
               <span>No paid rankings</span>
-              <span>·</span>
+              <span>Â·</span>
               <span>Founded in New Zealand</span>
             </div>
 
@@ -595,7 +595,7 @@ export default function Page() {
 
             <div>
               <button type="submit" disabled={submitting || photoUploading} style={{ ...cta, opacity: submitting || photoUploading ? 0.6 : 1 }}>
-                {submitting ? "Submitting…" : "Apply to Curated Fit"}
+                {submitting ? "Submittingâ¦" : "Apply to Curated Fit"}
               </button>
             </div>
           </form>
@@ -639,7 +639,7 @@ export default function Page() {
 
       <footer style={{ borderTop: "1px solid var(--line)" }}>
         <div style={{ maxWidth: 1080, margin: "0 auto", display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center", justifyContent: "space-between", padding: "28px 24px", fontSize: 14, color: "var(--muted)" }}>
-          <span>© {new Date().getFullYear()} Curated Fit · Founded in New Zealand</span>
+          <span>Â© {new Date().getFullYear()} Curated Fit Â· Founded in New Zealand</span>
           <span style={{ display: "flex", gap: 20 }}>
             <a href="/privacy">Privacy Policy</a>
             <a href="/terms">Terms</a>
