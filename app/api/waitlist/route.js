@@ -1,13 +1,13 @@
-export async function POST(request) {
+export async function POST(req) {
   try {
-    const data = await request.json();
+    const data = await req.json();
 
     const baseId = process.env.AIRTABLE_BASE_ID;
     const token = process.env.AIRTABLE_TOKEN;
     const table = "Waitlist";
 
     if (!baseId || !token) {
-      return Response.json({ error: "Server not configured" }, { status: 500 });
+      return Response.json({ error: "Server not configured." }, { status: 500 });
     }
 
     const fields = {
@@ -15,15 +15,27 @@ export async function POST(request) {
       ...(data.photoUrl ? { "Attachments": [{ url: data.photoUrl }] } : {}),
       "Email": data.email || "",
       "Phone": data.phone || "",
-      "Country code": data.countryCode || "",
-          "City": data.city || "",
-      "Postcode": data.postcode || "",
-      "Country": data.country || "",
+      "City": data.city || "",
+      "Area": data.area || "",
+      "Website": data.website || "",
+      "Instagram": data.instagram || "",
       "Experience": data.experience || "",
       "Registration": data.registration || "",
+      "Registration number": data.registrationNumber || "",
+      "Qualifications": data.qualifications || "",
+      "Insurance": data.insurance || "",
+      "Accepting clients": data.acceptingClients || "",
+      "Working locations": data.workingLocations || "",
+      "Working formats": Array.isArray(data.workingFormats) ? data.workingFormats.join(", ") : (data.workingFormats || ""),
       "Specialities": Array.isArray(data.specialities) ? data.specialities.join(", ") : (data.specialities || ""),
-      "About": data.about || "",
       "Other speciality": data.otherSpeciality || "",
+      "About": data.about || "",
+      "Status": data.status || "New",
+      "Source": data.source || "Curated Fit professional landing page",
+      "Consent": data.consent ? "Yes" : "No",
+      "Consent timestamp": data.consentAt || new Date().toISOString(),
+      "Marketing consent": data.marketing ? "Yes" : "No",
+      "Submitted at": new Date().toISOString(),
     };
 
     const res = await fetch(
@@ -34,7 +46,7 @@ export async function POST(request) {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ records: [{ fields }], typecast: true }),
+        body: JSON.stringify({ fields, typecast: true }),
       }
     );
 
@@ -44,7 +56,7 @@ export async function POST(request) {
     }
 
     return Response.json({ ok: true });
-  } catch (err) {
-    return Response.json({ error: "Bad request" }, { status: 400 });
+  } catch (e) {
+    return Response.json({ error: "Unexpected error" }, { status: 500 });
   }
 }
