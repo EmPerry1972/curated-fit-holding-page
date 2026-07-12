@@ -471,7 +471,7 @@ export default function Page() {
               <div data-field="experience">
                 <label htmlFor="experience" style={labelStyle}>Years of professional experience <span style={{ color: "var(--muted)" }}>*</span></label>
                 <select id="experience" style={field} value={form.experience} onChange={(e) => set("experience", e.target.value)}>
-                  <option value="">Selectâ¦</option>
+                  <option value="">Select…</option>
                   {EXPERIENCE.map((o) => <option key={o} value={o}>{o}</option>)}
                 </select>
                 {errors.experience && <p style={errStyle} role="alert">{errors.experience}</p>}
@@ -480,7 +480,7 @@ export default function Page() {
               <div data-field="registration">
                 <label htmlFor="registration" style={labelStyle}>Current registration body <span style={{ color: "var(--muted)" }}>*</span></label>
                 <select id="registration" style={field} value={form.registration} onChange={(e) => set("registration", e.target.value)}>
-                  <option value="">Selectâ¦</option>
+                  <option value="">Select…</option>
                   {REGISTRATION.map((o) => <option key={o} value={o}>{o}</option>)}
                 </select>
                 {errors.registration && <p style={errStyle} role="alert">{errors.registration}</p>}
@@ -509,7 +509,7 @@ export default function Page() {
               <div data-field="acceptingClients">
                 <label htmlFor="acceptingClients" style={labelStyle}>Currently accepting new clients <span style={{ color: "var(--muted)" }}>*</span></label>
                 <select id="acceptingClients" style={field} value={form.acceptingClients} onChange={(e) => set("acceptingClients", e.target.value)}>
-                  <option value="">Selectâ¦</option>
+                  <option value="">Select…</option>
                   {AVAILABILITY.map((o) => <option key={o} value={o}>{o}</option>)}
                 </select>
                 {errors.acceptingClients && <p style={errStyle} role="alert">{errors.acceptingClients}</p>}
@@ -563,7 +563,7 @@ export default function Page() {
                 <label htmlFor="photo" style={labelStyle}>Professional headshot</label>
                 <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 8 }}>Upload a recent head-and-shoulders photograph with a clean, uncluttered background. The image should clearly show your face and be suitable for a professional Curated Fit profile.</p>
                 <input id="photo" type="file" accept="image/jpeg,image/jpg,image/png,image/webp" onChange={onFile} style={{ fontFamily: "inherit", fontSize: 14 }} />
-                {photoUploading && <p style={{ fontSize: 13, color: "var(--muted)", marginTop: 8 }}>Uploadingâ¦</p>}
+                {photoUploading && <p style={{ fontSize: 13, color: "var(--muted)", marginTop: 8 }}>Uploading…</p>}
                 {photoName && !photoUploading && <p style={{ fontSize: 13, color: "var(--muted)", marginTop: 8 }}>Uploaded: {photoName}</p>}
                 {errors.photo && <p style={errStyle} role="alert">{errors.photo}</p>}
               </div>
@@ -595,7 +595,7 @@ export default function Page() {
 
             <div>
               <button type="submit" disabled={submitting || photoUploading} style={{ ...cta, opacity: submitting || photoUploading ? 0.6 : 1 }}>
-                {submitting ? "Submittingâ¦" : "Apply to Curated Fit"}
+                {submitting ? "Submitting…" : "Apply to Curated Fit"}
               </button>
             </div>
           </form>
