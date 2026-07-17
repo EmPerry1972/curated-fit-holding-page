@@ -79,15 +79,22 @@ async function sendConfirmationEmail(data) {
     return;
   }
 
-  const applicantName = data.fullName || "there";
+  const fullName = (data.fullName || "").trim();
+  const firstName = fullName ? fullName.split(/\s+/)[0] : "there";
 
   const html = `
     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111;">
-      <h2>Thanks for applying to Curated Fit</h2>
-      <p>Hi ${applicantName},</p>
-      <p>We've received your application to join Curated Fit as a coach. Our team will review your details and be in touch soon.</p>
-      <p>If you need to update anything, just reply to this email.</p>
-      <p>— The Curated Fit team</p>
+      <h2 style="margin-bottom: 16px;">One step closer to joining Curated Fit</h2>
+      <p>Hi ${firstName},</p>
+      <p>Thank you for applying to join Curated Fit.</p>
+      <p>We are bringing together a considered group of exercise professionals who care about doing the best by their clients and understand that the right fit can make all the difference.</p>
+      <p>Curated Fit is designed to help women find an exercise professional who suits how they want to exercise, live and feel, while giving exceptional professionals greater visibility with the clients they are best placed to support.</p>
+      <p>We are working towards going live by the end of August and will be in touch shortly once we have reviewed your application.</p>
+      <p>At this early stage, Curated Fit is growing organically, and your feedback is not only welcome, it is encouraged. We want to build this alongside the professionals who will be part of it, so please tell us what would make the service more useful, relevant and valuable to you and your clients.</p>
+      <p>Please also feel free to share Curated Fit with other like-minded exercise professionals who you believe would be a strong fit.</p>
+      <p>If you need to update anything in your application, simply reply to this email.</p>
+      <p>Warmly,</p>
+      <p>The Curated Fit team</p>
     </div>
   `;
 
@@ -100,7 +107,7 @@ async function sendConfirmationEmail(data) {
     body: JSON.stringify({
       from: fromAddress,
       to: applicantEmail,
-      subject: "We've received your Curated Fit application",
+      subject: "One step closer to joining Curated Fit",
       html,
     }),
   });
