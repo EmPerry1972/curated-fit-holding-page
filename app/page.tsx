@@ -611,7 +611,7 @@ export default function Page() {
           <div style={{ marginTop: 24 }}>
             <details style={{ borderTop: "1px solid var(--line)", padding: "18px 0" }}>
               <summary style={{ cursor: "pointer", fontFamily: serif, fontWeight: 500, fontSize: 18, color: "var(--ink)", listStyle: "none" }}>Is there a joining fee?</summary>
-              <p style={{ ...body, marginTop: 12 }}>There is no joining fee or monthly listing fee during the Curated Fit launch stage. Any future commercial changes will be communicated clearly before they take effect.</p>
+              <p style={{ ...body, marginTop: 12 }}>No — there is no cost to join or to be listed on Curated Fit. It's free for exercise professionals, and we'll always be upfront and transparent with you about anything to do with fees.</p>
             </details>
             <details style={{ borderTop: "1px solid var(--line)", padding: "18px 0" }}>
               <summary style={{ cursor: "pointer", fontFamily: serif, fontWeight: 500, fontSize: 18, color: "var(--ink)", listStyle: "none" }}>How are professionals selected?</summary>
