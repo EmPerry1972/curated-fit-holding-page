@@ -339,8 +339,8 @@ export default function Page() {
               <p style={body}>No bidding, no paid ranking. Introductions are based on each woman's goals, lifestyle and stage of life — so the fit is real before the first conversation.</p>
             </div>
             <div>
-              <h3 style={h3}>No launch fees</h3>
-              <p style={body}>No joining fee and no monthly listing fee during the launch stage. You're here on merit, not spend.</p>
+              <h3 style={h3}>No fees</h3>
+              <p style={body}>You're here on merit, not spend.</p>
             </div>
             <div>
               <h3 style={h3}>A selected network</h3>
