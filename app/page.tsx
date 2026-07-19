@@ -318,7 +318,7 @@ export default function Page() {
         <p style={eyebrow}>Applications now open</p>
         <h1 style={h1}>Selected professionals. Considered introductions.</h1>
         <p style={{ ...body, marginTop: 22, maxWidth: 620, marginLeft: "auto", marginRight: "auto" }}>
-          Curated Fit introduces you to women who are ready to begin strength training — including many who would never have walked into a gym to find you. We understand each woman first: her goals, her confidence, where she wants to train and the kind of professional she'll respond to. Then we introduce her to someone genuinely suited to help. We're currently inviting Auckland professionals to apply ahead of launch.
+          Curated Fit introduces you to women who are ready to find an exercise professional — including many who would never have walked into a gym to find you. We understand each woman first: her goals, her confidence, where she wants to train and the kind of professional she'll respond to. Then we introduce her to someone genuinely suited to help. We're currently inviting Auckland professionals to apply ahead of launch.
         </p>
         <div style={{ marginTop: 30 }}>
           <button type="button" onClick={scrollToForm} style={cta}>Apply to Curated Fit</button>
@@ -598,7 +598,7 @@ export default function Page() {
           <div style={{ marginTop: 24 }}>
             <details style={{ borderTop: "1px solid var(--line)", padding: "18px 0" }}>
               <summary style={{ cursor: "pointer", fontFamily: serif, fontWeight: 500, fontSize: 18, color: "var(--ink)", listStyle: "none" }}>Is there a joining fee?</summary>
-              <p style={{ ...body, marginTop: 12 }}>No, it's free to apply and be listed with Curated Fit</p>
+              <p style={{ ...body, marginTop: 12 }}>No. Curated Fit has no joining fee and no listing fee — it's free to apply and to be part of the network.</p>
             </details>
             <details style={{ borderTop: "1px solid var(--line)", padding: "18px 0" }}>
               <summary style={{ cursor: "pointer", fontFamily: serif, fontWeight: 500, fontSize: 18, color: "var(--ink)", listStyle: "none" }}>How are professionals selected?</summary>
