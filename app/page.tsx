@@ -213,17 +213,19 @@ export default function Page() {
 
 
   const serif = "var(--font-serif), Fraunces, Georgia, serif";
+  const mono = "var(--font-mono), 'Space Mono', ui-monospace, monospace";
   const wrap = { maxWidth: 780, margin: "0 auto", padding: "0 24px" };
   const eyebrow = {
-    fontSize: 13,
+    fontFamily: mono,
+    fontSize: 11,
     letterSpacing: "0.14em",
     textTransform: "uppercase",
-    color: "var(--muted)",
+    color: "#655F57",   
     marginBottom: 16,
   };
-  const h1 = { fontFamily: serif, fontWeight: 600, fontSize: "clamp(30px, 5vw, 46px)", lineHeight: 1.12, color: "var(--ink)" };
-  const h2 = { fontFamily: serif, fontWeight: 600, fontSize: "clamp(24px, 3.4vw, 32px)", lineHeight: 1.18, color: "var(--ink)" };
-  const h3 = { fontFamily: serif, fontWeight: 500, fontSize: 19, color: "var(--ink)", marginBottom: 8 };
+  const h1 = { fontFamily: serif, fontWeight: 300, letterSpacing: "0.005em", fontSize: "clamp(30px, 5vw, 46px)", lineHeight: 1.12, color: "var(--ink)" };
+  const h2 = { fontFamily: serif, fontWeight: 300, letterSpacing: "0.005em", fontSize: "clamp(24px, 3.4vw, 32px)", lineHeight: 1.18, color: "var(--ink)" };
+  const h3 = { fontFamily: serif, fontWeight: 300, fontSize: 19, color: "var(--ink)", marginBottom: 8 };
   const body = { fontSize: 17, lineHeight: 1.7, color: "var(--muted)" };
   const sectionPad = { padding: "clamp(56px, 8vw, 88px) 0" };
   const divider = { height: 1, background: "var(--line)", border: 0 };
