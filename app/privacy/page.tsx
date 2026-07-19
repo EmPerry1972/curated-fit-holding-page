@@ -8,8 +8,9 @@ export const metadata: Metadata = {
 
 const wrap = { maxWidth: 780, margin: "0 auto", padding: "0 24px" };
 const serif = "var(--font-serif), Fraunces, Georgia, serif";
-const h1 = { fontFamily: serif, fontWeight: 600, fontSize: "clamp(28px, 4.5vw, 40px)", lineHeight: 1.15, color: "var(--ink)" };
-const h2 = { fontFamily: serif, fontWeight: 500, fontSize: 21, color: "var(--ink)", margin: "34px 0 10px" };
+const mono = "var(--font-mono), 'Space Mono', ui-monospace, monospace";
+const h1 = { fontFamily: serif, fontWeight: 300, letterSpacing: "0.005em", fontSize: "clamp(28px, 4.5vw, 40px)", lineHeight: 1.15, color: "var(--ink)" };
+const h2 = { fontFamily: serif, fontWeight: 300, letterSpacing: "0.005em", fontSize: 21, color: "var(--ink)", margin: "34px 0 10px" };
 const body = { fontSize: 16, lineHeight: 1.7, color: "var(--muted)", marginBottom: 14 };
 
 export default function PrivacyPage() {
@@ -21,7 +22,7 @@ export default function PrivacyPage() {
       </nav>
 
       <section style={{ ...wrap, padding: "clamp(48px, 8vw, 80px) 24px" }}>
-        <p style={{ fontSize: 13, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 16 }}>Curated Fit</p>
+        <p style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: #655F57", marginBottom: 16 }}>Curated Fit</p>
         <h1 style={h1}>Privacy Policy</h1>
         <p style={{ ...body, marginTop: 20 }}>
           This policy explains how Curated Fit collects, uses, and protects the information you provide when
