@@ -331,10 +331,7 @@ export default function Page() {
         <div style={wrap}>
           <h2 style={h2}>A more considered professional network</h2>
           <p style={{ ...body, marginTop: 18 }}>
-            Curated Fit is not a paid directory. We take the time to understand who you work best with,
-            how you support clients, where you work, and what makes an introduction appropriate. Approved
-            professionals receive a considered Curated Fit profile and become eligible for matched
-            introductions as the platform launches. There is no joining or listing fee during the launch stage.
+            Curated Fit helps you reach the clients your work is genuinely built for — including women who may never have had the confidence, information or motivation to seek professional support. By creating alignment before the first conversation, we make introductions that are more likely to become lasting, meaningful working relationships. We manage the marketing and matching, so you can focus on what you do best.
           </p>
         </div>
       </section>
