@@ -318,9 +318,7 @@ export default function Page() {
         <p style={eyebrow}>Applications now open</p>
         <h1 style={h1}>Selected professionals. Considered introductions.</h1>
         <p style={{ ...body, marginTop: 22, maxWidth: 620, marginLeft: "auto", marginRight: "auto" }}>
-          Curated Fit is building a selected network of exercise professionals for women who want a more
-          considered way to choose the right support. We are currently inviting Auckland professionals to
-          apply ahead of launch.
+          Curated Fit introduces you to women who are ready to begin strength training — including many who would never have walked into a gym to find you. We understand each woman first: her goals, her confidence, where she wants to train and the kind of professional she'll respond to. Then we introduce her to someone genuinely suited to help. We're currently inviting Auckland professionals to apply ahead of launch.
         </p>
         <div style={{ marginTop: 30 }}>
           <button type="button" onClick={scrollToForm} style={cta}>Apply to Curated Fit</button>
@@ -334,7 +332,7 @@ export default function Page() {
             Curated Fit helps you reach the clients your work is genuinely built for — including women who may never have had the confidence, information or motivation to seek professional support. By creating alignment before the first conversation, we make introductions that are more likely to become lasting, meaningful working relationships. We manage the marketing and matching, so you can focus on what you do best.
           </p>
         </div>
-      </section>
+      </section>      <hr style={divider} />      <section style={sectionPad}>        <div style={wrap}>          <h2 style={h2}>Who you'll be introduced to</h2>          <p style={{ ...body, marginTop: 18 }}>            She's active in everyday life — walking, gardening, golf — but often isn't doing the strength work needed to maintain muscle as she ages. Strength can sound like heavy weights and unfamiliar equipment, and she may feel unsure where to start or worried about injury. Curated Fit gives her a clearer way in, and introduces her to a professional who suits how she wants to train. Knowing this before the first conversation means you meet clients who are ready, informed and a genuine fit for your expertise.          </p>        </div>      <hr style={divider} />      <section style={sectionPad}>        <div style={wrap}>          <h2 style={h2}>Who you'll be introduced to</h2>          <p style={{ ...body, marginTop: 18 }}>            She's active in everyday life — walking, gardening, golf — but often isn't doing the strength work needed to maintain muscle as she ages. Strength can sound like heavy weights and unfamiliar equipment, and she may feel unsure where to start or worried about injury. Curated Fit gives her a clearer way in, and introduces her to a professional who suits how she wants to train. Knowing this before the first conversation means you meet clients who are ready, informed and a genuine fit for your expertise.      <hr style={divider} />      <section style={sectionPad}>        <div style={wrap}>          <h2 style={h2}>Who you'll be introduced to</h2>      <hr style={divider} />      <section style={sectionPad}>      <hr style={divider} />
 
       <hr style={divider} />
 
@@ -344,19 +342,19 @@ export default function Page() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "32px 48px", marginTop: 34 }}>
             <div>
               <h3 style={h3}>Professionally positioned</h3>
-              <p style={body}>We create a considered Curated Fit profile that clearly explains who you work best with and how you support them.</p>
+              <p style={body}>Not a listing. A considered profile that explains who you work best with, how you support them, and why an introduction makes sense.</p>
             </div>
             <div>
               <h3 style={h3}>Matched introductions</h3>
-              <p style={body}>Introductions are based on the woman's goals, preferences, lifestyle, and stage of life, not advertising spend or paid ranking.</p>
+              <p style={body}>No bidding, no paid ranking. Introductions are based on each woman's goals, lifestyle and stage of life — so the fit is real before the first conversation.</p>
             </div>
             <div>
               <h3 style={h3}>No launch fees</h3>
-              <p style={body}>There is no joining fee or monthly listing fee during the launch stage.</p>
+              <p style={body}>No joining fee and no monthly listing fee during the launch stage. You're here on merit, not spend.</p>
             </div>
             <div>
               <h3 style={h3}>A selected network</h3>
-              <p style={body}>Applications are reviewed individually to protect the quality and credibility of the Curated Fit experience.</p>
+              <p style={body}>Every application is reviewed individually. A smaller, considered network protects the quality and credibility of every introduction.</p>
             </div>
           </div>
         </div>
@@ -410,7 +408,7 @@ export default function Page() {
         <div style={wrap}>
           <h2 style={h2}>Apply to Curated Fit</h2>
           <p style={{ ...body, marginTop: 18 }}>
-            This initial application helps us understand your experience, professional standing, and areas
+            The better we understand you, the better we can match you. This initial application helps us understand your experience, professional standing, and areas
             of support. We only ask for the information needed to decide whether to invite you to the next
             stage. More detailed matching and payment information will only be requested after approval.
           </p>
