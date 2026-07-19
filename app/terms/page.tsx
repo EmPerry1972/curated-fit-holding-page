@@ -71,7 +71,7 @@ export default function TermsPage() {
         <h2 style={h2}>Contact</h2>
         <p style={body}>
           For any questions about these terms, contact us at{" "}
-          <a href="mailto:hello@curatedfit.co.nz" style={{ textDecoration: "underline", color: "var(--ink)" }}>hello@curatedfit.co.nz</a>.
+          <a href="mailto:welcome@curatedfit.co.nz" style={{ textDecoration: "underline", color: "var(--ink)" }}>welcome@curatedfit.co.nz</a>.
         </p>
 
         <p style={{ ...body, marginTop: 30, fontSize: 14 }}>
@@ -85,7 +85,7 @@ export default function TermsPage() {
           <span style={{ display: "flex", gap: 20 }}>
             <Link href="/privacy">Privacy Policy</Link>
             <Link href="/terms">Terms</Link>
-            <a href="mailto:hello@curatedfit.co.nz">Contact</a>
+            <a href="mailto:welcome@curatedfit.co.nz">Contact</a>
           </span>
         </div>
       </footer>
