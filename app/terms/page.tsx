@@ -50,11 +50,9 @@ export default function TermsPage() {
           an introduction where your capacity, location, scope, or experience is not the right fit.
         </p>
 
-        <h2 style={h2}>No exclusivity and no launch fees</h2>
+        <h2 style={h2}>No exclusivity and no fees</h2>
         <p style={body}>
-          Curated Fit does not require professional exclusivity. There is no joining fee or monthly listing fee
-          during the launch stage. Any future commercial changes will be communicated clearly before they take
-          effect.
+          Curated Fit does not require professional exclusivity. There is no joining fee and no listing fee to be part of the network.
         </p>
 
         <h2 style={h2}>Your content</h2>
