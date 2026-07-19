@@ -68,7 +68,7 @@ export default function PrivacyPage() {
         <h2 style={h2}>Contact</h2>
         <p style={body}>
           For any privacy questions or requests, contact us at{" "}
-          <a href="mailto:emma@curatedfit.co.nz" style={{ textDecoration: "underline", color: "var(--ink)" }}>emma@curatedfit.co.nz</a>.
+          <a href="mailto:welcome@curatedfit.co.nz" style={{ textDecoration: "underline", color: "var(--ink)" }}>welcome@curatedfit.co.nz</a>.
         </p>
 
         <p style={{ ...body, marginTop: 30, fontSize: 14 }}>
@@ -82,7 +82,7 @@ export default function PrivacyPage() {
           <span style={{ display: "flex", gap: 20 }}>
             <Link href="/privacy">Privacy Policy</Link>
             <Link href="/terms">Terms</Link>
-            <a href="mailto:emma@curatedfit.co.nz">Contact</a>
+            <a href="mailto:welcome@curatedfit.co.nz">Contact</a>
           </span>
         </div>
       </footer>
