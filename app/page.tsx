@@ -386,9 +386,7 @@ export default function Page() {
         <div style={wrap}>
           <h2 style={h2}>Apply to Curated Fit</h2>
           <p style={{ ...body, marginTop: 18 }}>
-            The better we understand you, the better we can match you. This initial application helps us understand your experience, professional standing, and areas
-            of support. We only ask for the information needed to decide whether to invite you to the next
-            stage. More detailed matching and payment information will only be requested after approval.
+            Submit this initial application for review. Once approved, we will work with you to develop your Curated Fit profile, understand how you work, and make sure you are represented accurately.
           </p>
 
           <form onSubmit={submit} noValidate style={{ marginTop: 36, display: "grid", gap: 22 }}>
