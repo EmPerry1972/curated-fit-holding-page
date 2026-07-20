@@ -45,14 +45,14 @@ export default function TermsPage() {
 
         <h2 style={h2}>Introductions</h2>
         <p style={body}>
-          Introductions are based on suitability and fit, not on payment, popularity, or advertising spend. An
+          Introductions are based on suitability and fit, not on ranking, popularity, or promotion. An
           introduction is an opportunity to connect and is not an obligation for either party. You may decline
           an introduction where your capacity, location, scope, or experience is not the right fit.
         </p>
 
-        <h2 style={h2}>No exclusivity and no fees</h2>
+        <h2 style={h2}>No exclusivity</h2>
         <p style={body}>
-          Curated Fit does not require professional exclusivity. There is no joining fee and no listing fee to be part of the network.
+          Curated Fit does not require professional exclusivity.
         </p>
 
         <h2 style={h2}>Your content</h2>
