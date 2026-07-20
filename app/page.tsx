@@ -324,11 +324,11 @@ export default function Page() {
             </div>
             <div style={{ borderTop: "1px solid var(--line)", paddingTop: 20 }}>
               <h3 style={h3}>Matched introductions</h3>
-              <p style={body}>No bidding, no paid ranking. Introductions are based on each woman's goals, lifestyle and stage of life, so the fit is real before the first conversation.</p>
+              <p style={body}>Introductions are based on each woman's goals, lifestyle and stage of life, so the fit is real before the first conversation.</p>
             </div>
             <div style={{ borderTop: "1px solid var(--line)", paddingTop: 20 }}>
-              <h3 style={h3}>No fees</h3>
-              <p style={body}>You're here on merit, not spend.</p>
+              <h3 style={h3}>Selected on merit</h3>
+              <p style={body}>You're here because your work fits, not for any other reason.</p>
             </div>
             <div style={{ borderTop: "1px solid var(--line)", paddingTop: 20 }}>
               <h3 style={h3}>A selected network</h3>
@@ -372,8 +372,7 @@ export default function Page() {
           <h2 style={h2}>How introductions work</h2>
           <p style={{ ...body, marginTop: 18 }}>
             Women first tell us about their goals, preferences, lifestyle, experience, and stage of life.
-            Curated Fit then identifies suitable professionals based on fit. Professionals are not ranked by
-            payment, popularity, or advertising spend. An introduction is an opportunity to connect, not an
+            Curated Fit then identifies suitable professionals based on fit. Professionals are not ranked or promoted ahead of one another; suitability is the only factor. An introduction is an opportunity to connect, not an
             obligation for either party.
           </p>
         </div>
@@ -443,7 +442,7 @@ export default function Page() {
               <span>·</span>
               <span>Selected professionals only</span>
               <span>·</span>
-              <span>No paid rankings</span>
+              <span>No ranking, only fit</span>
               <span>·</span>
               <span>Founded in New Zealand</span>
             </div>
@@ -467,8 +466,8 @@ export default function Page() {
           <h2 style={h2}>Questions</h2>
           <div style={{ marginTop: 24 }}>
             <details style={{ borderTop: "1px solid var(--line)", padding: "18px 0" }}>
-              <summary style={{ cursor: "pointer", fontFamily: serif, fontWeight: 500, fontSize: 18, color: "var(--ink)", listStyle: "none" }}>Is there a joining fee?</summary>
-              <p style={{ ...body, marginTop: 12 }}>No. Curated Fit has no joining fee and no listing fee. It's free to apply and to be part of the network.</p>
+              <summary style={{ cursor: "pointer", fontFamily: serif, fontWeight: 500, fontSize: 18, color: "var(--ink)", listStyle: "none" }}>How do I become part of Curated Fit?</summary>
+              <p style={{ ...body, marginTop: 12 }}>Submit an initial application. If your work fits, we invite you to a short conversation and then help you build your Curated Fit profile.</p>
             </details>
             <details style={{ borderTop: "1px solid var(--line)", padding: "18px 0" }}>
               <summary style={{ cursor: "pointer", fontFamily: serif, fontWeight: 500, fontSize: 18, color: "var(--ink)", listStyle: "none" }}>How are professionals selected?</summary>
@@ -476,7 +475,7 @@ export default function Page() {
             </details>
             <details style={{ borderTop: "1px solid var(--line)", padding: "18px 0" }}>
               <summary style={{ cursor: "pointer", fontFamily: serif, fontWeight: 500, fontSize: 18, color: "var(--ink)", listStyle: "none" }}>How do introductions work?</summary>
-              <p style={{ ...body, marginTop: 12 }}>Introductions are based on the woman's goals, preferences, location, lifestyle, experience, and stage of life. Curated Fit does not sell ranking positions or prioritise professionals based on advertising spend.</p>
+              <p style={{ ...body, marginTop: 12 }}>Introductions are based on the woman's goals, preferences, location, lifestyle, experience, and stage of life. Curated Fit does not rank professionals or prioritise anyone; introductions are made purely on fit.</p>
             </details>
             <details style={{ borderTop: "1px solid var(--line)", padding: "18px 0" }}>
               <summary style={{ cursor: "pointer", fontFamily: serif, fontWeight: 500, fontSize: 18, color: "var(--ink)", listStyle: "none" }}>Can I decline an introduction?</summary>
