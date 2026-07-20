@@ -133,18 +133,6 @@ export default function Page() {
     const digits = form.phone.replace(/[^0-9]/g, "");
     if (digits.length < 8) next.phone = "Please enter a valid mobile number.";
     if (!form.city.trim()) next.city = "Please enter your city.";
-    if (!form.website.trim() && !form.instagram.trim())
-      next.website = "Please provide at least one professional link (website or Instagram).";
-    if (!form.experience) next.experience = "Please select your years of experience.";
-    if (!form.registration) next.registration = "Please select your registration body.";
-    const needsNumber = form.registration && !["Other", "Not currently registered"].includes(form.registration);
-    if (needsNumber && !form.registrationNumber.trim()) next.registrationNumber = "Please enter your registration number.";
-    if (!form.insurance) next.insurance = "Please indicate your insurance status.";
-    if (!form.acceptingClients) next.acceptingClients = "Please indicate your availability.";
-    if (specialities.length === 0) next.specialities = "Please select at least one area of support.";
-    if (specialities.includes("Other") && !form.otherSpeciality.trim())
-      next.otherSpeciality = "Please describe your other area of support.";
-    if (!form.about.trim()) next.about = "Please tell us who you do your best work with.";
     if (!consent) next.consent = "Please confirm and agree before submitting.";
     return next;
   }
@@ -437,124 +425,8 @@ export default function Page() {
                 {errors.area && <p style={errStyle} role="alert">{errors.area}</p>}
               </div>
 
-              <div data-field="website">
-                <label htmlFor="website" style={labelStyle}>Website</label>
-                <input id="website" type="url" style={field} value={form.website} onChange={(e) => set("website", e.target.value)} />
-                {errors.website && <p style={errStyle} role="alert">{errors.website}</p>}
-              </div>
-
-              <div data-field="instagram">
-                <label htmlFor="instagram" style={labelStyle}>Instagram or professional social profile</label>
-                <input id="instagram" type="text" style={field} value={form.instagram} onChange={(e) => set("instagram", e.target.value)} />
-                {errors.instagram && <p style={errStyle} role="alert">{errors.instagram}</p>}
-              </div>
-              <p style={{ fontSize: 13, color: "var(--muted)", marginTop: -4 }}>Please provide at least one professional link (website or Instagram).</p>
             </fieldset>
 
-
-            <fieldset style={{ border: 0, display: "grid", gap: 18 }}>
-              <legend style={{ ...eyebrow, marginBottom: 4 }}>Professional details</legend>
-
-              <div data-field="experience">
-                <label htmlFor="experience" style={labelStyle}>Years of professional experience <span style={{ color: "var(--muted)" }}>*</span></label>
-                <select id="experience" style={field} value={form.experience} onChange={(e) => set("experience", e.target.value)}>
-                  <option value="">Select…</option>
-                  {EXPERIENCE.map((o) => <option key={o} value={o}>{o}</option>)}
-                </select>
-                {errors.experience && <p style={errStyle} role="alert">{errors.experience}</p>}
-              </div>
-
-              <div data-field="registration">
-                <label htmlFor="registration" style={labelStyle}>Current registration body <span style={{ color: "var(--muted)" }}>*</span></label>
-                <select id="registration" style={field} value={form.registration} onChange={(e) => set("registration", e.target.value)}>
-                  <option value="">Select…</option>
-                  {REGISTRATION.map((o) => <option key={o} value={o}>{o}</option>)}
-                </select>
-                {errors.registration && <p style={errStyle} role="alert">{errors.registration}</p>}
-              </div>
-              {form.registration && !["Other", "Not currently registered"].includes(form.registration) && (
-                <div data-field="registrationNumber">
-                  <label htmlFor="registrationNumber" style={labelStyle}>Registration number <span style={{ color: "var(--muted)" }}>*</span></label>
-                  <input id="registrationNumber" type="text" style={field} value={form.registrationNumber} onChange={(e) => set("registrationNumber", e.target.value)} />
-                  {errors.registrationNumber && <p style={errStyle} role="alert">{errors.registrationNumber}</p>}
-                </div>
-              )}
-              <div data-field="qualifications">
-                <label htmlFor="qualifications" style={labelStyle}>Main qualifications</label>
-                <input id="qualifications" type="text" style={field} value={form.qualifications} onChange={(e) => set("qualifications", e.target.value)} />
-              </div>
-              <div data-field="insurance">
-                <label style={labelStyle}>Current professional liability insurance <span style={{ color: "var(--muted)" }}>*</span></label>
-                <div style={{ display: "flex", gap: 10 }}>
-                  {["Yes", "No"].map((o) => (
-                    <button key={o} type="button" style={pill(form.insurance === o)} onClick={() => set("insurance", o)} aria-pressed={form.insurance === o}>{o}</button>
-                  ))}
-                </div>
-                {errors.insurance && <p style={errStyle} role="alert">{errors.insurance}</p>}
-              </div>
-
-              <div data-field="acceptingClients">
-                <label htmlFor="acceptingClients" style={labelStyle}>Currently accepting new clients <span style={{ color: "var(--muted)" }}>*</span></label>
-                <select id="acceptingClients" style={field} value={form.acceptingClients} onChange={(e) => set("acceptingClients", e.target.value)}>
-                  <option value="">Select…</option>
-                  {AVAILABILITY.map((o) => <option key={o} value={o}>{o}</option>)}
-                </select>
-                {errors.acceptingClients && <p style={errStyle} role="alert">{errors.acceptingClients}</p>}
-              </div>
-              <div data-field="workingLocations">
-                <label htmlFor="workingLocations" style={labelStyle}>Primary working locations</label>
-                <input id="workingLocations" type="text" style={field} value={form.workingLocations} onChange={(e) => set("workingLocations", e.target.value)} />
-              </div>
-              <div>
-                <label style={labelStyle}>Working format</label>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                  {WORKING_FORMATS.map((o) => (
-                    <button key={o} type="button" style={pill(formats.includes(o))} onClick={() => toggle(formats, setFormats, o)} aria-pressed={formats.includes(o)}>{o}</button>
-                  ))}
-                </div>
-              </div>
-            </fieldset>
-
-
-            <fieldset style={{ border: 0, display: "grid", gap: 18 }}>
-              <legend style={{ ...eyebrow, marginBottom: 4 }}>Areas of support</legend>
-              <div data-field="specialities">
-                <label style={labelStyle}>Main areas of support <span style={{ color: "var(--muted)" }}>*</span></label>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                  {SPECIALITIES.map((s) => (
-                    <button key={s} type="button" style={pill(specialities.includes(s))} onClick={() => toggle(specialities, setSpecialities, s)} aria-pressed={specialities.includes(s)}>{s}</button>
-                  ))}
-                </div>
-                {errors.specialities && <p style={errStyle} role="alert">{errors.specialities}</p>}
-              </div>
-              {specialities.includes("Other") && (
-                <div data-field="otherSpeciality">
-                  <label htmlFor="otherSpeciality" style={labelStyle}>Please describe your other area of support</label>
-                  <input id="otherSpeciality" type="text" style={field} value={form.otherSpeciality} onChange={(e) => set("otherSpeciality", e.target.value)} />
-                  {errors.otherSpeciality && <p style={errStyle} role="alert">{errors.otherSpeciality}</p>}
-                </div>
-              )}
-              <div data-field="about">
-                <label htmlFor="about" style={labelStyle}>Who do you do your best work with? <span style={{ color: "var(--muted)" }}>*</span></label>
-                <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 8 }}>Briefly describe the clients you are best suited to support, your approach, and what makes a professional introduction appropriate.</p>
-                <textarea id="about" rows={5} maxLength={ABOUT_LIMIT} style={{ ...field, resize: "vertical" }} value={form.about} onChange={(e) => set("about", e.target.value)} />
-                <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 6, textAlign: "right" }}>{form.about.length} / {ABOUT_LIMIT}</p>
-                {errors.about && <p style={errStyle} role="alert">{errors.about}</p>}
-              </div>
-            </fieldset>
-
-
-            <fieldset style={{ border: 0, display: "grid", gap: 18 }}>
-              <legend style={{ ...eyebrow, marginBottom: 4 }}>Professional headshot</legend>
-              <div data-field="photo">
-                <label htmlFor="photo" style={labelStyle}>Professional headshot</label>
-                <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 8 }}>Upload a recent head-and-shoulders photograph with a clean, uncluttered background. The image should clearly show your face and be suitable for a professional Curated Fit profile.</p>
-                <input id="photo" type="file" accept="image/jpeg,image/jpg,image/png,image/webp" onChange={onFile} style={{ fontFamily: "inherit", fontSize: 14 }} />
-                {photoUploading && <p style={{ fontSize: 13, color: "var(--muted)", marginTop: 8 }}>Uploading…</p>}
-                {photoName && !photoUploading && <p style={{ fontSize: 13, color: "var(--muted)", marginTop: 8 }}>Uploaded: {photoName}</p>}
-                {errors.photo && <p style={errStyle} role="alert">{errors.photo}</p>}
-              </div>
-            </fieldset>
 
             <div data-field="consent" style={{ display: "grid", gap: 12, padding: "20px 0", borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)" }}>
               <label style={{ display: "flex", gap: 12, alignItems: "flex-start", fontSize: 14, color: "var(--ink)", cursor: "pointer" }}>
