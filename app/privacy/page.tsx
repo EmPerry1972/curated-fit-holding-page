@@ -10,7 +10,7 @@ const wrap = { maxWidth: 780, margin: "0 auto", padding: "0 24px" };
 const serif = "var(--font-serif), Fraunces, Georgia, serif";
 const mono = "var(--font-mono), 'Space Mono', ui-monospace, monospace";
 const h1 = { fontFamily: serif, fontWeight: 300, letterSpacing: "0.005em", fontSize: "clamp(28px, 4.5vw, 40px)", lineHeight: 1.15, color: "var(--ink)" };
-const h2 = { fontFamily: serif, fontWeight: 300, letterSpacing: "0.005em", fontSize: 21, color: "var(--ink)", margin: "34px 0 10px" };
+const h2 = { fontFamily: serif, fontWeight: 400, letterSpacing: "0.005em", fontSize: 21, color: "var(--ink)", margin: "34px 0 10px" };
 const body = { fontSize: 16, lineHeight: 1.7, color: "var(--muted)", marginBottom: 14 };
 
 export default function PrivacyPage() {
