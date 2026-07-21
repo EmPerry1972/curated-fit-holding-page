@@ -214,7 +214,7 @@ export default function Page() {
   const h1 = { fontFamily: serif, fontWeight: 300, letterSpacing: "0.005em", fontSize: "clamp(30px, 5vw, 46px)", lineHeight: 1.12, color: "var(--ink)" };
   const h2 = { fontFamily: serif, fontWeight: 400, letterSpacing: "0.005em", fontSize: "clamp(24px, 3.4vw, 32px)", lineHeight: 1.18, color: "var(--ink)" };
   const h3 = { fontFamily: serif, fontWeight: 300, fontSize: 19, color: "var(--ink)", marginBottom: 8 };
-  const body = { fontFamily: sans, fontSize: 17, lineHeight: 1.7, color: "var(--muted)", textAlign: "left" };
+  const body = { fontFamily: sans, fontSize: 17, lineHeight: 1.7, color: "var(--muted)", textAlign: "left" as const };
   const sectionPad = { padding: "clamp(56px, 8vw, 88px) 0" };
   const divider = { height: 1, background: "var(--line)", border: 0 };
   const field = {
@@ -227,7 +227,7 @@ export default function Page() {
     fontSize: 15,
     color: "var(--ink)",
   };
-  const labelStyle = { display: "block", fontFamily: sans, fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--label)", marginBottom: 7 };
+  const labelStyle = { display: "block", fontFamily: sans, fontSize: 12, fontWeight: 500, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "var(--label)", marginBottom: 7 };
   const errStyle = { color: "#B4453C", fontSize: 13, marginTop: 6 };
   const pill = (active) => ({
     background: active ? "var(--ink)" : "transparent",
