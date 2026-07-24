@@ -77,7 +77,7 @@ export default function Page() {
 
       <section style={sectionPad}>
         <div style={wrap}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 32 }}>
+          <div className="three-col" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 32 }}>
             <div>
               <h3 style={h3}>Already active in your own way</h3>
               <p style={body}>Walking, gardening, golf, Pilates and everyday movement all matter. Curated Fit helps you understand what kind of support could complement what you already do.</p>
@@ -109,40 +109,7 @@ export default function Page() {
         </div>
       </section>
 
-      <hr style={divider} />
-
-      <section style={sectionPad}>
-        <div style={wrap}>
-          <h2 style={h2}>How it works</h2>
-          <div style={{ display: "grid", gap: 34, marginTop: 32 }}>
-            <div>
-              <p style={stepNum}>01</p>
-              <h3 style={{ ...h3, marginTop: 10 }}>Tell us what you are looking for</h3>
-              <p style={body}>Answer a few questions about what you would like to feel or achieve, your experience, where you would feel most comfortable exercising, and the kind of support you would prefer.</p>
-              <p style={{ ...body, marginTop: 8, fontStyle: "italic" }}>No account is needed.</p>
-            </div>
-            <div>
-              <p style={stepNum}>02</p>
-              <h3 style={{ ...h3, marginTop: 10 }}>See your three matches</h3>
-              <p style={body}>Your answers shape the professionals you see. Each match reflects what you have told us matters to you.</p>
-              <p style={{ ...body, marginTop: 8, fontStyle: "italic" }}>Matches are based on fit, not paid placement.</p>
-            </div>
-            <div>
-              <p style={stepNum}>03</p>
-              <h3 style={{ ...h3, marginTop: 10 }}>Choose your next step</h3>
-              <p style={body}>Review each profile and decide who you would like to meet.</p>
-              <p style={{ ...body, marginTop: 8 }}>You can see their training, insurance, experience, areas of specialisation, way of working and costs before requesting an introduction.</p>
-              <p style={{ ...body, marginTop: 8 }}>When you are ready, we will connect you both.</p>
-            </div>
-            <div>
-              <p style={stepNum}>04</p>
-              <h3 style={{ ...h3, marginTop: 10 }}>Explore the wider selection</h3>
-              <p style={body}>Your three matches are a place to begin, not a limit.</p>
-              <p style={{ ...body, marginTop: 8 }}>You can browse the full Curated Selection at any time.</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      
 
       <hr style={divider} />
 
@@ -158,7 +125,7 @@ export default function Page() {
 
       <footer style={{ borderTop: "1px solid var(--line)" }}>
         <div style={{ maxWidth: 1080, margin: "0 auto", display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center", justifyContent: "space-between", padding: "28px 24px", fontFamily: sans, fontSize: 13, color: "var(--muted)" }}>
-          <span>ÃÂ© {new Date().getFullYear()} Curated Fit ÃÂ· Founded in New Zealand</span>
+          <span>ÃÂÃÂ© {new Date().getFullYear()} Curated Fit ÃÂÃÂ· Founded in New Zealand</span>
           <span style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
             <a href="/register" style={{ color: "var(--muted)" }}>Register as an Exercise Professional</a>
             <a href="/privacy" style={{ color: "var(--muted)" }}>Privacy Policy</a>
