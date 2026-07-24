@@ -37,3 +37,11 @@ p{font-family:var(--font-sans)!important;font-weight:400!important;font-size:1re
 .spec,.dose,.font-mono{font-family:var(--font-mono)!important;font-weight:400!important;font-size:0.8125rem!important;line-height:1.9!important;letter-spacing:0.03em!important;text-transform:uppercase!important;color:var(--text-label)!important;font-feature-settings:"tnum" 1}
 blockquote{font-family:var(--font-display)!important;font-style:italic!important;font-weight:400!important;font-size:clamp(1.25rem,2vw + 0.5rem,1.75rem)!important;line-height:1.4!important;color:var(--text-secondary)!important}
 a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--slate)!important;outline-offset:2px}
+
+/* Hero over video: force light text for readability over the background video */
+.hero-over-video h1,
+.hero-over-video h2,
+.hero-over-video h3,
+.hero-over-video p,
+.hero-over-video a{color:var(--warm-white)!important}
+.hero-over-video button{color:var(--charcoal)!important}
