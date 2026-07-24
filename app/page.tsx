@@ -58,9 +58,9 @@ export default function Page() {
           Begin with a few considered questions, then choose from three professionals matched to your answers.
         </p>
         <div style={{ marginTop: 30 }}>
-          <button type="button" onClick={scrollTop} style={cta}>Find your Fit</button>
+          <button type="button" onClick={scrollTop} style={cta}>Register your interest</button>
         </div>
-        <p style={{ ...eyebrow, marginTop: 26, marginBottom: 0 }}>Every coach vetted to one Curated standard.</p>
+        <p style={{ ...eyebrow, textTransform: "none", marginTop: 26, marginBottom: 0 }}>find your fit</p>
       </section>
 
       <section style={sectionPad}>
@@ -140,7 +140,7 @@ export default function Page() {
         <p style={{ ...body, marginTop: 16, maxWidth: 620, marginLeft: "auto", marginRight: "auto", textAlign: "center" }}>Answer a few considered questions and see three matched professionals, without creating an account or sharing your personal details.</p>
         <p style={{ ...body, marginTop: 16, maxWidth: 620, marginLeft: "auto", marginRight: "auto", textAlign: "center" }}>There is no pressure to continue. Curated Fit helps make the next step clearer, while keeping the decision entirely yours.</p>
         <div style={{ marginTop: 30 }}>
-          <button type="button" onClick={scrollTop} style={cta}>Find your Fit</button>
+          <button type="button" onClick={scrollTop} style={cta}>Register your interest</button>
         </div>
       </section>
 
