@@ -132,7 +132,7 @@ export default function Page() {
 
       <footer style={{ borderTop: "1px solid var(--line)" }}>
         <div style={{ maxWidth: 1080, margin: "0 auto", display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center", justifyContent: "space-between", padding: "28px 24px", fontFamily: sans, fontSize: 13, color: "var(--muted)" }}>
-          <span>ÃÂÃÂ© {new Date().getFullYear()} Curated Fit ÃÂÃÂ· Founded in New Zealand</span>
+          <span>&copy; {new Date().getFullYear()} Curated Fit &middot; Founded in New Zealand</span>
           <span style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
             <a href="/register" style={{ color: "var(--muted)" }}>Register as an Exercise Professional</a>
             <a href="/privacy" style={{ color: "var(--muted)" }}>Privacy Policy</a>
