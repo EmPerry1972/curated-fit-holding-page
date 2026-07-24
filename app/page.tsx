@@ -42,13 +42,9 @@ export default function Page() {
   return (
     <main ref={topRef}>
       <section className="hero-over-video" style={{ position: "relative", minHeight: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <video
-          src="https://videos.pexels.com/video-files/6970140/6970140-hd_1280_720_60fps.mp4"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
+        <img
+          src="/hero.jpg"
+          alt=""
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0 }}
         />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(44,44,44,0.72) 0%, rgba(44,44,44,0.55) 30%, rgba(44,44,44,0.25) 60%, rgba(44,44,44,0.10) 100%), linear-gradient(180deg, rgba(44,44,44,0.35) 0%, rgba(44,44,44,0.15) 45%, rgba(44,44,44,0.45) 100%)", zIndex: 1 }} />
