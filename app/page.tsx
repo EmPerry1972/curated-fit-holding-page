@@ -41,29 +41,7 @@ export default function Page() {
 
   return (
     <main ref={topRef}>
-      <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 24px", maxWidth: 1080, margin: "0 auto", flexWrap: "wrap", gap: 12 }}>
-        <img src="/logo.png" alt="Curated Fit" style={{ height: 64 }} />
-        <a href="/register" style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--muted)", textDecoration: "none" }}>
-          Register here as an Exercise Professional
-        </a>
-      </nav>
-
-      <section style={{ ...wrap, textAlign: "center", padding: "clamp(56px, 10vw, 104px) 24px 0" }}>
-        <p style={eyebrow}>The movement layer of Curated Wellness</p>
-        <h1 style={h1}>The right place to begin starts with the right person.</h1>
-        <p style={{ ...body, marginTop: 22, maxWidth: 620, marginLeft: "auto", marginRight: "auto", textAlign: "center" }}>
-          Curated Fit helps you find an exercise professional suited to what you want to achieve, where you would feel most comfortable, and the kind of support you would prefer.
-        </p>
-        <p style={{ ...body, marginTop: 16, maxWidth: 620, marginLeft: "auto", marginRight: "auto", textAlign: "center" }}>
-          Begin with a few considered questions, then choose from three professionals matched to your answers.
-        </p>
-        <div style={{ marginTop: 30 }}>
-          <button type="button" onClick={scrollTop} style={cta}>Register your interest</button>
-        </div>
-        <p style={{ ...eyebrow, textTransform: "none", marginTop: 26, marginBottom: 0 }}>find your fit</p>
-      </section>
-
-      <section style={{ ...wrap, padding: "clamp(40px, 6vw, 64px) 24px 0" }}>
+      <section style={{ position: "relative", minHeight: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <video
           src="https://videos.pexels.com/video-files/6970140/6970140-hd_1280_720_60fps.mp4"
           autoPlay
@@ -71,9 +49,31 @@ export default function Page() {
           loop
           playsInline
           preload="metadata"
-          style={{ width: "100%", height: "auto", display: "block", borderRadius: 8, background: "var(--stone)" }}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0 }}
         />
-        <p style={{ ...eyebrow, textTransform: "none", marginTop: 14, marginBottom: 0, textAlign: "center" }}>movement, at your own pace</p>
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(44,44,44,0.55) 0%, rgba(44,44,44,0.30) 40%, rgba(44,44,44,0.60) 100%)", zIndex: 1 }} />
+
+        <nav style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 24px", maxWidth: 1080, margin: "0 auto", width: "100%", flexWrap: "wrap", gap: 12 }}>
+          <img src="/logo-light.png" alt="Curated Fit" style={{ height: 64 }} onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/logo.png"; }} />
+          <a href="/register" style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--warm-white)", textDecoration: "none" }}>
+            Register here as an Exercise Professional
+          </a>
+        </nav>
+
+        <div style={{ position: "relative", zIndex: 2, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", padding: "clamp(48px, 8vw, 88px) 24px", maxWidth: 780, margin: "0 auto", width: "100%" }}>
+          <p style={{ ...eyebrow, color: "var(--warm-white)", marginBottom: 16 }}>The movement layer of Curated Wellness</p>
+          <h1 style={{ ...h1, color: "var(--warm-white)" }}>The right place to begin starts with the right person.</h1>
+          <p style={{ ...body, color: "var(--warm-white)", marginTop: 22, maxWidth: 620, textAlign: "center" }}>
+            Curated Fit helps you find an exercise professional suited to what you want to achieve, where you would feel most comfortable, and the kind of support you would prefer.
+          </p>
+          <p style={{ ...body, color: "var(--warm-white)", marginTop: 16, maxWidth: 620, textAlign: "center" }}>
+            Begin with a few considered questions, then choose from three professionals matched to your answers.
+          </p>
+          <div style={{ marginTop: 30 }}>
+            <button type="button" onClick={scrollTop} style={cta}>Register your interest</button>
+          </div>
+          <p style={{ ...eyebrow, color: "var(--warm-white)", textTransform: "none", marginTop: 26, marginBottom: 0 }}>find your fit</p>
+        </div>
       </section>
 
       <section style={sectionPad}>
