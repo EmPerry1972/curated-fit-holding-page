@@ -54,7 +54,7 @@ export default function Page() {
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(30,30,30,0.72) 0%, rgba(30,30,30,0.55) 30%, rgba(30,30,30,0.25) 60%, rgba(30,30,30,0.10) 100%), linear-gradient(180deg, rgba(30,30,30,0.35) 0%, rgba(30,30,30,0.15) 45%, rgba(30,30,30,0.45) 100%)", zIndex: 1 }} />
 
         <nav style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 24px", maxWidth: 1080, margin: "0 auto", width: "100%", flexWrap: "wrap", gap: 12 }}>
-          <img src="/logo.png" alt="Curated Fit" style={{ height: 64, filter: "brightness(0) invert(1)" }} />
+          <a href="/"><img src="/logo.png" alt="Curated Fit" style={{ height: 64, filter: "brightness(0) invert(1)" }} /></a>
           <a href="/register" style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--warm-white)", textDecoration: "none" }}>
             Register here as an Exercise Professional
           </a>
