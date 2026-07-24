@@ -51,22 +51,22 @@ export default function Page() {
           preload="metadata"
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0 }}
         />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(44,44,44,0.55) 0%, rgba(44,44,44,0.30) 40%, rgba(44,44,44,0.60) 100%)", zIndex: 1 }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(30,30,30,0.72) 0%, rgba(30,30,30,0.55) 30%, rgba(30,30,30,0.25) 60%, rgba(30,30,30,0.10) 100%), linear-gradient(180deg, rgba(30,30,30,0.35) 0%, rgba(30,30,30,0.15) 45%, rgba(30,30,30,0.45) 100%)", zIndex: 1 }} />
 
         <nav style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 24px", maxWidth: 1080, margin: "0 auto", width: "100%", flexWrap: "wrap", gap: 12 }}>
-          <img src="/logo.png" alt="Curated Fit" style={{ height: 64 }} />
+          <img src="/logo.png" alt="Curated Fit" style={{ height: 64, filter: "brightness(0) invert(1)" }} />
           <a href="/register" style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--warm-white)", textDecoration: "none" }}>
             Register here as an Exercise Professional
           </a>
         </nav>
 
-        <div style={{ position: "relative", zIndex: 2, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", padding: "clamp(48px, 8vw, 88px) 24px", maxWidth: 780, margin: "0 auto", width: "100%" }}>
+        <div style={{ position: "relative", zIndex: 2, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start", textAlign: "left", padding: "clamp(48px, 8vw, 96px) 24px", maxWidth: 1080, margin: "0 auto", width: "100%" }}>
           <p style={{ ...eyebrow, color: "var(--warm-white)", marginBottom: 16 }}>The movement layer of Curated Wellness</p>
-          <h1 style={{ ...h1, color: "var(--warm-white)" }}>The right place to begin starts with the right person.</h1>
-          <p style={{ ...body, color: "var(--warm-white)", marginTop: 22, maxWidth: 620, textAlign: "center" }}>
+          <h1 style={{ maxWidth: 680,  ...h1, color: "var(--warm-white)" }}>The right place to begin starts with the right person.</h1>
+          <p style={{ ...body, color: "var(--warm-white)", marginTop: 22, maxWidth: 500, textAlign: "left" }}>
             Curated Fit helps you find an exercise professional suited to what you want to achieve, where you would feel most comfortable, and the kind of support you would prefer.
           </p>
-          <p style={{ ...body, color: "var(--warm-white)", marginTop: 16, maxWidth: 620, textAlign: "center" }}>
+          <p style={{ ...body, color: "var(--warm-white)", marginTop: 16, maxWidth: 500, textAlign: "left" }}>
             Begin with a few considered questions, then choose from three professionals matched to your answers.
           </p>
           <div style={{ marginTop: 30 }}>
@@ -159,7 +159,7 @@ export default function Page() {
 
       <footer style={{ borderTop: "1px solid var(--line)" }}>
         <div style={{ maxWidth: 1080, margin: "0 auto", display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center", justifyContent: "space-between", padding: "28px 24px", fontFamily: sans, fontSize: 13, color: "var(--muted)" }}>
-          <span>© {new Date().getFullYear()} Curated Fit · Founded in New Zealand</span>
+          <span>Â© {new Date().getFullYear()} Curated Fit Â· Founded in New Zealand</span>
           <span style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
             <a href="/register" style={{ color: "var(--muted)" }}>Register as an Exercise Professional</a>
             <a href="/privacy" style={{ color: "var(--muted)" }}>Privacy Policy</a>
