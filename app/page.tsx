@@ -2,8 +2,8 @@
 
 import { useRef } from "react";
 
-const serif = "var(--font-serif), Fraunces, Georgia, serif";
-const mono = "var(--font-mono), 'Space Mono', ui-monospace, monospace";
+const serif = "var(--font-serif), 'Playfair Display', Georgia, serif";
+const mono = "var(--font-mono), 'IBM Plex Mono', ui-monospace, monospace";
 const sans = "var(--font-sans)";
 
 const wrap = { maxWidth: 780, margin: "0 auto", padding: "0 24px" } as const;
@@ -12,7 +12,7 @@ const eyebrow = {
   fontSize: 11,
   letterSpacing: "0.14em",
   textTransform: "uppercase" as const,
-  color: "#655F57",
+  color: "var(--warm-grey)",
   marginBottom: 16,
 };
 const h1 = { fontFamily: serif, fontWeight: 300, letterSpacing: "0.005em", fontSize: "clamp(30px, 5vw, 46px)", lineHeight: 1.12, color: "var(--ink)" } as const;
@@ -33,7 +33,7 @@ const cta = {
   fontWeight: 600,
   cursor: "pointer",
 } as const;
-const stepNum = { fontFamily: mono, fontSize: 13, letterSpacing: "0.14em", color: "#655F57" } as const;
+const stepNum = { fontFamily: mono, fontSize: 13, letterSpacing: "0.14em", color: "var(--warm-grey)" } as const;
 
 export default function Page() {
   const topRef = useRef<HTMLDivElement>(null);
