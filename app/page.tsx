@@ -56,16 +56,16 @@ export default function Page() {
           </a>
         </nav>
 
-        <div style={{ position: "relative", zIndex: 2, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start", textAlign: "left", padding: "clamp(48px, 8vw, 96px) 24px", maxWidth: 1080, margin: "0 auto", width: "100%" }}>
+        <div style={{ position: "relative", zIndex: 2, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-end", textAlign: "right", padding: "clamp(48px, 8vw, 96px) 24px", maxWidth: 1080, margin: "0 auto", width: "100%" }}>
           <p style={{ ...eyebrow, color: "var(--warm-white)", marginBottom: 16 }}>The movement layer of Curated Wellness</p>
           <h1 style={{ maxWidth: 680,  ...h1, color: "var(--warm-white)" }}>The right place to begin starts with the right person.</h1>
-          <p style={{ ...body, color: "var(--warm-white)", marginTop: 22, maxWidth: 500, textAlign: "left" }}>
+          <p style={{ ...body, color: "var(--warm-white)", marginTop: 22, maxWidth: 500, textAlign: "right" }}>
             Curated Fit helps you find an exercise professional suited to what you want to achieve, where you would feel most comfortable, and the kind of support you would prefer.
           </p>
-          <p style={{ ...body, color: "var(--warm-white)", marginTop: 16, maxWidth: 500, textAlign: "left" }}>
+          <p style={{ ...body, color: "var(--warm-white)", marginTop: 16, maxWidth: 500, textAlign: "right" }}>
             Begin with a few considered questions, then choose from three professionals matched to your answers.
           </p>
-          <p style={{ ...body, color: "var(--warm-white)", marginTop: 16, maxWidth: 500, textAlign: "left" }}>
+          <p style={{ ...body, color: "var(--warm-white)", marginTop: 16, maxWidth: 500, textAlign: "right" }}>
             Curated Fit is due to launch at the end of August. Register your interest to be among the first invited to Find your Fit.
           </p>
           <div style={{ marginTop: 30 }}>
