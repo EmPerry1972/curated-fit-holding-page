@@ -8,7 +8,7 @@ const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400"], style: 
 const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "Curated Fit — Find Your Fit",
+  title: "Curated Fit — Find your Fit",
   description:
     "Curated Fit helps you find an exercise professional suited to your goals, where you feel most comfortable, and the kind of support you prefer.",
   metadataBase: new URL("https://www.curatedfit.co.nz"),
@@ -16,14 +16,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Curated Fit",
-    title: "Curated Fit — Find Your Fit",
+    title: "Curated Fit — Find your Fit",
     description: "Curated Fit helps you find an exercise professional suited to your goals, where you feel most comfortable, and the kind of support you prefer.",
     url: "https://www.curatedfit.co.nz",
     locale: "en_NZ",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Curated Fit — Find Your Fit",
+    title: "Curated Fit — Find your Fit",
     description: "Curated Fit helps you find an exercise professional suited to your goals, where you feel most comfortable, and the kind of support you prefer.",
   },
 };
@@ -39,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "@context": "https://schema.org",
               "@type": "Organization",
               name: "Curated Fit",
-              slogan: "Find your fit.",
+              slogan: "Find your Fit.",
               description:
                 "Curated Fit helps you find an exercise professional suited to your goals, where you feel most comfortable, and the kind of support you prefer.",
               url: "https://www.curatedfit.co.nz",
