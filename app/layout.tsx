@@ -4,7 +4,7 @@ import { Inter, Playfair_Display, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-const playfair = Playfair_Display({ subsets: ["latin"], weight: ["300", "400"], style: ["normal", "italic"], variable: "--font-serif" });
+const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400"], style: ["normal", "italic"], variable: "--font-serif" });
 const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
