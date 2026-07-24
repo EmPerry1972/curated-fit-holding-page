@@ -19,7 +19,7 @@ const h1 = { fontFamily: serif, fontWeight: 300, letterSpacing: "0.005em", fontS
 const body = { fontFamily: sans, fontSize: 17, lineHeight: 1.7, color: "var(--muted)" } as const;
 const label = { display: "block", fontFamily: mono, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "var(--label)", marginBottom: 8 };
 const input = { width: "100%", fontFamily: sans, fontSize: 16, color: "var(--ink)", background: "var(--field)", border: "1px solid var(--line)", borderRadius: 8, padding: "13px 14px", outline: "none" } as const;
-const cta = { display: "inline-block", fontFamily: mono, fontSize: 12, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: "var(--ink)", color: "#fff", border: "none", borderRadius: 10, padding: "15px 26px", cursor: "pointer" } as const;
+const cta = { display: "inline-block", fontFamily: mono, fontSize: 12, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: "var(--ink)", color: "var(--warm-white)", border: "none", borderRadius: 10, padding: "15px 26px", cursor: "pointer" } as const;
 
 export default function EarlyAccessPage() {
   const [name, setName] = useState("");
