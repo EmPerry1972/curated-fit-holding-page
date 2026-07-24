@@ -26,7 +26,7 @@ const cta = {
   background: "var(--ink)",
   color: "#fff",
   border: "none",
-  borderRadius: 999,
+  borderRadius: 10,
   padding: "15px 30px",
   fontFamily: "inherit",
   fontSize: 16,
@@ -72,13 +72,12 @@ export default function Page() {
           <div style={{ marginTop: 30 }}>
             <button type="button" onClick={scrollTop} style={cta}>Register your interest</button>
           </div>
-          <p style={{ ...eyebrow, color: "var(--warm-white)", textTransform: "none", marginTop: 26, marginBottom: 0 }}>find your fit</p>
         </div>
       </section>
 
       <section style={sectionPad}>
         <div style={wrap}>
-          <div style={{ display: "grid", gap: 32 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 32 }}>
             <div>
               <h3 style={h3}>Already active in your own way</h3>
               <p style={body}>Walking, gardening, golf, Pilates and everyday movement all matter. Curated Fit helps you understand what kind of support could complement what you already do.</p>
@@ -159,7 +158,7 @@ export default function Page() {
 
       <footer style={{ borderTop: "1px solid var(--line)" }}>
         <div style={{ maxWidth: 1080, margin: "0 auto", display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center", justifyContent: "space-between", padding: "28px 24px", fontFamily: sans, fontSize: 13, color: "var(--muted)" }}>
-          <span>Â© {new Date().getFullYear()} Curated Fit Â· Founded in New Zealand</span>
+          <span>ÃÂ© {new Date().getFullYear()} Curated Fit ÃÂ· Founded in New Zealand</span>
           <span style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
             <a href="/register" style={{ color: "var(--muted)" }}>Register as an Exercise Professional</a>
             <a href="/privacy" style={{ color: "var(--muted)" }}>Privacy Policy</a>
