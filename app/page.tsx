@@ -66,7 +66,7 @@ export default function Page() {
             Begin with a few considered questions, then choose from three professionals matched to your answers.
           </p>
           <p style={{ ...body, color: "var(--warm-white)", marginTop: 16, maxWidth: 500, textAlign: "left" }}>
-            Curated Fit is due to launch at the end of August. Register your interest to be among the first invited to Find Your Fit.
+            Curated Fit is due to launch at the end of August. Register your interest to be among the first invited to Find your Fit.
           </p>
           <div style={{ marginTop: 30 }}>
             <a href="/early-access" style={{ ...cta, textDecoration: "none" }}>Register your interest</a>
