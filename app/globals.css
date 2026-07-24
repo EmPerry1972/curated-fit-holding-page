@@ -46,3 +46,20 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .hero-over-video a{color:var(--warm-white)!important}
 @media (max-width: 640px){.three-col{grid-template-columns:1fr!important;gap:40px!important}}
 @media (max-width: 900px){.why-grid{grid-template-columns:1fr!important;gap:32px!important}}
+
+
+/* Editorial framing: inset page content with generous side margins
+   so content sits in a centered column with white space on both sides */
+main {
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 6vw;
+    padding-right: 6vw;
+}
+@media (max-width: 900px) {
+    main { padding-left: 32px; padding-right: 32px; }
+}
+@media (max-width: 640px) {
+    main { padding-left: 20px; padding-right: 20px; }
+}
