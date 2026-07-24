@@ -22,7 +22,7 @@ export default function PrivacyPage() {
       </nav>
 
       <section style={{ ...wrap, padding: "clamp(48px, 8vw, 80px) 24px" }}>
-        <p style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "#655F57", marginBottom: 16 }}>Curated Fit</p>
+        <p style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--slate)", marginBottom: 16 }}>Curated Fit</p>
         <h1 style={h1}>Privacy Policy</h1>
         <p style={{ ...body, marginTop: 20 }}>
           This policy explains how Curated Fit collects, uses, and protects the information you provide when
