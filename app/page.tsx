@@ -41,7 +41,7 @@ export default function Page() {
 
   return (
     <main ref={topRef}>
-      <section style={{ position: "relative", minHeight: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <section className="hero-over-video" style={{ position: "relative", minHeight: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <video
           src="https://videos.pexels.com/video-files/6970140/6970140-hd_1280_720_60fps.mp4"
           autoPlay
@@ -54,7 +54,7 @@ export default function Page() {
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(44,44,44,0.55) 0%, rgba(44,44,44,0.30) 40%, rgba(44,44,44,0.60) 100%)", zIndex: 1 }} />
 
         <nav style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 24px", maxWidth: 1080, margin: "0 auto", width: "100%", flexWrap: "wrap", gap: 12 }}>
-          <img src="/logo-light.png" alt="Curated Fit" style={{ height: 64 }} onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/logo.png"; }} />
+          <img src="/logo.png" alt="Curated Fit" style={{ height: 64 }} />
           <a href="/register" style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--warm-white)", textDecoration: "none" }}>
             Register here as an Exercise Professional
           </a>
