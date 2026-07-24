@@ -63,6 +63,19 @@ export default function Page() {
         <p style={{ ...eyebrow, textTransform: "none", marginTop: 26, marginBottom: 0 }}>find your fit</p>
       </section>
 
+      <section style={{ ...wrap, padding: "clamp(40px, 6vw, 64px) 24px 0" }}>
+        <video
+          src="https://videos.pexels.com/video-files/6970140/6970140-hd_1280_720_60fps.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          style={{ width: "100%", height: "auto", display: "block", borderRadius: 8, background: "var(--stone)" }}
+        />
+        <p style={{ ...eyebrow, textTransform: "none", marginTop: 14, marginBottom: 0, textAlign: "center" }}>movement, at your own pace</p>
+      </section>
+
       <section style={sectionPad}>
         <div style={wrap}>
           <div style={{ display: "grid", gap: 32 }}>
