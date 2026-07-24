@@ -109,7 +109,7 @@ export default function Page() {
               <p style={{ ...body, marginTop: 24, fontStyle: "italic", color: "var(--ink)" }}>Look after today, and tomorrow will look after itself.</p>
             </div>
             <div>
-              <img src="/why-muscle-matters.jpg" alt="Why muscle matters" style={{ width: "100%", height: "auto", borderRadius: 4, display: "block" }} />
+              <img src="/why-muscle-matters.jpg" alt="Why muscle matters" style={{ width: "100%", height: "auto", borderRadius: 4, display: "block", filter: "grayscale(20%) brightness(0.95) saturate(0.9)" }} />
             </div>
           </div>
         </div>
