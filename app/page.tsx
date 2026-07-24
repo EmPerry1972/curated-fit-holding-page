@@ -70,7 +70,7 @@ export default function Page() {
             Begin with a few considered questions, then choose from three professionals matched to your answers.
           </p>
           <div style={{ marginTop: 30 }}>
-            <button type="button" onClick={scrollTop} style={cta}>Register your interest</button>
+            <a href="/early-access" style={{ ...cta, textDecoration: "none" }}>Register your interest</a>
           </div>
         </div>
       </section>
@@ -126,7 +126,7 @@ export default function Page() {
         <p style={{ ...body, marginTop: 16, maxWidth: 620, marginLeft: "auto", marginRight: "auto", textAlign: "center" }}>Answer a few considered questions and see three matched professionals, without creating an account or sharing your personal details.</p>
         <p style={{ ...body, marginTop: 16, maxWidth: 620, marginLeft: "auto", marginRight: "auto", textAlign: "center" }}>There is no pressure to continue. Curated Fit helps make the next step clearer, while keeping the decision entirely yours.</p>
         <div style={{ marginTop: 30 }}>
-          <button type="button" onClick={scrollTop} style={cta}>Register your interest</button>
+          <a href="/early-access" style={{ ...cta, textDecoration: "none" }}>Register your interest</a>
         </div>
       </section>
 
