@@ -208,7 +208,7 @@ export default function Page() {
     fontSize: 11,
     letterSpacing: "0.14em",
     textTransform: "uppercase",
-    color: "#655F57",   
+    color: "var(--slate)",   
     marginBottom: 16,
   };
   const h1 = { fontFamily: serif, fontWeight: 300, letterSpacing: "0.005em", fontSize: "clamp(30px, 5vw, 46px)", lineHeight: 1.12, color: "var(--ink)" };
@@ -231,7 +231,7 @@ export default function Page() {
   const errStyle = { color: "#B4453C", fontSize: 13, marginTop: 6 };
   const pill = (active) => ({
     background: active ? "var(--ink)" : "transparent",
-    color: active ? "#fff" : "var(--ink)",
+    color: active ? "var(--warm-white)" : "var(--ink)",
     border: "1px solid " + (active ? "var(--ink)" : "var(--line)"),
     borderRadius: 999,
     padding: "9px 15px",
@@ -242,7 +242,7 @@ export default function Page() {
   const cta = {
     display: "inline-block",
     background: "var(--ink)",
-    color: "#fff",
+    color: "var(--warm-white)",
     border: "none",
     borderRadius: 999,
     padding: "15px 30px",
