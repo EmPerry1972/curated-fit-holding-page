@@ -97,15 +97,22 @@ export default function Page() {
       <hr style={divider} />
 
       <section style={sectionPad}>
-        <div style={wrap}>
-          <p style={eyebrow}>Why muscle matters</p>
-          <h2 style={h2}>Muscle is what keeps everyday life feeling easier.</h2>
-          <p style={{ ...body, marginTop: 20 }}>You may already walk regularly, eat well and make thoughtful choices about your health. Muscle is often the part that receives less attention, even though it supports how you move, function and feel every day.</p>
-          <p style={{ ...body, marginTop: 16 }}>From walking uphill and getting up from the floor to playing a round of golf and continuing to do the things you enjoy, muscle supports far more than exercise.</p>
-          <p style={{ ...body, marginTop: 16 }}>From our 40s, changes associated with age and menopause can make muscle harder to maintain. Over time, everyday movement can begin to require more effort than it once did.</p>
-          <p style={{ ...body, marginTop: 16 }}>Building strength helps support the physical capacity you rely on each day. Research also links resistance exercise with benefits for mood, memory and mental sharpness.</p>
-          <p style={{ ...body, marginTop: 16 }}>It can begin simply, with an approach that suits your experience, your preferences and the way you want to live.</p>
-          <p style={{ ...body, marginTop: 24, fontStyle: "italic", color: "var(--ink)" }}>Look after today, and tomorrow will look after itself.</p>
+        <div style={{ ...wrap, maxWidth: 1080 }}>
+          <div className="why-grid" style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: 48, alignItems: "center" }}>
+            <div>
+              <p style={eyebrow}>Why muscle matters</p>
+              <h2 style={h2}>Muscle is what keeps everyday life feeling easier.</h2>
+              <p style={{ ...body, marginTop: 20 }}>You may already walk regularly, eat well and make thoughtful choices about your health. Muscle is often the part that receives less attention, even though it supports how you move, function and feel every day.</p>
+              <p style={{ ...body, marginTop: 16 }}>From walking uphill and getting up from the floor to playing a round of golf and continuing to do the things you enjoy, muscle supports far more than exercise.</p>
+              <p style={{ ...body, marginTop: 16 }}>From our 40s, changes associated with age and menopause can make muscle harder to maintain. Over time, everyday movement can begin to require more effort than it once did.</p>
+              <p style={{ ...body, marginTop: 16 }}>Building strength helps support the physical capacity you rely on each day. Research also links resistance exercise with benefits for mood, memory and mental sharpness.</p>
+              <p style={{ ...body, marginTop: 16 }}>It can begin simply, with an approach that suits your experience, your preferences and the way you want to live.</p>
+              <p style={{ ...body, marginTop: 24, fontStyle: "italic", color: "var(--ink)" }}>Look after today, and tomorrow will look after itself.</p>
+            </div>
+            <div>
+              <img src="/why-muscle-matters.jpg" alt="Why muscle matters" style={{ width: "100%", height: "auto", borderRadius: 4, display: "block" }} />
+            </div>
+          </div>
         </div>
       </section>
 
