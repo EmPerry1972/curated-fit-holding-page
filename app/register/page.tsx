@@ -257,7 +257,7 @@ export default function Page() {
     return (
       <main>
         <nav style={{ ...wrap, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 24px", maxWidth: 1080 }}>
-          <img src="/logo.png" alt="Curated Fit" style={{ height: 64 }} />
+          <a href="/"><img src="/logo.png" alt="Curated Fit" style={{ height: 64 }} /></a>
         </nav>
         <section style={{ ...wrap, textAlign: "center", padding: "clamp(80px, 14vw, 160px) 24px" }}>
           <p style={eyebrow}>Curated Fit</p>
@@ -289,7 +289,7 @@ export default function Page() {
   return (
     <main>
       <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 24px", maxWidth: 1080, margin: "0 auto" }}>
-        <img src="/logo.png" alt="Curated Fit" style={{ height: 64 }} />
+        <a href="/"><img src="/logo.png" alt="Curated Fit" style={{ height: 64 }} /></a>
         </nav>
 
       <section style={{ ...wrap, textAlign: "center", padding: "clamp(64px, 11vw, 120px) 24px 0" }}>
