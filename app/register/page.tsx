@@ -290,11 +290,7 @@ export default function Page() {
     <main>
       <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 24px", maxWidth: 1080, margin: "0 auto" }}>
         <img src="/logo.png" alt="Curated Fit" style={{ height: 64 }} />
-        <button type="button" onClick={scrollToForm} style={{ ...cta, padding: "10px 20px", fontSize: 14 }}>
-          <span style={{ display: "none" }} className="cta-full">Apply to Curated Fit</span>
-          <span>Apply to Curated Fit</span>
-        </button>
-      </nav>
+        </nav>
 
       <section style={{ ...wrap, textAlign: "center", padding: "clamp(64px, 11vw, 120px) 24px 0" }}>
         <p style={eyebrow}>Applications now open</p>
