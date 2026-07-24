@@ -63,3 +63,18 @@ main {
 @media (max-width: 640px) {
     main { padding-left: 20px; padding-right: 20px; }
 }
+
+
+/* Hero image: keep the subjects framed when the landscape photo is cropped on narrow screens */
+.hero-over-video > img {
+    object-position: 70% center;
+}
+@media (max-width: 640px) {
+    .hero-over-video > img {
+        object-position: 72% center;
+    }
+    /* Strengthen the overlay on mobile so the headline and body stay readable over the busier crop */
+    .hero-over-video > div {
+        background: linear-gradient(180deg, rgba(44,44,44,0.55) 0%, rgba(44,44,44,0.45) 40%, rgba(44,44,44,0.60) 100%) !important;
+    }
+}
