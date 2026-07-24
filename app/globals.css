@@ -1,9 +1,9 @@
 :root{
   /* Type families (Curated typography spec). Real licensed faces to be self-hosted;
-     free fallbacks used until FS Siena / SÃ¶hne web licences are live. */
+     free fallbacks used until FS Siena / SÃÂ¶hne web licences are live. */
   --font-display:"FS Siena","Playfair Display",Georgia,serif;
-  --font-sans:"SÃ¶hne","Inter",-apple-system,Helvetica,Arial,sans-serif;
-  --font-mono:"SÃ¶hne Mono","IBM Plex Mono",ui-monospace,monospace;
+  --font-sans:"SÃÂ¶hne","Inter",-apple-system,Helvetica,Arial,sans-serif;
+  --font-mono:"SÃÂ¶hne Mono","IBM Plex Mono",ui-monospace,monospace;
   --font-serif:var(--font-display);
   --warm-white:#F8F4EF;
   --stone:#EDE8E2;
@@ -44,3 +44,4 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .hero-over-video h3,
 .hero-over-video p,
 .hero-over-video a{color:var(--warm-white)!important}
+@media (max-width: 640px){.three-col{grid-template-columns:1fr!important;gap:40px!important}}
