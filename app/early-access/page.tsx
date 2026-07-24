@@ -33,7 +33,7 @@ export default function EarlyAccessPage() {
     e.preventDefault();
     setStatus("sending");
     try {
-      const res = await fetch("/api/waitlist", {
+      const res = await fetch("/api/early-access", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
