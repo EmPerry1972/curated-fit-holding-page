@@ -374,6 +374,32 @@ export default function Page() {
 
       <hr style={divider} />
 
+      <section style={sectionPad}>
+        <div style={wrap}>
+          <h2 style={h2}>A considered approach</h2>
+          <div style={{ marginTop: 30, display: "grid", gap: 26 }}>
+            <div style={{ borderTop: "1px solid var(--line)", paddingTop: 20 }}>
+              <h3 style={h3}>Three professionals. Not thirty.</h3>
+              <p style={body}>Not an open list. You answer a few considered questions and meet three exercise professionals matched to how you think, not only what you want to achieve, reviewed one at a time.</p>
+            </div>
+            <div style={{ borderTop: "1px solid var(--line)", paddingTop: 20 }}>
+              <h3 style={h3}>One standard, applied to people</h3>
+              <p style={body}>If a professional would not clear the same bar as an ingredient, they do not get listed. Every professional is vetted before they appear, and ranked on how well they suit you, never on who paid to appear.</p>
+            </div>
+            <div style={{ borderTop: "1px solid var(--line)", paddingTop: 20 }}>
+              <h3 style={h3}>Warm, qualified matches</h3>
+              <p style={body}>When it is a mutual fit, we introduce you. Professionals receive warm introductions from women who already suit how they work, a considered start for both sides.</p>
+            </div>
+            <div style={{ borderTop: "1px solid var(--line)", paddingTop: 20 }}>
+              <h3 style={h3}>One ecosystem, one standard</h3>
+              <p style={body}>Curated Fit extends the trust of Curated Wellness into finding the right exercise support. The same surfaces, the same light, the same restraint, across the whole ecosystem.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr style={divider} />
+
 
       <section style={sectionPad} ref={formRef} id="apply">
         <div style={wrap}>
