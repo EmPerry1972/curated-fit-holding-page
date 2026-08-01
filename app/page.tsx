@@ -67,7 +67,7 @@ export default function Page() {
             Begin with a few considered questions, then choose from three professionals matched to your answers.
           </p>
           <p style={{ ...body, color: "var(--warm-white)", marginTop: 16, maxWidth: 500, textAlign: "right" }}>
-            Curated Fit is due to launch at the end of August. Register your interest to be among the first invited to Find your Fit.
+            Curated Fit is now available in Auckland with a carefully selected group of exercise professionals. Begin with a few considered questions and see who may suit what you need.
           </p>
           <div style={{ marginTop: 30 }}>
             <a href="/early-access" style={{ ...cta, textDecoration: "none" }}>Find your Fit</a>
