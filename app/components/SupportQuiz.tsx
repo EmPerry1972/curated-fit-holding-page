@@ -2,6 +2,237 @@
 
 import { useMemo, useState } from "react";
 
+type Trainer = {
+  id: string;
+  name: string;
+  initials: string;
+  photo?: string;
+  speciality: string;
+  suburb: string;
+  formats: string;
+  baseFit: number;
+  tags: {
+    focus: string[];
+    experience: string[];
+    setting: string[];
+    style: string[];
+  };
+  why: string;
+};
+
+const TRAINERS: Trainer[] = [
+  {
+    id: "jessica",
+    name: "Jessica Wacey",
+    initials: "JW",
+    photo: "/jessica.jpg",
+    speciality: "Strength, muscle and menopause support",
+    suburb: "Massey, Auckland",
+    formats: "In-person and online",
+    baseFit: 96,
+    tags: {
+      focus: ["strength", "weight"],
+      experience: ["menopause"],
+      setting: ["gym", "online", "home"],
+      style: ["clear"],
+    },
+    why: "Strong on building strength and supporting you through menopause.",
+  },
+  {
+    id: "aroha",
+    name: "Aroha Ngata",
+    initials: "AN",
+    speciality: "Confidence, stability and returning to movement",
+    suburb: "Mount Eden, Auckland",
+    formats: "In-person and outdoors",
+    baseFit: 93,
+    tags: {
+      focus: ["stability", "comfort", "routine"],
+      experience: ["bone", "injury"],
+      setting: ["outdoors", "home", "studio"],
+      style: ["calm"],
+    },
+    why: "Gentle, reassuring support to rebuild confidence and stability.",
+  },
+  {
+    id: "daniel",
+    name: "Daniel Reeve",
+    initials: "DR",
+    speciality: "Energy, stamina and weight support",
+    suburb: "Ponsonby, Auckland",
+    formats: "In-person and online",
+    baseFit: 91,
+    tags: {
+      focus: ["energy", "weight"],
+      experience: [],
+      setting: ["gym", "online"],
+      style: ["direct"],
+    },
+    why: "Focused on lifting your energy, stamina and everyday capacity.",
+  },
+];
+
+function overlap(a: string[], b: string[]) {
+  if (!a || !b) return 0;
+  return a.filter((x) => b.includes(x)).length;
+}
+
+function rankTrainers(answers: Record<string, string[]>) {
+  const focus = answers["support"] || [];
+  const setting = answers["setting"] || [];
+  const experience = answers["experience"] || [];
+  const style = answers["style"] || [];
+  const hasAnswers = focus.length + setting.length + experience.length + style.length > 0;
+
+  const scored = TRAINERS.map((t) => {
+    const score =
+      overlap(focus, t.tags.focus) * 3 +
+      overlap(setting, t.tags.setting) * 2 +
+      overlap(experience, t.tags.experience) * 2 +
+      overlap(style, t.tags.style) * 1;
+    const maxScore = focus.length * 3 + setting.length * 2 + experience.length * 2 + style.length * 1;
+    const fit = hasAnswers && maxScore > 0
+      ? Math.min(98, Math.max(78, Math.round(78 + (score / maxScore) * 20)))
+      : t.baseFit;
+    return { ...t, fit, score };
+  });
+
+  scored.sort((a, b) => b.fit - a.fit || b.score - a.score);
+  return scored.slice(0, 3);
+}
+
+function Avatar({ trainer }: { trainer: Trainer }) {
+  const [failed, setFailed] = useState(false);
+  const box: React.CSSProperties = {
+    width: 84,
+    height: 84,
+    borderRadius: "50%",
+    flexShrink: 0,
+    overflow: "hidden",
+    background: "var(--stone)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  };
+  if (trainer.photo && !failed) {
+    return (
+      <div style={box}>
+        <img
+          src={trainer.photo}
+          alt={trainer.name}
+          onError={() => setFailed(true)}
+          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", filter: "grayscale(1)" }}
+        />
+      </div>
+    );
+  }
+  return (
+    <div style={box}>
+      <span style={{ fontFamily: "var(--font-display)", fontSize: 26, color: "var(--text-primary)" }}>
+        {trainer.initials}
+      </span>
+    </div>
+  );
+}
+
+function ResultsView({ answers }: { answers: Record<string, string[]> }) {
+  const matches = useMemo(() => rankTrainers(answers), [answers]);
+  const wrap: React.CSSProperties = {
+    maxWidth: 720,
+    margin: "0 auto",
+    padding: "clamp(56px, 9vw, 96px) 24px",
+  };
+  return (
+    <section style={wrap}>
+      <p
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: 12,
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          color: "var(--text-label)",
+          marginBottom: 16,
+        }}
+      >
+        Your matches
+      </p>
+      <h2
+        style={{
+          fontFamily: "var(--font-display)",
+          fontWeight: 400,
+          letterSpacing: "-0.01em",
+          fontSize: "clamp(28px, 4.4vw, 40px)",
+          lineHeight: 1.1,
+          color: "var(--text-primary)",
+          margin: 0,
+        }}
+      >
+        Three coaches, chosen for you.
+      </h2>
+      <p
+        style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: 16,
+          lineHeight: 1.5,
+          color: "var(--text-secondary)",
+          marginTop: 12,
+          marginBottom: 40,
+        }}
+      >
+        Ranked on how you want to move, feel and be supported.
+      </p>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        {matches.map((t) => (
+          <div
+            key={t.id}
+            style={{
+              display: "flex",
+              gap: 20,
+              alignItems: "center",
+              padding: 20,
+              border: "1px solid var(--line)",
+              background: "var(--field)",
+            }}
+          >
+            <Avatar trainer={t} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
+                <span style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--text-primary)" }}>
+                  {t.name}
+                </span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: "var(--text-label)", whiteSpace: "nowrap" }}>
+                  {t.fit}% fit
+                </span>
+              </div>
+              <p style={{ fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--text-secondary)", margin: "4px 0 0" }}>
+                {t.speciality} · {t.suburb}
+              </p>
+              <p style={{ fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--text-primary)", margin: "10px 0 0", lineHeight: 1.5 }}>
+                {t.why}
+              </p>
+              <a
+                href="/early-access"
+                style={{
+                  display: "inline-block",
+                  marginTop: 14,
+                  fontFamily: "var(--font-sans)",
+                  fontSize: 14,
+                  color: "var(--text-primary)",
+                  textDecoration: "underline",
+                  textUnderlineOffset: 3,
+                }}
+              >
+                Register your interest →
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 type Option = { id: string; title: string; desc?: string; exclusive?: boolean };
 type Mode = "single" | "multi" | "all";
 type Question = {
@@ -129,6 +360,7 @@ const LOCATIONS: string[] = [
 ];
 
 export default function SupportQuiz() {
+  const [showMatches, setShowMatches] = useState(false);
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
   const [location, setLocation] = useState("");
@@ -322,6 +554,10 @@ export default function SupportQuiz() {
     letterSpacing: "normal",
   };
 
+  if (showMatches) {
+    return <ResultsView answers={answers} />;
+  }
+
   return (
     <section style={wrap} aria-labelledby="support-quiz-heading">
       <p style={progress}>
@@ -456,9 +692,9 @@ export default function SupportQuiz() {
             Continue
           </button>
         ) : (
-          <a href="/early-access" style={{ ...ctaBtn, textDecoration: "none" }}>
+          <button type="button" onClick={() => setShowMatches(true)} style={{ ...ctaBtn }}>
             See your matches
-          </a>
+          </button>
         )}
       </div>
     </section>
