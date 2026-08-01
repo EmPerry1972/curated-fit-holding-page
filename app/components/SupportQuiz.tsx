@@ -1,78 +1,208 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
-const MAIN_OPTIONS = [
-  {
-    id: "strength",
-    title: "Build strength and maintain muscle",
-    desc: "I want to feel stronger and maintain the muscle I have.",
-  },
-  {
-    id: "energy",
-    title: "Improve my energy and stamina",
-    desc: "I want everyday activity to feel easier and have more energy for the things I enjoy.",
-  },
-  {
-    id: "weight",
-    title: "Support a change in my weight",
-    desc: "I want exercise that supports weight loss, weight maintenance or maintaining muscle as my weight changes.",
-  },
-  {
-    id: "stability",
-    title: "Move with greater confidence and stability",
-    desc: "I want to improve my balance, support my bone health and feel more capable in everyday activity.",
-  },
-  {
-    id: "comfort",
-    title: "Exercise more comfortably or return after time away",
-    desc: "I want support that takes account of pain, injury, illness, surgery or time away from exercise.",
-  },
-  {
-    id: "routine",
-    title: "Build confidence and find a routine that works for me",
-    desc: "I want guidance, accountability and support to exercise more consistently.",
-  },
-];
-const UNSURE_OPTION = {
-  id: "unsure",
-  title: "I\u2019m not sure yet",
-  desc: "I know I would like support, but I am not completely sure where to begin.",
+type Option = { id: string; title: string; desc?: string; exclusive?: boolean };
+type Mode = "single" | "multi" | "all";
+type Question = {
+  id: string;
+  eyebrow: string;
+  question: string;
+  helper: string;
+  mode: Mode;
+  maxSelect?: number;
+  options: Option[];
 };
 
-const MAX_SELECT = 2;
+const QUESTIONS: Question[] = [
+  {
+    id: "support",
+    eyebrow: "A considered question",
+    question: "What would you most like support with right now?",
+    helper: "Choose up to two.",
+    mode: "multi",
+    maxSelect: 2,
+    options: [
+      { id: "strength", title: "Build strength and maintain muscle", desc: "I want to feel stronger and maintain the muscle I have." },
+      { id: "energy", title: "Improve my energy and stamina", desc: "I want everyday activity to feel easier and have more energy for the things I enjoy." },
+      { id: "weight", title: "Support a change in my weight", desc: "I want exercise that supports weight loss, weight maintenance or maintaining muscle as my weight changes." },
+      { id: "stability", title: "Move with greater confidence and stability", desc: "I want to improve my balance, support my bone health and feel more capable in everyday activity." },
+      { id: "comfort", title: "Exercise more comfortably or return after time away", desc: "I want support that takes account of pain, injury, illness, surgery or time away from exercise." },
+      { id: "routine", title: "Build confidence and find a routine that works for me", desc: "I want guidance, accountability and support to exercise more consistently." },
+      { id: "unsure", title: "I\u2019m not sure yet", desc: "I know I would like support, but I am not completely sure where to begin.", exclusive: true },
+    ],
+  },
+  {
+    id: "current",
+    eyebrow: "A considered question",
+    question: "Which best describes exercise in your life at the moment?",
+    helper: "Choose one.",
+    mode: "single",
+    options: [
+      { id: "regular", title: "I exercise regularly and would like more focused support." },
+      { id: "sometimes", title: "I exercise sometimes and would like greater consistency." },
+      { id: "everyday", title: "Most of my activity comes from walking, golf, gardening or everyday life." },
+      { id: "returning", title: "I am returning after some time away." },
+      { id: "new", title: "Regular exercise would be new for me." },
+      { id: "unsure2", title: "I\u2019m not sure how to describe where I am at the moment." },
+    ],
+  },
+  {
+    id: "experience",
+    eyebrow: "A considered question",
+    question: "Is there anything you would like your professional to have particular experience with?",
+    helper: "Choose all that apply.",
+    mode: "all",
+    options: [
+      { id: "menopause", title: "Perimenopause or menopause" },
+      { id: "injury", title: "Injury, ongoing pain or returning after surgery" },
+      { id: "bone", title: "Bone health, balance or stability" },
+      { id: "condition", title: "A health condition that affects how I exercise" },
+      { id: "pelvic", title: "Pelvic health considerations" },
+      { id: "weightmed", title: "Weight change or weight-loss medication" },
+      { id: "none", title: "None of these", exclusive: true },
+      { id: "later", title: "I would prefer to discuss this later", exclusive: true },
+    ],
+  },
+  {
+    id: "setting",
+    eyebrow: "A considered question",
+    question: "Where would you feel most comfortable exercising?",
+    helper: "Choose up to two.",
+    mode: "multi",
+    maxSelect: 2,
+    options: [
+      { id: "home", title: "At home" },
+      { id: "studio", title: "In a private studio" },
+      { id: "gym", title: "In a gym" },
+      { id: "outdoors", title: "Outdoors" },
+      { id: "online", title: "Online" },
+      { id: "open", title: "I am open to different settings" },
+    ],
+  },
+  {
+    id: "style",
+    eyebrow: "A considered question",
+    question: "What kind of support helps you respond well?",
+    helper: "Choose up to two.",
+    mode: "multi",
+    maxSelect: 2,
+    options: [
+      { id: "calm", title: "Calm and reassuring", desc: "I value patience and support that helps me build confidence." },
+      { id: "clear", title: "Clear and structured", desc: "I want a considered plan and a clear sense of progress." },
+      { id: "direct", title: "Direct and accountable", desc: "I respond well to honest challenge and regular follow-through." },
+      { id: "detailed", title: "Detailed and explanatory", desc: "I like understanding what I am doing and why." },
+      { id: "flexible", title: "Flexible and responsive", desc: "I want support that adapts as my needs and confidence change." },
+      { id: "warm", title: "Warm and conversational", desc: "Feeling comfortable with the person I work with matters to me." },
+      { id: "unsure5", title: "I\u2019m not sure yet", desc: "I would prefer to keep an open mind.", exclusive: true },
+    ],
+  },
+  {
+    id: "preference",
+    eyebrow: "A final considered question",
+    question: "Do you have a preference for who you work with?",
+    helper: "Choose one.",
+    mode: "single",
+    options: [
+      { id: "woman", title: "I would prefer to work with a woman." },
+      { id: "man", title: "I would prefer to work with a man." },
+      { id: "nopref", title: "I do not have a preference." },
+    ],
+  },
+];
+
+// A compact seed list for the predictive location field. Not exhaustive — replace with a
+// geocoding autocomplete API in a later phase. Typing filters these; free text is also allowed.
+const LOCATIONS: string[] = [
+  "Auckland CBD 1010", "Ponsonby 1011", "Grey Lynn 1021", "Mount Eden 1024",
+  "Epsom 1023", "Remuera 1050", "Newmarket 1023", "Parnell 1052", "Mission Bay 1071",
+  "St Heliers 1071", "Takapuna 0622", "Devonport 0624", "Milford 0620", "Albany 0632",
+  "Henderson 0612", "New Lynn 0600", "Mount Albert 1025", "Point Chevalier 1022",
+  "Manukau 2104", "Botany Downs 2010", "Howick 2014", "Papakura 2110", "Pukekohe 2120",
+  "Wellington Central 6011", "Te Aro 6011", "Thorndon 6011", "Kelburn 6012", "Newtown 6021",
+  "Miramar 6022", "Karori 6012", "Lower Hutt 5010", "Porirua 5022", "Petone 5012",
+  "Christchurch Central 8011", "Riccarton 8011", "Merivale 8014", "Fendalton 8052",
+  "Papanui 8053", "Sumner 8081", "Addington 8024", "Ilam 8041",
+  "Hamilton Central 3204", "Chartwell 3210", "Rototuna 3210", "Tauranga 3110", "Mount Maunganui 3116",
+  "Rotorua 3010", "Napier 4110", "Hastings 4122", "Palmerston North 4410", "New Plymouth 4310",
+  "Whangarei 0110", "Dunedin Central 9016", "Queenstown 9300", "Nelson 7010", "Invercargill 9810",
+];
 
 export default function SupportQuiz() {
-  const [selected, setSelected] = useState<string[]>([]);
-  const unsureSelected = selected.includes(UNSURE_OPTION.id);
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string[]>>({});
+  const [location, setLocation] = useState("");
+  const [locationFocused, setLocationFocused] = useState(false);
 
-  function toggleMain(id: string) {
-    setSelected((prev) => {
-      const withoutUnsure = prev.filter((s) => s !== UNSURE_OPTION.id);
-      if (withoutUnsure.includes(id)) {
-        return withoutUnsure.filter((s) => s !== id);
-      }
-      if (withoutUnsure.length >= MAX_SELECT) {
-        return withoutUnsure;
-      }
-      return [...withoutUnsure, id];
-    });
+  const total = QUESTIONS.length;
+  const q = QUESTIONS[step];
+  const selected = answers[q.id] || [];
+
+  function setSelected(next: string[]) {
+    setAnswers((prev) => ({ ...prev, [q.id]: next }));
   }
 
-  function toggleUnsure() {
-    setSelected((prev) =>
-      prev.includes(UNSURE_OPTION.id) ? [] : [UNSURE_OPTION.id]
-    );
+  function toggle(opt: Option) {
+    const isSelected = selected.includes(opt.id);
+    if (q.mode === "single") {
+      setSelected(isSelected ? [] : [opt.id]);
+      return;
+    }
+    // multi and all modes
+    if (opt.exclusive) {
+      setSelected(isSelected ? [] : [opt.id]);
+      return;
+    }
+    // selecting a normal option clears any exclusive selection
+    const exclusiveIds = q.options.filter((o) => o.exclusive).map((o) => o.id);
+    let base = selected.filter((s) => !exclusiveIds.includes(s));
+    if (base.includes(opt.id)) {
+      base = base.filter((s) => s !== opt.id);
+    } else {
+      if (q.mode === "multi" && q.maxSelect && base.length >= q.maxSelect) {
+        return;
+      }
+      base = [...base, opt.id];
+    }
+    setSelected(base);
   }
 
-  const mainCount = selected.filter((s) => s !== UNSURE_OPTION.id).length;
-  const atLimit = mainCount >= MAX_SELECT;
+  function isDisabled(opt: Option): boolean {
+    if (opt.exclusive || selected.includes(opt.id)) return false;
+    const exclusiveSelected = q.options.some((o) => o.exclusive && selected.includes(o.id));
+    if (exclusiveSelected) return true;
+    if (q.mode === "multi" && q.maxSelect && selected.length >= q.maxSelect) return true;
+    return false;
+  }
+
+  const isSetting = q.id === "setting";
+  const onlineSelected = isSetting && selected.includes("online");
+  const locationRequired = isSetting && !onlineSelected;
+
+  const canContinue = (() => {
+    if (selected.length === 0) return false;
+    if (isSetting && locationRequired && location.trim() === "") return false;
+    return true;
+  })();
+
+  const locationSuggestions = useMemo(() => {
+    const term = location.trim().toLowerCase();
+    if (term.length < 2) return [];
+    return LOCATIONS.filter((l) => l.toLowerCase().includes(term)).slice(0, 6);
+  }, [location]);
+
+  function goNext() {
+    if (step < total - 1) setStep(step + 1);
+  }
+  function goBack() {
+    if (step > 0) setStep(step - 1);
+  }
+
   const wrap: React.CSSProperties = {
     maxWidth: 760,
     margin: "0 auto",
     padding: "clamp(56px, 9vw, 96px) 24px",
   };
-
   const eyebrow: React.CSSProperties = {
     fontFamily: "var(--font-mono)",
     fontSize: 12,
@@ -81,7 +211,6 @@ export default function SupportQuiz() {
     color: "var(--text-label)",
     marginBottom: 16,
   };
-
   const heading: React.CSSProperties = {
     fontFamily: "var(--font-display)",
     fontWeight: 400,
@@ -89,14 +218,24 @@ export default function SupportQuiz() {
     fontSize: "clamp(28px, 4.4vw, 40px)",
     lineHeight: 1.15,
     color: "var(--text-primary)",
+    textTransform: "none",
   };
-
   const helper: React.CSSProperties = {
     fontFamily: "var(--font-sans)",
     fontSize: 16,
     lineHeight: 1.6,
     color: "var(--text-secondary)",
     marginTop: 12,
+    textTransform: "none",
+    letterSpacing: "normal",
+  };
+  const progress: React.CSSProperties = {
+    fontFamily: "var(--font-mono)",
+    fontSize: 12,
+    letterSpacing: "0.14em",
+    textTransform: "uppercase",
+    color: "var(--text-label)",
+    marginBottom: 24,
   };
 
   function optionStyle(isSelected: boolean, disabled: boolean): React.CSSProperties {
@@ -114,67 +253,215 @@ export default function SupportQuiz() {
       transition: "border-color 0.15s ease, background 0.15s ease",
     };
   }
-
   const optTitle: React.CSSProperties = {
     fontFamily: "var(--font-display)",
     fontSize: 19,
+    fontWeight: 600,
     color: "var(--text-primary)",
     margin: 0,
+    textTransform: "none",
+    letterSpacing: "normal",
   };
-
   const optDesc: React.CSSProperties = {
     fontFamily: "var(--font-sans)",
     fontSize: 15,
+    fontWeight: 400,
     lineHeight: 1.55,
     color: "var(--text-secondary)",
     margin: "6px 0 0",
+    textTransform: "none",
+    letterSpacing: "normal",
   };
+  const label: React.CSSProperties = {
+    fontFamily: "var(--font-display)",
+    fontSize: 19,
+    fontWeight: 600,
+    color: "var(--text-primary)",
+    margin: "0 0 6px",
+    textTransform: "none",
+    letterSpacing: "normal",
+  };
+  const input: React.CSSProperties = {
+    width: "100%",
+    boxSizing: "border-box",
+    background: "var(--field)",
+    border: "1px solid var(--line)",
+    borderRadius: 14,
+    padding: "16px 18px",
+    fontFamily: "var(--font-sans)",
+    fontSize: 16,
+    color: "var(--text-primary)",
+    textTransform: "none",
+    letterSpacing: "normal",
+    outline: "none",
+  };
+  const ctaBtn: React.CSSProperties = {
+    display: "inline-block",
+    background: "var(--charcoal)",
+    color: "var(--warm-white)",
+    border: "none",
+    borderRadius: 999,
+    padding: "14px 30px",
+    fontFamily: "var(--font-sans)",
+    fontSize: 15,
+    fontWeight: 600,
+    cursor: "pointer",
+    textTransform: "none",
+    letterSpacing: "normal",
+  };
+  const backBtn: React.CSSProperties = {
+    display: "inline-block",
+    background: "transparent",
+    color: "var(--text-secondary)",
+    border: "none",
+    padding: "14px 8px",
+    fontFamily: "var(--font-sans)",
+    fontSize: 15,
+    cursor: "pointer",
+    textTransform: "none",
+    letterSpacing: "normal",
+  };
+
   return (
     <section style={wrap} aria-labelledby="support-quiz-heading">
-      <p style={eyebrow}>A considered question</p>
+      <p style={progress}>
+        Question {step + 1} of {total}
+      </p>
+      <p style={eyebrow}>{q.eyebrow}</p>
       <h2 id="support-quiz-heading" style={heading}>
-        What would you most like support with right now?
+        {q.question}
       </h2>
-      <p style={helper}>Choose up to two.</p>
+      <p style={helper}>{q.helper}</p>
 
       <div role="group" aria-labelledby="support-quiz-heading" style={{ marginTop: 28 }}>
-        {MAIN_OPTIONS.map((opt) => {
+        {q.options.map((opt, i) => {
           const isSelected = selected.includes(opt.id);
-          const disabled = !isSelected && (atLimit || unsureSelected);
+          const disabled = isDisabled(opt);
+          const prevExclusive = i > 0 && opt.exclusive && !q.options[i - 1].exclusive;
           return (
-            <button
-              key={opt.id}
-              type="button"
-              aria-pressed={isSelected}
-              disabled={disabled}
-              onClick={() => toggleMain(opt.id)}
-              style={optionStyle(isSelected, disabled)}
-            >
-              <p style={optTitle}>{opt.title}</p>
-              <p style={optDesc}>{opt.desc}</p>
-            </button>
+            <div key={opt.id}>
+              {prevExclusive && (
+                <div
+                  style={{
+                    height: 1,
+                    background: "var(--line)",
+                    border: "none",
+                    margin: "26px 0 8px",
+                  }}
+                />
+              )}
+              <button
+                type="button"
+                aria-pressed={isSelected}
+                disabled={disabled}
+                onClick={() => toggle(opt)}
+                style={optionStyle(isSelected, disabled)}
+              >
+                <p style={optTitle}>{opt.title}</p>
+                {opt.desc && <p style={optDesc}>{opt.desc}</p>}
+              </button>
+            </div>
           );
         })}
+      </div>
 
-        <div
-          style={{
-            height: 1,
-            background: "var(--line)",
-            border: "none",
-            margin: "26px 0 8px",
-          }}
-        />
+      {isSetting && (
+        <div style={{ marginTop: 36 }}>
+          <p style={label}>Where would you usually like to exercise?</p>
+          <p style={{ ...helper, marginTop: 0, marginBottom: 12 }}>
+            Enter a suburb or postcode.{onlineSelected ? " Optional when exercising online." : ""}
+          </p>
+          <div style={{ position: "relative" }}>
+            <input
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              onFocus={() => setLocationFocused(true)}
+              onBlur={() => setTimeout(() => setLocationFocused(false), 120)}
+              placeholder="Start typing a suburb or postcode"
+              aria-label="Suburb or postcode"
+              autoComplete="off"
+              style={input}
+            />
+            {locationFocused && locationSuggestions.length > 0 && (
+              <ul
+                style={{
+                  listStyle: "none",
+                  margin: "6px 0 0",
+                  padding: 6,
+                  position: "absolute",
+                  left: 0,
+                  right: 0,
+                  zIndex: 10,
+                  background: "var(--warm-white)",
+                  border: "1px solid var(--line)",
+                  borderRadius: 14,
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+                }}
+              >
+                {locationSuggestions.map((s) => (
+                  <li key={s}>
+                    <button
+                      type="button"
+                      onMouseDown={() => setLocation(s)}
+                      style={{
+                        display: "block",
+                        width: "100%",
+                        textAlign: "left",
+                        background: "transparent",
+                        border: "none",
+                        borderRadius: 10,
+                        padding: "10px 12px",
+                        fontFamily: "var(--font-sans)",
+                        fontSize: 15,
+                        color: "var(--text-primary)",
+                        cursor: "pointer",
+                        textTransform: "none",
+                        letterSpacing: "normal",
+                      }}
+                    >
+                      {s}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
 
-        <button
-          type="button"
-          aria-pressed={unsureSelected}
-          onClick={toggleUnsure}
-          style={optionStyle(unsureSelected, false)}
-        >
-          <p style={optTitle}>{UNSURE_OPTION.title}</p>
-          <p style={optDesc}>{UNSURE_OPTION.desc}</p>
-        </button>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 16,
+          marginTop: 40,
+        }}
+      >
+        {step > 0 ? (
+          <button type="button" onClick={goBack} style={backBtn}>
+            Back
+          </button>
+        ) : (
+          <span />
+        )}
+        {step < total - 1 ? (
+          <button
+            type="button"
+            onClick={goNext}
+            disabled={!canContinue}
+            style={{ ...ctaBtn, opacity: canContinue ? 1 : 0.4, cursor: canContinue ? "pointer" : "not-allowed" }}
+          >
+            Continue
+          </button>
+        ) : (
+          <a href="/early-access" style={{ ...ctaBtn, textDecoration: "none" }}>
+            See your matches
+          </a>
+        )}
       </div>
     </section>
   );
 }
+
