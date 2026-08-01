@@ -76,16 +76,16 @@ export default function Page() {
 
       <section style={sectionPad}>
         <div style={wrap}>
-          <div className="three-col" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 32 }}>
-            <div>
+          <div className="three-col" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", border: "1px solid var(--line)" }}>
+            <div style={{ padding: 32, borderRight: "1px solid var(--line)" }}>
               <h3 style={h3}>Already active in your own way</h3>
               <p style={body}>Walking, gardening, golf, Pilates and everyday movement all matter. Curated Fit helps you understand what kind of support could complement what you already do.</p>
             </div>
-            <div>
+            <div style={{ padding: 32, borderRight: "1px solid var(--line)" }}>
               <h3 style={h3}>Consistency starts with the right fit</h3>
               <p style={body}>A well-matched professional can help you find an approach that feels manageable enough to continue.</p>
             </div>
-            <div>
+            <div style={{ padding: 32 }}>
               <h3 style={h3}>There is more than one way to build strength</h3>
               <p style={body}>It can begin simply, with thoughtful guidance and an approach suited to your experience.</p>
             </div>
