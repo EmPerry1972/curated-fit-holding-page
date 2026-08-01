@@ -70,7 +70,7 @@ export default function Page() {
             Curated Fit is due to launch at the end of August. Register your interest to be among the first invited to Find your Fit.
           </p>
           <div style={{ marginTop: 30 }}>
-            <a href="/early-access" style={{ ...cta, textDecoration: "none" }}>Register your interest</a>
+            <a href="/early-access" style={{ ...cta, textDecoration: "none" }}>Find your Fit</a>
           </div>
         </div>
       </section>
@@ -126,7 +126,7 @@ export default function Page() {
         <p style={{ ...body, marginTop: 16, maxWidth: 620, marginLeft: "auto", marginRight: "auto", textAlign: "center" }}>Answer a few considered questions and see three matched professionals, without creating an account or sharing your personal details.</p>
         <p style={{ ...body, marginTop: 16, maxWidth: 620, marginLeft: "auto", marginRight: "auto", textAlign: "center" }}>There is no pressure to continue. Curated Fit helps make the next step clearer, while keeping the decision entirely yours.</p>
         <div style={{ marginTop: 30 }}>
-          <a href="/early-access" style={{ ...cta, textDecoration: "none" }}>Register your interest</a>
+          <a href="/early-access" style={{ ...cta, textDecoration: "none" }}>Find your Fit</a>
         </div>
       </section>
       <SupportQuiz />
