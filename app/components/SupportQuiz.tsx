@@ -488,7 +488,7 @@ export default function SupportQuiz() {
   const optTitle: React.CSSProperties = {
     fontFamily: "var(--font-display)",
     fontSize: 19,
-    fontWeight: 600,
+    fontWeight: 700,
     color: "var(--text-primary)",
     margin: 0,
     textTransform: "none",
