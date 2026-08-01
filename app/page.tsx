@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import SupportQuiz from "./components/SupportQuiz";
 
 const serif = "var(--font-serif), 'Playfair Display', Georgia, serif";
 const mono = "var(--font-mono), 'IBM Plex Mono', ui-monospace, monospace";
@@ -128,6 +129,7 @@ export default function Page() {
           <a href="/early-access" style={{ ...cta, textDecoration: "none" }}>Register your interest</a>
         </div>
       </section>
+      <SupportQuiz />
 
       <footer style={{ borderTop: "1px solid var(--line)" }}>
         <div style={{ maxWidth: 1080, margin: "0 auto", display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center", justifyContent: "space-between", padding: "28px 24px", fontFamily: sans, fontSize: 13, color: "var(--muted)" }}>
