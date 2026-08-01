@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef } from "react";
-import SupportQuiz from "./components/SupportQuiz";
 
 const serif = "var(--font-serif), 'Playfair Display', Georgia, serif";
 const mono = "var(--font-mono), 'IBM Plex Mono', ui-monospace, monospace";
@@ -70,7 +69,7 @@ export default function Page() {
             Curated Fit is now available in Auckland with a carefully selected group of exercise professionals. Begin with a few considered questions and see who may suit what you need.
           </p>
           <div style={{ marginTop: 30 }}>
-            <a href="/early-access" style={{ ...cta, textDecoration: "none" }}>Find your Fit</a>
+            <a href="/find-your-fit" style={{ ...cta, textDecoration: "none" }}>Find your Fit</a>
           </div>
         </div>
       </section>
@@ -126,10 +125,9 @@ export default function Page() {
         <p style={{ ...body, marginTop: 16, maxWidth: 620, marginLeft: "auto", marginRight: "auto", textAlign: "center" }}>Answer a few considered questions and see three matched professionals, without creating an account or sharing your personal details.</p>
         <p style={{ ...body, marginTop: 16, maxWidth: 620, marginLeft: "auto", marginRight: "auto", textAlign: "center" }}>There is no pressure to continue. Curated Fit helps make the next step clearer, while keeping the decision entirely yours.</p>
         <div style={{ marginTop: 30 }}>
-          <a href="/early-access" style={{ ...cta, textDecoration: "none" }}>Find your Fit</a>
+          <a href="/find-your-fit" style={{ ...cta, textDecoration: "none" }}>Find your Fit</a>
         </div>
       </section>
-      <SupportQuiz />
 
       <footer style={{ borderTop: "1px solid var(--line)" }}>
         <div style={{ maxWidth: 1080, margin: "0 auto", display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center", justifyContent: "space-between", padding: "28px 24px", fontFamily: sans, fontSize: 13, color: "var(--muted)" }}>
