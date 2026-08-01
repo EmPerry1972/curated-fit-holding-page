@@ -593,7 +593,7 @@ export default function SupportQuiz() {
                 onClick={() => toggle(opt)}
                 style={optionStyle(isSelected, disabled)}
               >
-                <p style={optTitle}>{opt.title}</p>
+                <p style={optTitle}><strong style={{ fontWeight: 700, fontFamily: "inherit" }}>{opt.title}</strong></p>
                 {opt.desc && <p style={optDesc}>{opt.desc}</p>}
               </button>
             </div>
