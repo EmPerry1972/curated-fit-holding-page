@@ -42,17 +42,10 @@ export default function Page() {
 
   return (
     <main ref={topRef}>
-      <section className="hero-over-video" style={{ position: "relative", minHeight: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <img
-          src="/hero.jpg"
-          alt=""
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0 }}
-        />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(44,44,44,0.72) 0%, rgba(44,44,44,0.55) 30%, rgba(44,44,44,0.25) 60%, rgba(44,44,44,0.10) 100%), linear-gradient(180deg, rgba(44,44,44,0.35) 0%, rgba(44,44,44,0.15) 45%, rgba(44,44,44,0.45) 100%)", zIndex: 1 }} />
-
-<nav style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 24px", maxWidth: 1080, margin: "0 auto", width: "100%", flexWrap: "wrap", gap: 12 }}>
+<section style={{ position: "relative" }}>
+        <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 0", flexWrap: "wrap", gap: 12, borderBottom: "1px solid var(--line)" }}>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
-            <a href="/"><img src="/logo.png" alt="Curated Fit" style={{ height: 64, filter: "brightness(0) invert(1)" }} /></a>
+            <a href="/"><img src="/logo.png" alt="Curated Fit" style={{ height: 42, filter: "brightness(0)" }} /></a>
             <a
               href="/curated-conversations"
               className="conversations-link"
@@ -68,25 +61,30 @@ export default function Page() {
               Curated Conversations
             </a>
           </div>
-          <a href="/register" id="register-pro-link" style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "#000000", fontWeight: 700, textDecoration: "none", backgroundColor: "#ffffff", padding: "8px 14px", borderRadius: 4, display: "inline-block" }}>
+          <a href="/register" id="register-pro-link" style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 700, textDecoration: "none", backgroundColor: "var(--stone)", padding: "10px 16px", borderRadius: 4, display: "inline-block" }}>
             Register here as an Exercise Professional
           </a>
         </nav>
 
-        <div style={{ position: "relative", zIndex: 2, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-end", textAlign: "right", padding: "clamp(48px, 8vw, 96px) 24px", maxWidth: 1080, margin: "0 auto", width: "100%" }}>
-          <p style={{ ...eyebrow, color: "var(--warm-white)", marginBottom: 16 }}>The movement layer of Curated Wellness</p>
-          <h1 style={{ maxWidth: 680,  ...h1, color: "var(--warm-white)" }}>The right place to begin starts with the right person.</h1>
-          <p style={{ ...body, color: "var(--warm-white)", marginTop: 22, maxWidth: 500, textAlign: "right" }}>
-            Curated Fit helps you find an exercise professional suited to what you want to achieve, where you would feel most comfortable, and the kind of support you would prefer.
-          </p>
-          <p style={{ ...body, color: "var(--warm-white)", marginTop: 16, maxWidth: 500, textAlign: "right" }}>
-            Begin with a few considered questions, then choose from three professionals matched to your answers.
-          </p>
-          <p style={{ ...body, color: "var(--warm-white)", marginTop: 16, maxWidth: 500, textAlign: "right" }}>
-            Curated Fit is now available in Auckland with a carefully selected group of exercise professionals. Begin with a few considered questions and see who may suit what you need.
-          </p>
-          <div style={{ marginTop: 30 }}>
-            <a href="/find-your-fit" style={{ ...cta, textDecoration: "none" }}>Find your Fit</a>
+        <div className="hero-split" style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", alignItems: "stretch", gap: 48, minHeight: "70vh" }}>
+          <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", padding: "clamp(32px, 5vw, 64px) 0" }}>
+            <p style={eyebrow}>The movement layer of Curated Wellness</p>
+            <h1 style={{ ...h1, maxWidth: 560 }}>The right place to begin starts with the right person.</h1>
+            <p style={{ ...body, marginTop: 22, maxWidth: 480 }}>
+              Curated Fit helps you find an exercise professional suited to what you want to achieve, where you would feel most comfortable, and the kind of support you would prefer.
+            </p>
+            <p style={{ ...body, marginTop: 16, maxWidth: 480 }}>
+              Begin with a few considered questions, then choose from three professionals matched to your answers.
+            </p>
+            <p style={{ ...body, marginTop: 16, maxWidth: 480 }}>
+              Curated Fit is now available in Auckland with a carefully selected group of exercise professionals.
+            </p>
+            <div style={{ marginTop: 30 }}>
+              <a href="/find-your-fit" style={{ ...cta, textDecoration: "none" }}>Find your Fit</a>
+            </div>
+          </div>
+          <div style={{ position: "relative", minHeight: 320, borderRadius: 12, overflow: "hidden" }}>
+            <img src="/hero.jpg" alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
         </div>
       </section>
