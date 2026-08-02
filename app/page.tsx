@@ -55,6 +55,7 @@ export default function Page() {
             <a href="/"><img src="/logo.png" alt="Curated Fit" style={{ height: 64, filter: "brightness(0) invert(1)" }} /></a>
             <a
               href="/curated-conversations"
+              className="conversations-link"
               style={{
                 fontFamily: mono,
                 fontSize: 11,
