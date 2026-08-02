@@ -94,23 +94,41 @@ type Item = { kind: string; title: string; body: string; meta: string };
 const PODCASTS: Item[] = [
   {
     kind: "Podcast",
-    title: "The morning it felt easier to get off the floor",
-    body: "A conversation about strength that shows up in ordinary moments, and why it matters more than any number.",
-    meta: "Episode 01 · 34 min",
+    title: "Why knowing strength matters still does not make us do it",
+    body: "On why information alone rarely changes behaviour, and what actually makes strength training feel safe enough to begin.",
+    meta: "Dr Peter Steidl, neuroscientist, with a qualified Curated Fit professional · Curated Fit Journal",
   },
   {
     kind: "Podcast",
-    title: "When the walk stopped being enough",
-    body: "On recognising the point where everyday movement asks for a little more, and how to add it gently.",
-    meta: "Episode 02 · 41 min",
+    title: "Creatine is creatine. Or is it?",
+    body: "How creatine monohydrate is made and tested, and what the evidence really supports for strength, performance and cognition.",
+    meta: "An Alzchem technical specialist with an independent creatine researcher · Curated Wellness, Cross-Linked",
   },
   {
     kind: "Podcast",
-    title: "The years no one warned her about",
-    body: "Menopause, muscle and the quiet changes that reshape how exercise feels from your forties onward.",
-    meta: "Episode 03 · 38 min",
+    title: "Bovine, marine or ovine: does the source of collagen matter?",
+    body: "What separates ovine collagen from other sources, and why a development story should not substitute for product-specific evidence.",
+    meta: "A Silver Fern Farms product developer with an independent collagen specialist · Curated Wellness, Cross-Linked",
   },
-];
+  {
+    kind: "Podcast",
+    title: "You reached your goal weight. What needs protecting now?",
+    body: "On protecting muscle and building a sustainable maintenance plan once the number on the scale stops moving.",
+    meta: "An independent obesity-medicine doctor or endocrinologist with an exercise physiologist · Curated Fit Journal",
+  },
+  {
+    kind: "Podcast",
+    title: "Can a blood test tell you whether you are healthy?",
+    body: "What blood tests can and cannot tell you about your health, and why a single result rarely tells the whole story.",
+    meta: "A laboratory-medicine specialist or independent GP · Curated Wellness, Cross-Linked",
+  },
+  {
+    kind: "Podcast",
+    title: 'When a supplement says "tested," what was actually tested?',
+    body: "What supplement testing claims actually mean, and how to tell identity, potency and purity testing apart.",
+    meta: "An independent analytical laboratory specialist · Curated Wellness, Cross-Linked",
+  },
+  ];
 
 const BLOGS: Item[] = [
   {
