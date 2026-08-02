@@ -1,8 +1,6 @@
 import { notFound } from "next/navigation";
 import Content from "./Content";
-
-// Set PUBLISHED to true when the page is ready to go live.
-const PUBLISHED = false;
+import { CONVERSATIONS_PUBLISHED } from "../config";
 
 // While unpublished, the page can still be previewed at:
 //   /curated-conversations?preview=cf-preview-2026
@@ -16,7 +14,7 @@ export default async function CuratedConversationsPage({
   const params = await searchParams;
   const previewOk = params?.preview === PREVIEW_KEY;
 
-  if (!PUBLISHED && !previewOk) {
+  if (!CONVERSATIONS_PUBLISHED && !previewOk) {
     notFound();
   }
 
