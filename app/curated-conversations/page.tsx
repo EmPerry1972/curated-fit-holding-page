@@ -1,5 +1,10 @@
 "use client";
 
+import { notFound } from "next/navigation";
+
+// Set to true when content is ready to publish this page.
+const PUBLISHED = false;
+
 const serif = "var(--font-serif), 'Playfair Display', Georgia, serif";
 const mono = "var(--font-mono), 'IBM Plex Mono', ui-monospace, monospace";
 const sans = "var(--font-sans), 'Inter', -apple-system, Helvetica, Arial, sans-serif";
@@ -167,6 +172,10 @@ function Grid({ items }: { items: { kind: string; title: string; body: string; m
 }
 
 export default function CuratedConversationsPage() {
+  if (!PUBLISHED) {
+    notFound();
+  }
+
   return (
     <main style={{ minHeight: "100vh", background: "var(--warm-white)" }}>
       <nav
