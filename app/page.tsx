@@ -1,4 +1,5 @@
 "use client";
+import { CONVERSATIONS_PUBLISHED } from "./config";
 
 import { useRef } from "react";
 
@@ -54,6 +55,21 @@ export default function Page() {
           <a href="/register" id="register-pro-link" style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "#000000", fontWeight: 700, textDecoration: "none", backgroundColor: "#ffffff", padding: "8px 14px", borderRadius: 4, display: "inline-block" }}>
             Register here as an Exercise Professional
           </a>
+        {CONVERSATIONS_PUBLISHED && (
+          <a
+            href="/curated-conversations"
+            style={{
+              fontFamily: mono,
+              fontSize: 11,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "var(--text-primary)",
+              textDecoration: "none",
+            }}
+          >
+            Curated Conversations
+          </a>
+        )}
         </nav>
 
         <div style={{ position: "relative", zIndex: 2, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-end", textAlign: "right", padding: "clamp(48px, 8vw, 96px) 24px", maxWidth: 1080, margin: "0 auto", width: "100%" }}>
