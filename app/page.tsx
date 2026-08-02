@@ -60,6 +60,7 @@ export default function Page() {
                 fontSize: 11,
                 letterSpacing: "0.12em",
                 color: "var(--text-primary)",
+                textTransform: "none",
                 textDecoration: "none",
               }}
             >
