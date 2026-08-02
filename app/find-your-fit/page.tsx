@@ -11,8 +11,7 @@ export default function FindYourFitPage() {
         <a href="/register" id="register-pro-link" style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "#000000", fontWeight: 700, textDecoration: "none", backgroundColor: "#ffffff", padding: "8px 14px", borderRadius: 4, display: "inline-block", border: "1px solid var(--line)" }}>
           Register here as an Exercise Professional
         </a>
-        {CONVERSATIONS_PUBLISHED && (
-          <a
+        <a
             href="/curated-conversations"
             style={{
               fontFamily: mono,
@@ -25,7 +24,6 @@ export default function FindYourFitPage() {
           >
             Curated Conversations
           </a>
-        )}
       </nav>
       <SupportQuiz />
     </main>
