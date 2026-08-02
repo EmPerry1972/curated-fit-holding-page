@@ -50,23 +50,24 @@ export default function Page() {
         />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(44,44,44,0.72) 0%, rgba(44,44,44,0.55) 30%, rgba(44,44,44,0.25) 60%, rgba(44,44,44,0.10) 100%), linear-gradient(180deg, rgba(44,44,44,0.35) 0%, rgba(44,44,44,0.15) 45%, rgba(44,44,44,0.45) 100%)", zIndex: 1 }} />
 
-        <nav style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 24px", maxWidth: 1080, margin: "0 auto", width: "100%", flexWrap: "wrap", gap: 12 }}>
-          <a href="/"><img src="/logo.png" alt="Curated Fit" style={{ height: 64, filter: "brightness(0) invert(1)" }} /></a>
+<nav style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 24px", maxWidth: 1080, margin: "0 auto", width: "100%", flexWrap: "wrap", gap: 12 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
+            <a href="/"><img src="/logo.png" alt="Curated Fit" style={{ height: 64, filter: "brightness(0) invert(1)" }} /></a>
+            <a
+              href="/curated-conversations"
+              style={{
+                fontFamily: mono,
+                fontSize: 11,
+                letterSpacing: "0.12em",
+                color: "var(--text-primary)",
+                textDecoration: "none",
+              }}
+            >
+              Curated Conversations
+            </a>
+          </div>
           <a href="/register" id="register-pro-link" style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "#000000", fontWeight: 700, textDecoration: "none", backgroundColor: "#ffffff", padding: "8px 14px", borderRadius: 4, display: "inline-block" }}>
             Register here as an Exercise Professional
-          </a>
-          <a
-            href="/curated-conversations"
-            style={{
-              fontFamily: mono,
-              fontSize: 11,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              color: "var(--text-primary)",
-              textDecoration: "none",
-            }}
-          >
-            Curated Conversations
           </a>
         </nav>
 
