@@ -43,48 +43,33 @@ export default function Page() {
   return (
     <main ref={topRef}>
 <section style={{ position: "relative" }}>
-        <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 0", flexWrap: "wrap", gap: 12, borderBottom: "1px solid var(--line)" }}>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
-            <a href="/"><img src="/logo.png" alt="Curated Fit" style={{ height: 42, filter: "brightness(0)" }} /></a>
-            <a
-              href="/curated-conversations"
-              className="conversations-link"
-              style={{
-                fontFamily: mono,
-                fontSize: 11,
-                letterSpacing: "0.12em",
-                color: "var(--text-primary)",
-                textTransform: "none",
-                textDecoration: "none",
-              }}
-            >
-              Curated Conversations
-            </a>
-          </div>
-          <a href="/register" id="register-pro-link" style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 700, textDecoration: "none", backgroundColor: "var(--stone)", padding: "10px 16px", borderRadius: 4, display: "inline-block" }}>
+        <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "26px 0", flexWrap: "wrap", gap: 12, borderBottom: "1px solid var(--line)" }}>
+          <a href="/"><img src="/logo.png" alt="Curated Fit" style={{ height: 42, filter: "brightness(0)" }} /></a>
+          <a href="/register" id="register-pro-link" style={{ fontFamily: sans, fontSize: 11, letterSpacing: "1px", fontWeight: 600, textDecoration: "none", backgroundColor: "#f0ede6", padding: "10px 20px", display: "inline-block" }}>
             Register here as an Exercise Professional
           </a>
         </nav>
 
-        <div className="hero-split" style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", alignItems: "stretch", gap: 48, minHeight: "70vh" }}>
-          <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", padding: "clamp(32px, 5vw, 64px) 0" }}>
-            <p style={eyebrow}>The movement layer of Curated Wellness</p>
-            <h1 style={{ ...h1, maxWidth: 560 }}>The right place to begin starts with the right person.</h1>
-            <p style={{ ...body, marginTop: 22, maxWidth: 480 }}>
+        <div className="hero-split" style={{ display: "grid", gridTemplateColumns: "52% 48%", alignItems: "center", minHeight: "calc(100vh - 96px)" }}>
+          <div className="hero-textcol" style={{ padding: "60px 70px" }}>
+            <p style={{ fontFamily: sans, fontSize: 12, letterSpacing: "2px", color: "#9a9a92", marginBottom: 18 }}>THE MOVEMENT LAYER OF CURATED WELLNESS</p>
+            <h1 style={{ ...h1, fontSize: "clamp(30px, 5vw, 46px)", lineHeight: 1.18, marginBottom: 22, maxWidth: 560 }}>The right place to begin starts with the right person.</h1>
+            <p style={{ fontFamily: sans, fontSize: 15, lineHeight: 1.7, color: "#57564f", marginBottom: 14, maxWidth: 440 }}>
               Curated Fit helps you find an exercise professional suited to what you want to achieve, where you would feel most comfortable, and the kind of support you would prefer.
             </p>
-            <p style={{ ...body, marginTop: 16, maxWidth: 480 }}>
+            <p style={{ fontFamily: sans, fontSize: 15, lineHeight: 1.7, color: "#57564f", marginBottom: 14, maxWidth: 440 }}>
               Begin with a few considered questions, then choose from three professionals matched to your answers.
             </p>
-            <p style={{ ...body, marginTop: 16, maxWidth: 480 }}>
+            <p style={{ fontFamily: sans, fontSize: 15, lineHeight: 1.7, color: "#57564f", marginBottom: 14, maxWidth: 440 }}>
               Curated Fit is now available in Auckland with a carefully selected group of exercise professionals.
             </p>
-            <div style={{ marginTop: 30 }}>
-              <a href="/find-your-fit" style={{ ...cta, textDecoration: "none" }}>Find your Fit</a>
+            <div style={{ marginTop: 30, display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
+              <a href="/find-your-fit" style={{ fontFamily: sans, backgroundColor: "var(--ink)", color: "var(--warm-white)", padding: "16px 32px", fontSize: 13, letterSpacing: "1px", fontWeight: 600, textDecoration: "none", display: "inline-block" }}>Find your Fit</a>
+              <a href="/curated-conversations" className="conversations-link" style={{ fontFamily: sans, fontSize: 12, color: "#8a8a82", textDecoration: "underline" }}>Curated Conversations →</a>
             </div>
           </div>
-          <div style={{ position: "relative", minHeight: 320, borderRadius: 12, overflow: "hidden" }}>
-            <img src="/hero.jpg" alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+          <div className="hero-imgcol" style={{ position: "relative", height: "100%", alignSelf: "stretch", overflow: "hidden" }}>
+            <img src="/hero.jpg" alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 50%", display: "block", filter: "saturate(1.05) brightness(1.02)" }} />
           </div>
         </div>
       </section>
