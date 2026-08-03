@@ -89,3 +89,9 @@ main {
     min-height: auto !important;
   }
 }
+
+/* Hero split (Option C): reset text padding and set image height on narrow screens */
+@media (max-width: 820px) {
+  .hero-textcol { padding: 0 !important; }
+  .hero-imgcol { height: 320px !important; }
+}
