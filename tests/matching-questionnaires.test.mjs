@@ -22,15 +22,19 @@ import {
 import {
   CLIENT_WRITABLE_FIELDS,
   CLIENT_TEST_COOKIE_NAME,
+  INVITATION_ADMIN_COOKIE_MAX_AGE,
+  INVITATION_ADMIN_COOKIE_NAME,
   InvitationTokenError,
   PROFESSIONAL_WRITABLE_FIELDS,
   StagingConfigError,
   createClientQuestionnaire,
+  createInvitationAdminCookieHeader,
   findProfessionalByInvitationToken,
   generateProfessionalInvitation,
   getStagingConfig,
   hashInvitationToken,
   isClientTestCookieValid,
+  isInvitationAdminCookieValid,
   submitProfessionalQuestionnaire,
 } from "../app/lib/staging-airtable.js";
 
@@ -44,6 +48,7 @@ function installEnv() {
   process.env.AIRTABLE_MATCHING_TOKEN = "secret-test-pat";
   process.env.MATCHING_QUESTIONNAIRE_ORIGIN = "https://questionnaire.example";
   process.env.MATCHING_CLIENT_TEST_SECRET = "separate-client-test-password";
+  process.env.MATCHING_INVITATION_ADMIN_SECRET = "separate-invitation-admin-password";
 }
 
 function validExpertise(level = "None") {
@@ -519,4 +524,120 @@ test("client-test secret is never returned, logged or embedded in page source", 
   assert.doesNotMatch(response.headers.get("set-cookie"), new RegExp(process.env.MATCHING_CLIENT_TEST_SECRET));
   const source = `${await readFile("app/client-matching-test/page.tsx", "utf8")}\n${await readFile("app/components/HiddenMatchingQuestionnaire.tsx", "utf8")}`;
   assert.doesNotMatch(source, /separate-client-test-password/);
+});
+
+test("missing, wrong and client-test admin passwords receive the same generic failure", async () => {
+  installEnv();
+  const { POST } = await import("../app/api/matching-staging/invitation-auth/route.js");
+  const request = (password) => new Request("https://questionnaire.example/api/matching-staging/invitation-auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password }) });
+  const wrong = await POST(request("wrong"));
+  const clientSecret = await POST(request(process.env.MATCHING_CLIENT_TEST_SECRET));
+  delete process.env.MATCHING_INVITATION_ADMIN_SECRET;
+  const missing = await POST(request("separate-invitation-admin-password"));
+  assert.equal(wrong.status, 404); assert.equal(clientSecret.status, 404); assert.equal(missing.status, 404);
+  assert.deepEqual(await wrong.json(), await clientSecret.json());
+  assert.deepEqual(await missing.json(), { error: "This facility is unavailable." });
+});
+
+test("invitation admin cookie is signed and expires server-side at 15 minutes", () => {
+  installEnv();
+  const issued = new Date("2026-08-03T00:00:00.000Z");
+  const header = createInvitationAdminCookieHeader("https://questionnaire.example", { now: issued });
+  const value = header.split(";")[0].slice(`${INVITATION_ADMIN_COOKIE_NAME}=`.length);
+  assert.match(header, new RegExp(`^${INVITATION_ADMIN_COOKIE_NAME}=`));
+  assert.match(header, /HttpOnly/i); assert.match(header, /SameSite=Strict/i); assert.match(header, /Secure/i);
+  assert.match(header, new RegExp(`Max-Age=${INVITATION_ADMIN_COOKIE_MAX_AGE}`)); assert.match(header, /Expires=/i);
+  assert.equal(isInvitationAdminCookieValid(value, { now: new Date(issued.getTime() + 899_000) }), true);
+  assert.equal(isInvitationAdminCookieValid(value, { now: new Date(issued.getTime() + 900_000) }), false);
+  assert.equal(isInvitationAdminCookieValid(`${value.slice(0, -1)}0`, { now: issued }), false);
+  assert.doesNotMatch(header, new RegExp(process.env.MATCHING_INVITATION_ADMIN_SECRET));
+});
+
+test("unauthenticated invitation requests receive a generic unavailable response", async () => {
+  installEnv();
+  const { POST } = await import("../app/api/matching-staging/invitations/route.js");
+  const response = await POST(new Request("https://questionnaire.example/api/matching-staging/invitations", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "verify", professionalRecordId: "recProfessional123" }) }));
+  assert.equal(response.status, 404);
+  assert.deepEqual(await response.json(), { error: "This facility is unavailable." });
+});
+
+test("authenticated admin verifies one exact Waitlist professional and returns Name", async () => {
+  const mock = createAirtableMock({ tokenRecords: [] });
+  await withMock(mock, async (calls) => {
+    const { POST: authenticate } = await import("../app/api/matching-staging/invitation-auth/route.js");
+    const { POST: invitations } = await import("../app/api/matching-staging/invitations/route.js");
+    const auth = await authenticate(new Request("https://questionnaire.example/api/matching-staging/invitation-auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: process.env.MATCHING_INVITATION_ADMIN_SECRET }) }));
+    const response = await invitations(new Request("https://questionnaire.example/api/matching-staging/invitations", { method: "POST", headers: { "Content-Type": "application/json", Cookie: auth.headers.get("set-cookie") }, body: JSON.stringify({ action: "verify", professionalRecordId: "recProfessional123" }) }));
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { professional: { id: "recProfessional123", name: "Alex" } });
+    assert.deepEqual(calls.map(({ table, recordId, method }) => ({ table, recordId, method })), [{ table: "Waitlist", recordId: "recProfessional123", method: "GET" }]);
+  });
+});
+
+test("admin generation writes only the three invitation fields and never creates Waitlist records", async () => {
+  const mock = createAirtableMock({ tokenRecords: [] });
+  await withMock(mock, async (calls) => {
+    const { POST: authenticate } = await import("../app/api/matching-staging/invitation-auth/route.js");
+    const { POST: invitations } = await import("../app/api/matching-staging/invitations/route.js");
+    const auth = await authenticate(new Request("https://questionnaire.example/api/matching-staging/invitation-auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: process.env.MATCHING_INVITATION_ADMIN_SECRET }) }));
+    const response = await invitations(new Request("https://questionnaire.example/api/matching-staging/invitations", { method: "POST", headers: { "Content-Type": "application/json", Cookie: auth.headers.get("set-cookie") }, body: JSON.stringify({ action: "generate", professionalRecordId: "recProfessional123", expiry: FUTURE_EXPIRY, origin: "https://preview.example" }) }));
+    assert.equal(response.status, 200);
+    const patch = calls.find((call) => call.table === "Waitlist" && call.method === "PATCH");
+    assert.deepEqual(Object.keys(patch.body.fields), ["Invitation Token Hash", "Invitation Token Expiry", "Invitation Token Status"]);
+    assert.equal(patch.body.fields["Invitation Token Expiry"], FUTURE_EXPIRY);
+    assert.equal(patch.body.fields["Invitation Token Status"], "Active");
+    assert.equal("Status" in patch.body.fields, false);
+    assert.equal("Approved for Matching" in patch.body.fields, false);
+    assert.equal(calls.some((call) => call.table === "Waitlist" && call.method === "POST"), false);
+  });
+});
+
+test("admin generation never stores or logs the plaintext token and outputs its link exactly once", async () => {
+  const mock = createAirtableMock({ tokenRecords: [] });
+  await withMock(mock, async (calls) => {
+    const messages = [];
+    const originalError = console.error;
+    const originalLog = console.log;
+    console.error = (...args) => messages.push(args.join(" "));
+    console.log = (...args) => messages.push(args.join(" "));
+    try {
+      const { POST: authenticate } = await import("../app/api/matching-staging/invitation-auth/route.js");
+      const { POST: invitations } = await import("../app/api/matching-staging/invitations/route.js");
+      const auth = await authenticate(new Request("https://questionnaire.example/api/matching-staging/invitation-auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: process.env.MATCHING_INVITATION_ADMIN_SECRET }) }));
+      const response = await invitations(new Request("https://questionnaire.example/api/matching-staging/invitations", { method: "POST", headers: { "Content-Type": "application/json", Cookie: auth.headers.get("set-cookie") }, body: JSON.stringify({ action: "generate", professionalRecordId: "recProfessional123", expiry: FUTURE_EXPIRY, origin: "https://preview.example" }) }));
+      const data = await response.json();
+      const rawToken = new URL(data.invitationUrl).searchParams.get("token");
+      assert.equal(isValidInvitationToken(rawToken), true);
+      assert.equal(JSON.stringify(data).split(rawToken).length - 1, 1);
+      assert.equal(JSON.stringify(calls).includes(rawToken), false);
+      assert.equal(messages.join("\n").includes(rawToken), false);
+      assert.equal(calls.find((call) => call.method === "PATCH").body.fields["Invitation Token Hash"], hashInvitationToken(rawToken));
+    } finally {
+      console.error = originalError;
+      console.log = originalLog;
+    }
+  });
+});
+
+test("invitation administration has no email, public API, listing or public navigation path", async () => {
+  const files = [
+    "app/components/MatchingInvitationAdmin.tsx",
+    "app/api/matching-staging/invitation-auth/route.js",
+    "app/api/matching-staging/invitations/route.js",
+    "app/matching-invitation-admin/page.tsx",
+  ];
+  const source = (await Promise.all(files.map((file) => readFile(file, "utf8")))).join("\n");
+  assert.doesNotMatch(source, /\/api\/waitlist|sendConfirmationEmail|resend\.com/);
+  assert.doesNotMatch(source, /listByFormula|AIRTABLE_MATCHING_TOKEN|MATCHING_CLIENT_TEST_SECRET/);
+  for (const publicFile of ["app/page.tsx", "app/register/page.tsx", "app/find-your-fit/page.tsx"]) {
+    assert.doesNotMatch(await readFile(publicFile, "utf8"), /matching-invitation-admin/);
+  }
+});
+
+test("invitation admin page is noindex and the staging example keeps its secret empty", async () => {
+  const layout = await readFile("app/matching-invitation-admin/layout.tsx", "utf8");
+  const example = await readFile(".env.matching-staging.example", "utf8");
+  assert.match(layout, /index: false/); assert.match(layout, /follow: false/);
+  assert.match(example, /^MATCHING_INVITATION_ADMIN_SECRET=$/m);
+  assert.doesNotMatch(example, /^MATCHING_INVITATION_ADMIN_SECRET=.+$/m);
 });

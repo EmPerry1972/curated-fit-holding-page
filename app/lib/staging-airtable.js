@@ -22,6 +22,8 @@ const DEFAULT_TABLES = Object.freeze({
 
 export const CLIENT_TEST_COOKIE_NAME = "curated_fit_client_test";
 const CLIENT_TEST_COOKIE_MAX_AGE = 30 * 60;
+export const INVITATION_ADMIN_COOKIE_NAME = "curated_fit_invitation_admin";
+export const INVITATION_ADMIN_COOKIE_MAX_AGE = 15 * 60;
 
 export const PROFESSIONAL_WRITABLE_FIELDS = Object.freeze([
   "Roles", "Structured Availability", "Experienced Client Stages", "Working Settings", "Base Suburb",
@@ -85,6 +87,13 @@ function getClientTestSecret() {
   return secret;
 }
 
+function getInvitationAdminSecret() {
+  getStagingConfig();
+  const secret = process.env.MATCHING_INVITATION_ADMIN_SECRET;
+  if (!secret) throw new StagingConfigError("The invitation administration facility is unavailable.");
+  return secret;
+}
+
 function safeStringEqual(left, right) {
   const leftBuffer = Buffer.from(String(left), "utf8");
   const rightBuffer = Buffer.from(String(right), "utf8");
@@ -93,6 +102,14 @@ function safeStringEqual(left, right) {
 
 function clientTestCookieValue(secret) {
   return createHmac("sha256", secret).update("curated-fit-client-test-v1", "utf8").digest("hex");
+}
+
+function invitationAdminCookieSignature(secret, issuedAt) {
+  return createHmac("sha256", secret).update(`curated-fit-invitation-admin-v1:${issuedAt}`, "utf8").digest("hex");
+}
+
+function parseCookies(cookieHeader) {
+  return Object.fromEntries(String(cookieHeader || "").split(";").map((item) => item.trim().split(/=(.*)/s).slice(0, 2)).filter(([name]) => name));
 }
 
 export function authenticateClientTestPassword(password) {
@@ -106,8 +123,7 @@ export function isClientTestCookieValid(cookieValue) {
 }
 
 export function isClientTestRequestAuthenticated(request) {
-  const cookieHeader = request.headers.get("cookie") || "";
-  const cookies = Object.fromEntries(cookieHeader.split(";").map((item) => item.trim().split(/=(.*)/s).slice(0, 2)).filter(([name]) => name));
+  const cookies = parseCookies(request.headers.get("cookie"));
   return isClientTestCookieValid(cookies[CLIENT_TEST_COOKIE_NAME]);
 }
 
@@ -116,6 +132,37 @@ export function createClientTestCookieHeader(requestUrl) {
   const hostname = new URL(requestUrl).hostname;
   const secure = !["localhost", "127.0.0.1", "::1"].includes(hostname);
   return `${CLIENT_TEST_COOKIE_NAME}=${clientTestCookieValue(secret)}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${CLIENT_TEST_COOKIE_MAX_AGE}${secure ? "; Secure" : ""}`;
+}
+
+export function authenticateInvitationAdminPassword(password) {
+  const secret = getInvitationAdminSecret();
+  return typeof password === "string" && safeStringEqual(password, secret);
+}
+
+export function createInvitationAdminCookieHeader(requestUrl, { now = new Date() } = {}) {
+  const secret = getInvitationAdminSecret();
+  const issuedAt = Math.floor(now.getTime() / 1000);
+  const value = `${issuedAt}.${invitationAdminCookieSignature(secret, issuedAt)}`;
+  const hostname = new URL(requestUrl).hostname;
+  const secure = !["localhost", "127.0.0.1", "::1"].includes(hostname);
+  const expires = new Date((issuedAt + INVITATION_ADMIN_COOKIE_MAX_AGE) * 1000).toUTCString();
+  return `${INVITATION_ADMIN_COOKIE_NAME}=${value}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${INVITATION_ADMIN_COOKIE_MAX_AGE}; Expires=${expires}${secure ? "; Secure" : ""}`;
+}
+
+export function isInvitationAdminCookieValid(cookieValue, { now = new Date() } = {}) {
+  const secret = getInvitationAdminSecret();
+  if (typeof cookieValue !== "string") return false;
+  const [issuedAtText, suppliedSignature, extra] = cookieValue.split(".");
+  if (extra !== undefined || !/^\d+$/.test(issuedAtText || "") || !suppliedSignature) return false;
+  const issuedAt = Number(issuedAtText);
+  const currentTime = Math.floor(now.getTime() / 1000);
+  if (!Number.isSafeInteger(issuedAt) || issuedAt > currentTime || currentTime - issuedAt >= INVITATION_ADMIN_COOKIE_MAX_AGE) return false;
+  return safeStringEqual(suppliedSignature, invitationAdminCookieSignature(secret, issuedAt));
+}
+
+export function isInvitationAdminRequestAuthenticated(request, options) {
+  const cookies = parseCookies(request.headers.get("cookie"));
+  return isInvitationAdminCookieValid(cookies[INVITATION_ADMIN_COOKIE_NAME], options);
 }
 
 function escapeFormulaValue(value) {
@@ -306,6 +353,13 @@ async function invitationHashExists(hash) {
   return Boolean(result.records?.length);
 }
 
+export async function getWaitlistProfessional(professionalRecordId) {
+  if (!/^rec[A-Za-z0-9]{10,}$/.test(professionalRecordId || "")) throw new AirtableRequestError("A valid professional record is required.", 400);
+  const { tables } = getStagingConfig();
+  const record = await airtableRequest(tables.waitlist, { recordId: professionalRecordId });
+  return { id: record.id, name: record.fields?.Name || "Unnamed professional" };
+}
+
 export async function generateProfessionalInvitation({ professionalRecordId, expiry, origin }) {
   if (!/^rec[A-Za-z0-9]{10,}$/.test(professionalRecordId || "")) throw new Error("A valid Airtable professional record ID is required.");
   const expiryDate = new Date(expiry);
@@ -313,7 +367,7 @@ export async function generateProfessionalInvitation({ professionalRecordId, exp
   const parsedOrigin = new URL(origin);
   if (!/^https?:$/.test(parsedOrigin.protocol)) throw new Error("An HTTP or HTTPS questionnaire origin is required.");
   const { tables } = getStagingConfig();
-  await airtableRequest(tables.waitlist, { recordId: professionalRecordId });
+  await getWaitlistProfessional(professionalRecordId);
 
   let rawToken;
   let tokenHash;
