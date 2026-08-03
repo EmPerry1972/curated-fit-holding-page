@@ -135,10 +135,12 @@ export function validateProfessionalSubmission(data) {
   }
 
   validateMulti(errors, "workingSettings", data?.workingSettings, SETTINGS.map(({ id }) => id));
-  if (!data?.baseSuburb?.trim()) errors.baseSuburb = "Add your base suburb.";
+  const baseSuburb = data?.baseSuburb || "";
+  if (baseSuburb && !SERVICE_AREAS.some(({ id }) => id === baseSuburb)) errors.baseSuburb = "Choose a canonical service area.";
+  if (!baseSuburb && !data?.otherArea?.trim()) errors.otherArea = "Add your base suburb or area if it is not listed.";
   if (typeof data?.travelsToClients !== "boolean") errors.travelsToClients = "Choose whether you travel to clients.";
   validateMulti(errors, "travelAreas", data?.travelAreas || [], SERVICE_AREAS.map(({ id }) => id), { min: 0 });
-  if (data?.travelCharge !== "" && data?.travelCharge !== undefined && (!Number.isFinite(Number(data.travelCharge)) || Number(data.travelCharge) < 0)) errors.travelCharge = "Enter a valid non-negative travel charge.";
+  if (data?.travelCharge !== "" && data?.travelCharge !== undefined && (!Number.isFinite(Number(String(data.travelCharge).trim())) || Number(String(data.travelCharge).trim()) < 0)) errors.travelCharge = "Enter a valid non-negative travel charge.";
   validateMulti(errors, "supportStyles", data?.supportStyles, SUPPORT_STYLES.map(({ id }) => id), { max: 2 });
   if (!PROFESSIONAL_GENDERS.includes(data?.gender)) errors.gender = "Choose an approved gender option.";
   return errors;

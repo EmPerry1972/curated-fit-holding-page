@@ -4,6 +4,7 @@ import {
   STAGING_RESPONSE_HEADERS,
   StagingConfigError,
   createClientQuestionnaire,
+  isClientTestRequestAuthenticated,
 } from "../../../lib/staging-airtable.js";
 
 export const dynamic = "force-dynamic";
@@ -14,6 +15,7 @@ function json(body, status = 200) {
 
 export async function POST(request) {
   try {
+    if (!isClientTestRequestAuthenticated(request)) return json({ error: "This facility is unavailable." }, 404);
     const data = await request.json();
     await createClientQuestionnaire(data);
     return json({ ok: true });

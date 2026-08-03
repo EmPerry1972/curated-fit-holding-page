@@ -1,4 +1,4 @@
-import { createHash, randomBytes } from "node:crypto";
+import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 
 import {
   EXPERTISE_OPTIONS,
@@ -19,6 +19,9 @@ const DEFAULT_TABLES = Object.freeze({
   settings: "Settings",
   serviceAreas: "Service Areas",
 });
+
+export const CLIENT_TEST_COOKIE_NAME = "curated_fit_client_test";
+const CLIENT_TEST_COOKIE_MAX_AGE = 30 * 60;
 
 export const PROFESSIONAL_WRITABLE_FIELDS = Object.freeze([
   "Roles", "Structured Availability", "Experienced Client Stages", "Working Settings", "Base Suburb",
@@ -73,6 +76,46 @@ export function getStagingConfig({ requireOrigin = false } = {}) {
       serviceAreas: process.env.AIRTABLE_MATCHING_SERVICE_AREAS_TABLE || DEFAULT_TABLES.serviceAreas,
     },
   };
+}
+
+function getClientTestSecret() {
+  getStagingConfig();
+  const secret = process.env.MATCHING_CLIENT_TEST_SECRET;
+  if (!secret) throw new StagingConfigError("The client test facility is unavailable.");
+  return secret;
+}
+
+function safeStringEqual(left, right) {
+  const leftBuffer = Buffer.from(String(left), "utf8");
+  const rightBuffer = Buffer.from(String(right), "utf8");
+  return leftBuffer.length === rightBuffer.length && timingSafeEqual(leftBuffer, rightBuffer);
+}
+
+function clientTestCookieValue(secret) {
+  return createHmac("sha256", secret).update("curated-fit-client-test-v1", "utf8").digest("hex");
+}
+
+export function authenticateClientTestPassword(password) {
+  const secret = getClientTestSecret();
+  return typeof password === "string" && safeStringEqual(password, secret);
+}
+
+export function isClientTestCookieValid(cookieValue) {
+  const secret = getClientTestSecret();
+  return typeof cookieValue === "string" && safeStringEqual(cookieValue, clientTestCookieValue(secret));
+}
+
+export function isClientTestRequestAuthenticated(request) {
+  const cookieHeader = request.headers.get("cookie") || "";
+  const cookies = Object.fromEntries(cookieHeader.split(";").map((item) => item.trim().split(/=(.*)/s).slice(0, 2)).filter(([name]) => name));
+  return isClientTestCookieValid(cookies[CLIENT_TEST_COOKIE_NAME]);
+}
+
+export function createClientTestCookieHeader(requestUrl) {
+  const secret = getClientTestSecret();
+  const hostname = new URL(requestUrl).hostname;
+  const secure = !["localhost", "127.0.0.1", "::1"].includes(hostname);
+  return `${CLIENT_TEST_COOKIE_NAME}=${clientTestCookieValue(secret)}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${CLIENT_TEST_COOKIE_MAX_AGE}${secure ? "; Secure" : ""}`;
 }
 
 function escapeFormulaValue(value) {
@@ -179,11 +222,11 @@ function professionalFields(data, linked, completedAt) {
     "Structured Availability": data.structuredAvailability,
     "Experienced Client Stages": linked.stages,
     "Working Settings": linked.settings,
-    "Base Suburb": data.baseSuburb.trim(),
+    "Base Suburb": linked.baseSuburb,
     "Travel Areas": linked.travelAreas,
     "Travels To Clients": data.travelsToClients,
-    ...(data.travelCharge !== "" && data.travelCharge !== undefined ? { "Travel Charge": Number(data.travelCharge) } : {}),
-    ...(data.otherArea?.trim() ? { "Other Area": data.otherArea.trim() } : {}),
+    ...(data.travelCharge !== "" && data.travelCharge !== undefined ? { "Travel Charge": String(data.travelCharge).trim() } : {}),
+    "Other Area": data.otherArea?.trim() || "",
     "Support Styles": linked.supportStyles,
     Gender: data.gender,
     "Questionnaire Status": "Completed",
@@ -195,6 +238,7 @@ function professionalFields(data, linked, completedAt) {
     ...(data.matchingRegistrationNumber?.trim() ? { "Matching Registration Number": data.matchingRegistrationNumber.trim() } : {}),
     ...(data.matchingInsuranceDetails?.trim() ? { "Matching Insurance Details": data.matchingInsuranceDetails.trim() } : {}),
     "Questionnaire Completed At": completedAt.toISOString(),
+    "Invitation Token Status": "Used",
   };
 }
 
@@ -203,11 +247,12 @@ export async function submitProfessionalQuestionnaire(data, { now = new Date() }
   if (Object.keys(errors).length) throw new QuestionnaireValidationError(errors);
   const initial = await findProfessionalByInvitationToken(data.token, { now });
   const { tables } = getStagingConfig();
-  const [stageIds, settingIds, supportStyleIds, travelAreaIds, expertiseOptionIds] = await Promise.all([
+  const [stageIds, settingIds, supportStyleIds, travelAreaIds, baseSuburbIds, expertiseOptionIds] = await Promise.all([
     resolveLinkedRecordIds(tables.exerciseStages, "Stage ID", data.experiencedClientStages),
     resolveLinkedRecordIds(tables.settings, "Setting ID", data.workingSettings),
     resolveLinkedRecordIds(tables.supportStyles, "Style ID", data.supportStyles),
     resolveLinkedRecordIds(tables.serviceAreas, "Area ID", data.travelAreas || []),
+    resolveLinkedRecordIds(tables.serviceAreas, "Area ID", data.baseSuburb ? [data.baseSuburb] : []),
     resolveLinkedRecordIds(tables.expertiseOptions, "Option ID", EXPERTISE_OPTIONS.map(({ id }) => id)),
   ]);
   const expertiseMap = Object.fromEntries(EXPERTISE_OPTIONS.map((option, index) => [option.id, expertiseOptionIds[index]]));
@@ -219,12 +264,7 @@ export async function submitProfessionalQuestionnaire(data, { now = new Date() }
   await airtableRequest(tables.waitlist, {
     recordId: initial.id,
     method: "PATCH",
-    fields: professionalFields(data, { stages: stageIds, settings: settingIds, supportStyles: supportStyleIds, travelAreas: travelAreaIds }, now),
-  });
-  await airtableRequest(tables.waitlist, {
-    recordId: initial.id,
-    method: "PATCH",
-    fields: { "Invitation Token Status": "Used" },
+    fields: professionalFields(data, { stages: stageIds, settings: settingIds, supportStyles: supportStyleIds, travelAreas: travelAreaIds, baseSuburb: baseSuburbIds }, now),
   });
   return { ok: true };
 }

@@ -17,7 +17,7 @@ import {
   SUPPORT_STYLES,
 } from "../lib/matching-questionnaires";
 
-type Props = { kind: "client" | "professional"; token?: string };
+type Props = { kind: "client" | "professional"; token?: string; clientAuthenticated?: boolean };
 type FieldErrors = Record<string, string>;
 type ChoiceOption = { id: string; label: string };
 type ExpertiseOption = ChoiceOption & { category: string; safetySensitive: boolean };
@@ -125,7 +125,7 @@ function ProfessionalQuestionnaire({ token }: { token: string }) {
     <Question number={4} title="Client exercise stages"><p style={styles.body}>Choose up to three.</p><MultiChoice options={EXERCISE_STAGES} values={form.experiencedClientStages} onChange={(value) => update("experiencedClientStages", value)} max={3} error={errors.experiencedClientStages} /></Question>
     <Question number={5} title="Relevant professional experience"><p style={styles.body}>Complete all 12 rows. Substantial or specialist experience remains capped until evidence is verified. Safety-sensitive scope is never automatically approved.</p><div style={styles.tableWrap}><table style={styles.table}><thead><tr><th style={styles.cell}>Expertise</th><th style={styles.cell}>Submitted level</th><th style={styles.cell}>Evidence</th><th style={styles.cell}>Approximate clients supported</th></tr></thead><tbody>{expertiseOptions.map((option) => <tr key={option.id}><td style={styles.cell}><strong>{option.id}</strong><br />{option.label}{option.safetySensitive ? <><br /><small>Safety-sensitive</small></> : null}</td><td style={styles.cell}><select aria-label={`${option.id} Submitted Level`} value={form.expertise[option.id].submittedLevel} onChange={(event) => updateExpertise(option.id, "submittedLevel", event.target.value)} style={styles.field}><option value="">Choose</option>{EXPERIENCE_LEVELS.map((level) => <option key={level}>{level}</option>)}</select>{errors[`expertise.${option.id}`] && <p style={styles.error}>{errors[`expertise.${option.id}`]}</p>}</td><td style={styles.cell}><input aria-label={`${option.id} Evidence`} value={form.expertise[option.id].evidence} onChange={(event) => updateExpertise(option.id, "evidence", event.target.value)} style={styles.field} /></td><td style={styles.cell}><input aria-label={`${option.id} Approximate Clients Supported`} type="number" min="0" value={form.expertise[option.id].approximateClientsSupported} onChange={(event) => updateExpertise(option.id, "approximateClientsSupported", event.target.value)} style={styles.field} /></td></tr>)}</tbody></table></div>{errors.expertise && <p style={styles.error}>{errors.expertise}</p>}</Question>
     <Question number={6} title="Working settings"><MultiChoice options={SETTINGS} values={form.workingSettings} onChange={(value) => update("workingSettings", value)} error={errors.workingSettings} /></Question>
-    <Question number={7} title="Location and travel"><div style={styles.grid}><Field label="Base suburb" value={form.baseSuburb} onChange={(value) => update("baseSuburb", value)} error={errors.baseSuburb} required /><Field label="Other area" value={form.otherArea} onChange={(value) => update("otherArea", value)} /><Field label="Travel charge" type="number" value={form.travelCharge} onChange={(value) => update("travelCharge", value)} error={errors.travelCharge} /></div><p style={styles.body}>Canonical travel areas</p><MultiChoice options={SERVICE_AREAS} values={form.travelAreas} onChange={(value) => update("travelAreas", value)} /><label style={{ ...styles.choice, marginTop: 16 }}><input type="checkbox" checked={form.travelsToClients} onChange={(event) => update("travelsToClients", event.target.checked)} /><span>I travel to clients</span></label></Question>
+    <Question number={7} title="Location and travel"><div style={styles.grid}><SelectIdField label="Base Suburb" value={form.baseSuburb} onChange={(value) => update("baseSuburb", value)} options={SERVICE_AREAS} error={errors.baseSuburb} required={false} emptyLabel="Not listed" /><Field label="Base suburb or area, if not listed" value={form.otherArea} onChange={(value) => update("otherArea", value)} error={errors.otherArea} /><Field label="Travel charge" type="number" value={form.travelCharge} onChange={(value) => update("travelCharge", value)} error={errors.travelCharge} /></div><p style={styles.body}>Only canonical Service Areas can be linked. If your Auckland suburb is not listed, leave Base Suburb as “Not listed” and enter it in “Base suburb or area, if not listed”.</p><p style={styles.body}>Canonical travel areas</p><MultiChoice options={SERVICE_AREAS} values={form.travelAreas} onChange={(value) => update("travelAreas", value)} /><label style={{ ...styles.choice, marginTop: 16 }}><input type="checkbox" checked={form.travelsToClients} onChange={(event) => update("travelsToClients", event.target.checked)} /><span>I travel to clients</span></label></Question>
     <Question number={8} title="Support style"><p style={styles.body}>Choose up to two.</p><MultiChoice options={SUPPORT_STYLES} values={form.supportStyles} onChange={(value) => update("supportStyles", value)} max={2} error={errors.supportStyles} /></Question>
     <Question number={9} title="Gender"><SelectField label="Gender" value={form.gender} onChange={(value) => update("gender", value)} options={PROFESSIONAL_GENDERS} error={errors.gender} required /></Question>
     {fatalError && <p role="alert" style={styles.error}>{fatalError}</p>}<button type="submit" disabled={submitting} style={{ ...styles.button, opacity: submitting ? 0.5 : 1 }}>{submitting ? "Saving…" : "Submit questionnaire"}</button>
@@ -151,15 +151,35 @@ function ClientQuestionnaire() {
   </form></Frame>;
 }
 
-function SelectIdField({ label, value, onChange, options, error }: { label: string; value: string; onChange: (value: string) => void; options: ChoiceOption[]; error?: string }) {
+function ClientAccessGate() {
+  const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  async function authenticate(event: FormEvent) {
+    event.preventDefault(); setSubmitting(true); setError("");
+    try {
+      const response = await fetch("/api/matching-staging/client-auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password }) });
+      if (!response.ok) throw new Error("Unavailable");
+      window.location.reload();
+    } catch {
+      setError("This facility is unavailable.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+  return <Frame><p style={styles.eyebrow}>Internal staging access</p><h1 style={styles.heading}>Client matching test</h1><p style={styles.body}>Enter the separate client-test password to continue.</p><form onSubmit={authenticate}><Field label="Client-test password" type="password" value={password} onChange={setPassword} required />{error && <p role="alert" style={styles.error}>{error}</p>}<button type="submit" disabled={submitting} style={{ ...styles.button, opacity: submitting ? 0.5 : 1 }}>{submitting ? "Checking…" : "Continue"}</button></form></Frame>;
+}
+
+function SelectIdField({ label, value, onChange, options, error, required = true, emptyLabel = "Choose one" }: { label: string; value: string; onChange: (value: string) => void; options: ChoiceOption[]; error?: string; required?: boolean; emptyLabel?: string }) {
   const id = label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-  return <div><label htmlFor={id} style={styles.label}>{label} *</label><select id={id} value={value} onChange={(event) => onChange(event.target.value)} style={styles.field}><option value="">Choose one</option>{options.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}</select>{error && <p style={styles.error}>{error}</p>}</div>;
+  return <div><label htmlFor={id} style={styles.label}>{label}{required ? " *" : ""}</label><select id={id} value={value} onChange={(event) => onChange(event.target.value)} style={styles.field}><option value="">{emptyLabel}</option>{options.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}</select>{error && <p style={styles.error}>{error}</p>}</div>;
 }
 
 function Question({ number, title, children }: { number?: number; title: string; children: React.ReactNode }) {
   return <section style={styles.section}>{number ? <p style={styles.eyebrow}>Question {number} of 9</p> : null}<h2 style={styles.sectionTitle}>{title}</h2>{children}</section>;
 }
 
-export default function HiddenMatchingQuestionnaire({ kind, token = "" }: Props) {
-  return kind === "professional" ? <ProfessionalQuestionnaire token={token} /> : <ClientQuestionnaire />;
+export default function HiddenMatchingQuestionnaire({ kind, token = "", clientAuthenticated = false }: Props) {
+  if (kind === "professional") return <ProfessionalQuestionnaire token={token} />;
+  return clientAuthenticated ? <ClientQuestionnaire /> : <ClientAccessGate />;
 }

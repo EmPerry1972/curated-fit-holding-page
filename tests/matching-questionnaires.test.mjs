@@ -21,6 +21,7 @@ import {
 } from "../app/lib/matching-questionnaires.js";
 import {
   CLIENT_WRITABLE_FIELDS,
+  CLIENT_TEST_COOKIE_NAME,
   InvitationTokenError,
   PROFESSIONAL_WRITABLE_FIELDS,
   StagingConfigError,
@@ -29,6 +30,7 @@ import {
   generateProfessionalInvitation,
   getStagingConfig,
   hashInvitationToken,
+  isClientTestCookieValid,
   submitProfessionalQuestionnaire,
 } from "../app/lib/staging-airtable.js";
 
@@ -41,6 +43,7 @@ function installEnv() {
   process.env.AIRTABLE_MATCHING_BASE_ID = "apphwcmdSVSl7H0iR";
   process.env.AIRTABLE_MATCHING_TOKEN = "secret-test-pat";
   process.env.MATCHING_QUESTIONNAIRE_ORIGIN = "https://questionnaire.example";
+  process.env.MATCHING_CLIENT_TEST_SECRET = "separate-client-test-password";
 }
 
 function validExpertise(level = "None") {
@@ -62,7 +65,7 @@ function validProfessional(overrides = {}) {
     experiencedClientStages: [EXERCISE_STAGES[0].id],
     expertise: validExpertise(),
     workingSettings: [SETTINGS[0].id],
-    baseSuburb: "Herne Bay",
+    baseSuburb: "",
     travelAreas: ["AREA-ONLINE"],
     travelsToClients: true,
     travelCharge: "10",
@@ -94,7 +97,7 @@ function jsonResponse(data, status = 200) {
   return { ok: status >= 200 && status < 300, status, json: async () => data, text: async () => JSON.stringify(data) };
 }
 
-function createAirtableMock({ tokenRecords, failExpertiseWrite = false, existingExpertise = false } = {}) {
+function createAirtableMock({ tokenRecords, failExpertiseWrite = false, failFinalWaitlistWrite = false, existingExpertise = false } = {}) {
   const calls = [];
   const defaultTokenRecords = [{ id: "recProfessional123", fields: { Name: "Alex", "Invitation Token Status": "Active", "Invitation Token Expiry": FUTURE_EXPIRY } }];
   const recordsForToken = tokenRecords === undefined ? defaultTokenRecords : tokenRecords;
@@ -106,6 +109,21 @@ function createAirtableMock({ tokenRecords, failExpertiseWrite = false, existing
     const method = init.method || "GET";
     const body = init.body ? JSON.parse(init.body) : null;
     calls.push({ url, table, recordId, method, body, authorization: init.headers?.Authorization });
+
+    const writtenFields = body?.fields || body?.records?.[0]?.fields;
+    if (writtenFields && table === "Waitlist" && "Questionnaire Status" in writtenFields) {
+      assert.ok(Array.isArray(writtenFields["Base Suburb"]), "Waitlist.Base Suburb must be a linked-record array");
+      assert.ok(Array.isArray(writtenFields["Experienced Client Stages"]), "Waitlist.Experienced Client Stages must be a linked-record array");
+      assert.ok(Array.isArray(writtenFields["Working Settings"]), "Waitlist.Working Settings must be a linked-record array");
+      assert.ok(Array.isArray(writtenFields["Travel Areas"]), "Waitlist.Travel Areas must be a linked-record array");
+      assert.ok(Array.isArray(writtenFields["Support Styles"]), "Waitlist.Support Styles must be a linked-record array");
+      if ("Travel Charge" in writtenFields) assert.equal(typeof writtenFields["Travel Charge"], "string", "Waitlist.Travel Charge must be text");
+      assert.equal(typeof writtenFields["Matching Qualification Year"], "number", "Waitlist.Matching Qualification Year must be a number");
+    }
+    if (writtenFields && table === "Clients") {
+      assert.ok(Array.isArray(writtenFields["Exercise Stage"]), "Clients.Exercise Stage must be a linked-record array");
+      assert.ok(Array.isArray(writtenFields.Suburb), "Clients.Suburb must be a linked-record array");
+    }
 
     if (table === "Waitlist" && recordId && method === "GET") return jsonResponse({ id: recordId, fields: { Name: "Alex" } });
     if (table === "Waitlist" && !recordId) {
@@ -122,6 +140,7 @@ function createAirtableMock({ tokenRecords, failExpertiseWrite = false, existing
       return jsonResponse({ records: existingExpertise ? [{ id: "recExistingExpertise", fields: { "Expertise Record": "existing" } }] : [] });
     }
     if (table === "Professional Expertise" && failExpertiseWrite && (method === "POST" || method === "PATCH")) return jsonResponse({ error: "failed" }, 500);
+    if (table === "Waitlist" && failFinalWaitlistWrite && method === "PATCH" && writtenFields?.["Questionnaire Status"] === "Completed") return jsonResponse({ error: "failed" }, 500);
     return jsonResponse(recordId ? { id: recordId, fields: body?.fields || {} } : { records: [{ id: "recCreated", fields: body?.records?.[0]?.fields || {} }] });
   };
   return { calls, fetchMock };
@@ -227,6 +246,36 @@ test("professional validation rejects unapproved gender and incomplete expertise
   assert.ok(errors.gender); assert.ok(errors.expertise);
 });
 
+test("professional must supply either canonical Base Suburb or Other Area", () => {
+  const errors = validateProfessionalSubmission(validProfessional({ baseSuburb: "", otherArea: "" }));
+  assert.ok(errors.otherArea);
+});
+
+test("invalid Base Suburb Area ID is rejected", () => {
+  const errors = validateProfessionalSubmission(validProfessional({ baseSuburb: "AREA-AUCKLAND", otherArea: "" }));
+  assert.ok(errors.baseSuburb);
+});
+
+test("canonical AREA-ONLINE Base Suburb resolves to a linked record array", async () => {
+  const mock = createAirtableMock();
+  await withMock(mock, async (calls) => {
+    await submitProfessionalQuestionnaire(validProfessional({ baseSuburb: "AREA-ONLINE", otherArea: "" }));
+    const fields = calls.find((call) => call.body?.fields?.["Questionnaire Status"] === "Completed").body.fields;
+    assert.deepEqual(fields["Base Suburb"], ["recAREAONLINE"]);
+    assert.equal(fields["Other Area"], "");
+  });
+});
+
+test("free-text suburb is stored only in Other Area and Base Suburb remains an empty linked array", async () => {
+  const mock = createAirtableMock();
+  await withMock(mock, async (calls) => {
+    await submitProfessionalQuestionnaire(validProfessional({ baseSuburb: "", otherArea: "Herne Bay" }));
+    const fields = calls.find((call) => call.body?.fields?.["Questionnaire Status"] === "Completed").body.fields;
+    assert.deepEqual(fields["Base Suburb"], []);
+    assert.equal(fields["Other Area"], "Herne Bay");
+  });
+});
+
 test("professional submission resolves linked records, rechecks token and writes only approved fields", async () => {
   const mock = createAirtableMock();
   await withMock(mock, async (calls) => {
@@ -241,6 +290,9 @@ test("professional submission resolves linked records, rechecks token and writes
     assert.deepEqual(questionnaireWrite.body.fields["Experienced Client Stages"], ["recSTG01"]);
     assert.deepEqual(questionnaireWrite.body.fields["Working Settings"], ["recSET01"]);
     assert.deepEqual(questionnaireWrite.body.fields["Support Styles"], ["recSTY01"]);
+    assert.deepEqual(questionnaireWrite.body.fields["Base Suburb"], []);
+    assert.equal(questionnaireWrite.body.fields["Travel Charge"], "10");
+    assert.equal(typeof questionnaireWrite.body.fields["Travel Charge"], "string");
     assert.equal("Qualification Status" in questionnaireWrite.body.fields, false);
     assert.equal("Insurance Status" in questionnaireWrite.body.fields, false);
     assert.equal("Approved for Matching" in questionnaireWrite.body.fields, false);
@@ -276,17 +328,30 @@ test("failed expertise write never marks token Used", async () => {
   await withMock(mock, async (calls) => {
     await assert.rejects(() => submitProfessionalQuestionnaire(validProfessional()));
     assert.equal(calls.some((call) => call.body?.fields?.["Invitation Token Status"] === "Used"), false);
+    assert.equal(calls.some((call) => call.body?.fields?.["Questionnaire Status"] === "Completed"), false);
   });
 });
 
-test("token becomes Used only after expertise and questionnaire writes succeed", async () => {
+test("Completed and Used are written atomically in exactly one final Waitlist PATCH", async () => {
   const mock = createAirtableMock();
   await withMock(mock, async (calls) => {
     await submitProfessionalQuestionnaire(validProfessional());
-    const usedIndex = calls.findIndex((call) => call.body?.fields?.["Invitation Token Status"] === "Used");
+    const waitlistPatches = calls.filter((call) => call.table === "Waitlist" && call.recordId && call.method === "PATCH");
+    assert.equal(waitlistPatches.length, 1);
+    const finalPatch = waitlistPatches[0];
+    assert.equal(finalPatch.body.fields["Questionnaire Status"], "Completed");
+    assert.equal(finalPatch.body.fields["Invitation Token Status"], "Used");
     const finalExpertiseIndex = calls.map((call, index) => ({ call, index })).filter(({ call }) => call.table === "Professional Expertise" && ["POST", "PATCH"].includes(call.method)).at(-1).index;
-    const questionnaireIndex = calls.findIndex((call) => call.body?.fields?.["Questionnaire Status"] === "Completed");
-    assert.ok(usedIndex > finalExpertiseIndex); assert.ok(usedIndex > questionnaireIndex);
+    assert.ok(calls.indexOf(finalPatch) > finalExpertiseIndex);
+    assert.equal(calls.some((call) => Object.keys(call.body?.fields || {}).length === 1 && call.body.fields["Invitation Token Status"] === "Used"), false);
+  });
+});
+
+test("failed final Waitlist PATCH does not claim success", async () => {
+  const mock = createAirtableMock({ failFinalWaitlistWrite: true });
+  await withMock(mock, async (calls) => {
+    await assert.rejects(() => submitProfessionalQuestionnaire(validProfessional()));
+    assert.equal(calls.filter((call) => call.table === "Waitlist" && call.method === "PATCH").length, 1);
   });
 });
 
@@ -379,4 +444,79 @@ test("professional API returns the same generic response for unknown and revoked
     assert.equal(unknown.status, 404); assert.equal(revoked.status, 404);
     assert.deepEqual(await unknown.json(), await revoked.json());
   } finally { globalThis.fetch = originalFetch; }
+});
+
+test("client test access is unavailable without separate secret or authentication cookie", async () => {
+  installEnv();
+  assert.equal(isClientTestCookieValid(undefined), false);
+  delete process.env.MATCHING_CLIENT_TEST_SECRET;
+  assert.throws(() => isClientTestCookieValid(undefined), StagingConfigError);
+  const pageSource = await readFile("app/client-matching-test/page.tsx", "utf8");
+  assert.match(pageSource, /isClientTestCookieValid/);
+  assert.match(pageSource, /clientAuthenticated/);
+});
+
+test("client API refuses unauthenticated requests with a generic unavailable response", async () => {
+  installEnv();
+  const { POST } = await import("../app/api/matching-staging/client/route.js");
+  const response = await POST(new Request("https://questionnaire.example/api/matching-staging/client", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(validClient()) }));
+  assert.equal(response.status, 404);
+  assert.deepEqual(await response.json(), { error: "This facility is unavailable." });
+});
+
+test("wrong and missing client-test passwords receive the same generic failure", async () => {
+  installEnv();
+  const { POST } = await import("../app/api/matching-staging/client-auth/route.js");
+  const makeRequest = (body) => new Request("https://questionnaire.example/api/matching-staging/client-auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const wrong = await POST(makeRequest({ password: "wrong" }));
+  const missing = await POST(makeRequest({}));
+  assert.equal(wrong.status, 404); assert.equal(missing.status, 404);
+  assert.deepEqual(await wrong.json(), await missing.json());
+});
+
+test("valid client-test authentication issues a secure limited cookie and permits client API access", async () => {
+  const mock = createAirtableMock();
+  await withMock(mock, async () => {
+    const { POST: authenticate } = await import("../app/api/matching-staging/client-auth/route.js");
+    const { POST: createClient } = await import("../app/api/matching-staging/client/route.js");
+    const authResponse = await authenticate(new Request("https://questionnaire.example/api/matching-staging/client-auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: process.env.MATCHING_CLIENT_TEST_SECRET }) }));
+    assert.equal(authResponse.status, 200);
+    const setCookie = authResponse.headers.get("set-cookie");
+    assert.match(setCookie, new RegExp(`^${CLIENT_TEST_COOKIE_NAME}=`));
+    assert.match(setCookie, /HttpOnly/i); assert.match(setCookie, /SameSite=Strict/i); assert.match(setCookie, /Max-Age=1800/i); assert.match(setCookie, /Secure/i);
+    assert.doesNotMatch(setCookie, new RegExp(process.env.MATCHING_CLIENT_TEST_SECRET));
+    const clientResponse = await createClient(new Request("https://questionnaire.example/api/matching-staging/client", { method: "POST", headers: { "Content-Type": "application/json", Cookie: setCookie }, body: JSON.stringify(validClient()) }));
+    assert.equal(clientResponse.status, 200); assert.deepEqual(await clientResponse.json(), { ok: true });
+  });
+});
+
+test("client-test authentication does not grant professional questionnaire access", async () => {
+  const mock = createAirtableMock();
+  await withMock(mock, async () => {
+    const { POST: authenticate } = await import("../app/api/matching-staging/client-auth/route.js");
+    const { GET: getProfessional } = await import("../app/api/matching-staging/professional/route.js");
+    const authResponse = await authenticate(new Request("https://questionnaire.example/api/matching-staging/client-auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: process.env.MATCHING_CLIENT_TEST_SECRET }) }));
+    const response = await getProfessional(new Request("https://questionnaire.example/api/matching-staging/professional", { headers: { Cookie: authResponse.headers.get("set-cookie") } }));
+    assert.equal(response.status, 404);
+  });
+});
+
+test("professional questionnaire works independently of the client-test secret", async () => {
+  const mock = createAirtableMock();
+  await withMock(mock, async () => {
+    delete process.env.MATCHING_CLIENT_TEST_SECRET;
+    const { GET } = await import("../app/api/matching-staging/professional/route.js");
+    const response = await GET(new Request(`https://questionnaire.example/api/matching-staging/professional?token=${RAW_TOKEN}`));
+    assert.equal(response.status, 200);
+  });
+});
+
+test("client-test secret is never returned, logged or embedded in page source", async () => {
+  installEnv();
+  const { POST } = await import("../app/api/matching-staging/client-auth/route.js");
+  const response = await POST(new Request("http://localhost/api/matching-staging/client-auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: process.env.MATCHING_CLIENT_TEST_SECRET }) }));
+  assert.doesNotMatch(await response.text(), new RegExp(process.env.MATCHING_CLIENT_TEST_SECRET));
+  assert.doesNotMatch(response.headers.get("set-cookie"), new RegExp(process.env.MATCHING_CLIENT_TEST_SECRET));
+  const source = `${await readFile("app/client-matching-test/page.tsx", "utf8")}\n${await readFile("app/components/HiddenMatchingQuestionnaire.tsx", "utf8")}`;
+  assert.doesNotMatch(source, /separate-client-test-password/);
 });
