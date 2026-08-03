@@ -3,7 +3,9 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
+  ALL_CLIENT_WORK_MODES,
   AVAILABILITY_OPTIONS,
+  CLIENT_WORK_MODES,
   CLIENT_GENDER_PREFERENCES,
   EXERCISE_STAGES,
   EXPERIENCE_FACTORS,
@@ -12,10 +14,13 @@ import {
   PROFESSIONAL_GENDERS,
   PROFESSIONAL_QUESTIONS,
   PROFESSIONAL_ROLES,
+  QUALIFICATION_COMPLETION_STATUSES,
   SETTINGS,
   SUPPORT_STYLES,
   factorsForSubmittedLevel,
   isValidInvitationToken,
+  normaliseClientWorkModes,
+  qualificationYears,
   validateClientSubmission,
   validateProfessionalSubmission,
 } from "../app/lib/matching-questionnaires.js";
@@ -35,8 +40,11 @@ import {
   hashInvitationToken,
   isClientTestCookieValid,
   isInvitationAdminCookieValid,
+  listCanonicalServiceAreas,
   submitProfessionalQuestionnaire,
 } from "../app/lib/staging-airtable.js";
+import { REQUIRED_FIELDS, migrateMatchingStagingSchema, planSchemaAdditions } from "../scripts/migrate-matching-staging-schema.mjs";
+import { importServiceAreas, parseCsv } from "../scripts/import-nz-service-areas.mjs";
 
 const RAW_TOKEN = "a".repeat(43);
 const TOKEN_HASH = hashInvitationToken(RAW_TOKEN);
@@ -58,22 +66,21 @@ function validExpertise(level = "None") {
 function validProfessional(overrides = {}) {
   return {
     token: RAW_TOKEN,
-    roles: [PROFESSIONAL_ROLES[0]],
+    roles: [PROFESSIONAL_ROLES[0]], otherRole: "",
     matchingQualifications: "Level 4 Certificate",
     matchingTrainingProvider: "Approved provider",
+    qualificationCompletionStatus: "Completed",
     matchingQualificationYear: "2024",
     matchingProfessionalRegistration: "Registration body",
     matchingRegistrationNumber: "REG-1",
     matchingInsuranceConfirmation: "Yes",
-    matchingInsuranceDetails: "Policy details",
     structuredAvailability: AVAILABILITY_OPTIONS[0],
     experiencedClientStages: [EXERCISE_STAGES[0].id],
     expertise: validExpertise(),
     workingSettings: [SETTINGS[0].id],
-    baseSuburb: "",
+    baseSuburb: "", locationNotListed: true,
     travelAreas: ["AREA-ONLINE"],
-    travelsToClients: true,
-    travelCharge: "10",
+    clientWorkModes: ["I can travel to clients"],
     otherArea: "Grey Lynn",
     supportStyles: [SUPPORT_STYLES[0].id],
     gender: PROFESSIONAL_GENDERS[0],
@@ -102,7 +109,7 @@ function jsonResponse(data, status = 200) {
   return { ok: status >= 200 && status < 300, status, json: async () => data, text: async () => JSON.stringify(data) };
 }
 
-function createAirtableMock({ tokenRecords, failExpertiseWrite = false, failFinalWaitlistWrite = false, existingExpertise = false } = {}) {
+function createAirtableMock({ tokenRecords, failExpertiseWrite = false, failFinalWaitlistWrite = false, existingExpertise = false, serviceAreaRecords = [], missingStableIds = [] } = {}) {
   const calls = [];
   const defaultTokenRecords = [{ id: "recProfessional123", fields: { Name: "Alex", "Invitation Token Status": "Active", "Invitation Token Expiry": FUTURE_EXPIRY } }];
   const recordsForToken = tokenRecords === undefined ? defaultTokenRecords : tokenRecords;
@@ -122,8 +129,8 @@ function createAirtableMock({ tokenRecords, failExpertiseWrite = false, failFina
       assert.ok(Array.isArray(writtenFields["Working Settings"]), "Waitlist.Working Settings must be a linked-record array");
       assert.ok(Array.isArray(writtenFields["Travel Areas"]), "Waitlist.Travel Areas must be a linked-record array");
       assert.ok(Array.isArray(writtenFields["Support Styles"]), "Waitlist.Support Styles must be a linked-record array");
-      if ("Travel Charge" in writtenFields) assert.equal(typeof writtenFields["Travel Charge"], "string", "Waitlist.Travel Charge must be text");
-      assert.equal(typeof writtenFields["Matching Qualification Year"], "number", "Waitlist.Matching Qualification Year must be a number");
+      assert.ok(Array.isArray(writtenFields["Client Work Modes"]), "Waitlist.Client Work Modes must be a multiple-select array");
+      if ("Matching Qualification Year" in writtenFields) assert.equal(typeof writtenFields["Matching Qualification Year"], "number", "Waitlist.Matching Qualification Year must be a number");
     }
     if (writtenFields && table === "Clients") {
       assert.ok(Array.isArray(writtenFields["Exercise Stage"]), "Clients.Exercise Stage must be a linked-record array");
@@ -138,8 +145,9 @@ function createAirtableMock({ tokenRecords, failExpertiseWrite = false, failFina
     const idFields = { "Expertise Options": "Option ID", "Exercise Stages": "Stage ID", "Support Styles": "Style ID", Settings: "Setting ID", "Service Areas": "Area ID" };
     if (idFields[table]) {
       const formula = parsed.searchParams.get("filterByFormula") || "";
-      const ids = [...formula.matchAll(/="([A-Z]+-[A-Z0-9]+)"/g)].map((match) => match[1]);
-      return jsonResponse({ records: ids.map((id) => ({ id: `rec${id.replace(/-/g, "")}`, fields: { [idFields[table]]: id } })) });
+      if (table === "Service Areas" && formula.includes("{Status}")) return jsonResponse({ records: serviceAreaRecords });
+      const ids = [...formula.matchAll(/="([A-Z]+(?:-[A-Z0-9]+)+)"/g)].map((match) => match[1]);
+      return jsonResponse({ records: ids.filter((id) => !missingStableIds.includes(id)).map((id) => ({ id: `rec${id.replace(/-/g, "")}`, fields: { [idFields[table]]: id } })) });
     }
     if (table === "Professional Expertise" && method === "GET") {
       return jsonResponse({ records: existingExpertise ? [{ id: "recExistingExpertise", fields: { "Expertise Record": "existing" } }] : [] });
@@ -172,6 +180,48 @@ test("disabled feature refuses matching operations", () => {
 test("configuration defaults use only canonical staging tables", () => {
   installEnv();
   assert.deepEqual(getStagingConfig().tables, { waitlist: "Waitlist", clients: "Clients", professionalExpertise: "Professional Expertise", expertiseOptions: "Expertise Options", exerciseStages: "Exercise Stages", supportStyles: "Support Styles", settings: "Settings", serviceAreas: "Service Areas" });
+});
+
+test("staging schema migration defines exactly the six approved additions", () => {
+  assert.deepEqual(Object.keys(REQUIRED_FIELDS), ["Waitlist", "Service Areas"]);
+  assert.deepEqual(REQUIRED_FIELDS.Waitlist.map(({ name, type }) => [name, type]), [
+    ["Other Role", "singleLineText"], ["Qualification Completion Status", "singleSelect"], ["Client Work Modes", "multipleSelects"],
+  ]);
+  assert.deepEqual(REQUIRED_FIELDS["Service Areas"].map(({ name, type }) => [name, type]), [
+    ["Region Name", "singleLineText"], ["Region ID", "singleLineText"], ["Location Type", "singleSelect"],
+  ]);
+  assert.deepEqual(REQUIRED_FIELDS.Waitlist[1].options.choices.map(({ name }) => name), QUALIFICATION_COMPLETION_STATUSES);
+  assert.deepEqual(REQUIRED_FIELDS.Waitlist[2].options.choices.map(({ name }) => name), CLIENT_WORK_MODES);
+});
+
+test("schema migration is idempotent and refuses incompatible existing fields", () => {
+  const empty = [{ id: "tblWaitlist", name: "Waitlist", fields: [] }, { id: "tblAreas", name: "Service Areas", fields: [] }];
+  assert.equal(planSchemaAdditions(empty).length, 6);
+  const complete = empty.map((table) => ({ ...table, fields: REQUIRED_FIELDS[table.name].map((field) => structuredClone(field)) }));
+  assert.deepEqual(planSchemaAdditions(complete), []);
+  complete[0].fields[0].type = "multilineText";
+  assert.throws(() => planSchemaAdditions(complete), /refusing to retype/i);
+});
+
+test("schema migration hard-aborts outside the staging base before network access", async () => {
+  installEnv(); process.env.AIRTABLE_MATCHING_BASE_ID = "appMainMustNeverBeTouched";
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = () => { throw new Error("network must not be reached"); };
+  try { await assert.rejects(() => migrateMatchingStagingSchema({ apply: true }), /Refusing schema migration/); }
+  finally { globalThis.fetch = originalFetch; }
+});
+
+test("reviewable LINZ location artifact has 3,177 unique approved records and remains unimported", async () => {
+  const content = await readFile("artifacts/nz-service-areas-linz-442170.csv", "utf8");
+  const rows = parseCsv(content);
+  assert.equal(rows.length, 3177);
+  assert.equal(new Set(rows.map((row) => row["Area ID"])).size, 3177);
+  assert.deepEqual(rows[0], { "Area Name": "Online", "Area ID": "AREA-ONLINE", "Normalised Name": "online", "Region Name": "Online", "Region ID": "REGION-ONLINE", "Location Type": "Online", Online: true, Status: "Canonical" });
+  assert.equal(rows.slice(1).every((row) => /^AREA-LINZ-\d+$/.test(row["Area ID"]) && row["Region Name"] && row["Region ID"] && ["Suburb", "Rural locality"].includes(row["Location Type"]) && row.Status === "Canonical"), true);
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = () => { throw new Error("dry review must not write"); };
+  try { assert.deepEqual(await importServiceAreas(), { apply: false, recordCount: 3177, writes: 0 }); }
+  finally { globalThis.fetch = originalFetch; }
 });
 
 test("token is SHA-256 hashed", () => {
@@ -251,22 +301,93 @@ test("professional validation rejects unapproved gender and incomplete expertise
   assert.ok(errors.gender); assert.ok(errors.expertise);
 });
 
-test("professional must supply either canonical Base Suburb or Other Area", () => {
-  const errors = validateProfessionalSubmission(validProfessional({ baseSuburb: "", otherArea: "" }));
+test("Other Role is conditionally required and written only to its approved field", async () => {
+  assert.ok(validateProfessionalSubmission(validProfessional({ roles: ["Other"], otherRole: "" })).otherRole);
+  assert.equal(validateProfessionalSubmission(validProfessional({ roles: ["Other"], otherRole: "Clinical Pilates specialist" })).otherRole, undefined);
+  const mock = createAirtableMock();
+  await withMock(mock, async (calls) => {
+    await submitProfessionalQuestionnaire(validProfessional({ roles: ["Other"], otherRole: "  Clinical Pilates specialist  " }));
+    const fields = calls.find((call) => call.body?.fields?.["Questionnaire Status"] === "Completed").body.fields;
+    assert.equal(fields["Other Role"], "Clinical Pilates specialist");
+    assert.equal(Object.keys(fields).filter((name) => name.includes("Role") && name !== "Roles").join(","), "Other Role");
+  });
+});
+
+test("Other Role is cleared when Other is not selected", async () => {
+  const mock = createAirtableMock();
+  await withMock(mock, async (calls) => {
+    await submitProfessionalQuestionnaire(validProfessional({ otherRole: "must not persist" }));
+    const fields = calls.find((call) => call.body?.fields?.["Questionnaire Status"] === "Completed").body.fields;
+    assert.equal(fields["Other Role"], "");
+  });
+});
+
+test("qualification completion status controls the numeric completion year", async () => {
+  assert.deepEqual(QUALIFICATION_COMPLETION_STATUSES, ["Completed", "Currently studying", "Prefer to discuss"]);
+  assert.ok(validateProfessionalSubmission(validProfessional({ qualificationCompletionStatus: "Completed", matchingQualificationYear: "" })).matchingQualificationYear);
+  assert.equal(validateProfessionalSubmission(validProfessional({ qualificationCompletionStatus: "Currently studying", matchingQualificationYear: "" })).matchingQualificationYear, undefined);
+  assert.equal(qualificationYears()[0], String(new Date().getFullYear()));
+  const mock = createAirtableMock();
+  await withMock(mock, async (calls) => {
+    await submitProfessionalQuestionnaire(validProfessional({ qualificationCompletionStatus: "Currently studying", matchingQualificationYear: "" }));
+    const fields = calls.find((call) => call.body?.fields?.["Questionnaire Status"] === "Completed").body.fields;
+    assert.equal(fields["Qualification Completion Status"], "Currently studying");
+    assert.equal("Matching Qualification Year" in fields, false);
+  });
+});
+
+test("insurance details are never written and Insurance Status remains manual", async () => {
+  const mock = createAirtableMock();
+  await withMock(mock, async (calls) => {
+    await submitProfessionalQuestionnaire(validProfessional({ matchingInsuranceDetails: "must not be sent" }));
+    const fields = calls.find((call) => call.body?.fields?.["Questionnaire Status"] === "Completed").body.fields;
+    assert.equal(fields["Matching Insurance Confirmation"], "Yes");
+    assert.equal("Matching Insurance Details" in fields, false);
+    assert.equal("Insurance Status" in fields, false);
+  });
+});
+
+test("Q4 and Q5 use the approved wording and conditional experience text", async () => {
+  const source = await readFile("app/components/HiddenMatchingQuestionnaire.tsx", "utf8");
+  assert.match(source, /Which types of clients do you have the most experience supporting\?/);
+  assert.match(source, /Choose up to three areas where your experience is strongest\./);
+  assert.match(source, /Tell us where your experience is strongest/);
+  assert.match(source, /Tell us a little about your experience in this area/);
+  assert.match(source, /const showExperience = \["Regular", "Substantial or specialist"\]/);
+  assert.doesNotMatch(source, />Evidence</);
+  assert.equal(EXERCISE_STAGES.length, 6);
+  assert.equal(EXERCISE_STAGES.some(({ label }) => /all stages/i.test(label)), false);
+});
+
+test("professional must supply either a listed Base Suburb or a not-listed Other Area", () => {
+  const errors = validateProfessionalSubmission(validProfessional({ baseSuburb: "", locationNotListed: true, otherArea: "" }));
   assert.ok(errors.otherArea);
 });
 
 test("invalid Base Suburb Area ID is rejected", () => {
-  const errors = validateProfessionalSubmission(validProfessional({ baseSuburb: "AREA-AUCKLAND", otherArea: "" }));
+  const errors = validateProfessionalSubmission(validProfessional({ baseSuburb: "AREA-AUCKLAND", locationNotListed: false, otherArea: "" }));
   assert.ok(errors.baseSuburb);
 });
 
-test("canonical AREA-ONLINE Base Suburb resolves to a linked record array", async () => {
+test("well-formed but unknown Base Suburb Area ID is rejected server-side", async () => {
+  const mock = createAirtableMock({ missingStableIds: ["AREA-LINZ-999"] });
+  await withMock(mock, () => assert.rejects(() => submitProfessionalQuestionnaire(validProfessional({ baseSuburb: "AREA-LINZ-999", locationNotListed: false, otherArea: "" })), /Canonical staging options/));
+});
+
+test("professional location choices expose approved region and location fields", async () => {
+  const serviceAreaRecords = [{ id: "recArea101", fields: { "Area Name": "Herne Bay", "Area ID": "AREA-LINZ-101", "Region Name": "Auckland Region", "Region ID": "02", "Location Type": "Suburb", Online: false, Status: "Canonical" } }];
+  const mock = createAirtableMock({ serviceAreaRecords });
+  await withMock(mock, async () => {
+    assert.deepEqual(await listCanonicalServiceAreas(), [{ id: "AREA-LINZ-101", label: "Herne Bay", regionName: "Auckland Region", regionId: "02", locationType: "Suburb", online: false }]);
+  });
+});
+
+test("listed Base Suburb resolves to a linked record array", async () => {
   const mock = createAirtableMock();
   await withMock(mock, async (calls) => {
-    await submitProfessionalQuestionnaire(validProfessional({ baseSuburb: "AREA-ONLINE", otherArea: "" }));
+    await submitProfessionalQuestionnaire(validProfessional({ baseSuburb: "AREA-LINZ-101", locationNotListed: false, otherArea: "" }));
     const fields = calls.find((call) => call.body?.fields?.["Questionnaire Status"] === "Completed").body.fields;
-    assert.deepEqual(fields["Base Suburb"], ["recAREAONLINE"]);
+    assert.deepEqual(fields["Base Suburb"], ["recAREALINZ101"]);
     assert.equal(fields["Other Area"], "");
   });
 });
@@ -274,10 +395,51 @@ test("canonical AREA-ONLINE Base Suburb resolves to a linked record array", asyn
 test("free-text suburb is stored only in Other Area and Base Suburb remains an empty linked array", async () => {
   const mock = createAirtableMock();
   await withMock(mock, async (calls) => {
-    await submitProfessionalQuestionnaire(validProfessional({ baseSuburb: "", otherArea: "Herne Bay" }));
+    await submitProfessionalQuestionnaire(validProfessional({ baseSuburb: "", locationNotListed: true, otherArea: "Herne Bay" }));
     const fields = calls.find((call) => call.body?.fields?.["Questionnaire Status"] === "Completed").body.fields;
     assert.deepEqual(fields["Base Suburb"], []);
     assert.equal(fields["Other Area"], "Herne Bay");
+  });
+});
+
+test("location validation accepts exactly the listed or not-listed path", () => {
+  assert.deepEqual(validateProfessionalSubmission(validProfessional({ baseSuburb: "AREA-LINZ-101", locationNotListed: false, otherArea: "" })), {});
+  assert.deepEqual(validateProfessionalSubmission(validProfessional({ baseSuburb: "", locationNotListed: true, otherArea: "  Herne Bay  " })), {});
+  assert.ok(validateProfessionalSubmission(validProfessional({ baseSuburb: "", locationNotListed: false, otherArea: "Herne Bay" })).baseSuburb);
+  assert.ok(validateProfessionalSubmission(validProfessional({ baseSuburb: "AREA-LINZ-101", locationNotListed: true, otherArea: "Herne Bay" })).baseSuburb);
+});
+
+test("work-mode All of the above maps exclusively to the three stored values", () => {
+  assert.deepEqual(normaliseClientWorkModes([ALL_CLIENT_WORK_MODES]), CLIENT_WORK_MODES);
+  assert.equal(normaliseClientWorkModes([ALL_CLIENT_WORK_MODES, CLIENT_WORK_MODES[0]]), null);
+  assert.deepEqual(normaliseClientWorkModes([CLIENT_WORK_MODES[0], CLIENT_WORK_MODES[2]]), [CLIENT_WORK_MODES[0], CLIENT_WORK_MODES[2]]);
+});
+
+test("work modes and Travel Areas map to approved Airtable values", async () => {
+  const mock = createAirtableMock();
+  await withMock(mock, async (calls) => {
+    await submitProfessionalQuestionnaire(validProfessional({ clientWorkModes: [ALL_CLIENT_WORK_MODES], travelAreas: ["AREA-LINZ-101", "AREA-LINZ-202"] }));
+    const fields = calls.find((call) => call.body?.fields?.["Questionnaire Status"] === "Completed").body.fields;
+    assert.deepEqual(fields["Client Work Modes"], CLIENT_WORK_MODES);
+    assert.equal(fields["Client Work Modes"].includes(ALL_CLIENT_WORK_MODES), false);
+    assert.equal(fields["Travels To Clients"], true);
+    assert.deepEqual(fields["Travel Areas"], ["recAREALINZ101", "recAREALINZ202"]);
+  });
+});
+
+test("non-travelling work modes reject submitted Travel Areas", () => {
+  const errors = validateProfessionalSubmission(validProfessional({ clientWorkModes: ["I work with clients online"], travelAreas: ["AREA-LINZ-101"] }));
+  assert.ok(errors.travelAreas);
+});
+
+test("Travel Charge is absent and questionnaire submission never creates Service Areas", async () => {
+  const mock = createAirtableMock();
+  await withMock(mock, async (calls) => {
+    await submitProfessionalQuestionnaire(validProfessional({ travelCharge: "99" }));
+    const fields = calls.find((call) => call.body?.fields?.["Questionnaire Status"] === "Completed").body.fields;
+    assert.equal("Travel Charge" in fields, false);
+    assert.equal(PROFESSIONAL_WRITABLE_FIELDS.includes("Travel Charge"), false);
+    assert.equal(calls.some((call) => call.table === "Service Areas" && call.method === "POST"), false);
   });
 });
 
@@ -296,8 +458,9 @@ test("professional submission resolves linked records, rechecks token and writes
     assert.deepEqual(questionnaireWrite.body.fields["Working Settings"], ["recSET01"]);
     assert.deepEqual(questionnaireWrite.body.fields["Support Styles"], ["recSTY01"]);
     assert.deepEqual(questionnaireWrite.body.fields["Base Suburb"], []);
-    assert.equal(questionnaireWrite.body.fields["Travel Charge"], "10");
-    assert.equal(typeof questionnaireWrite.body.fields["Travel Charge"], "string");
+    assert.equal("Travel Charge" in questionnaireWrite.body.fields, false);
+    assert.deepEqual(questionnaireWrite.body.fields["Client Work Modes"], ["I can travel to clients"]);
+    assert.equal(questionnaireWrite.body.fields["Travels To Clients"], true);
     assert.equal("Qualification Status" in questionnaireWrite.body.fields, false);
     assert.equal("Insurance Status" in questionnaireWrite.body.fields, false);
     assert.equal("Approved for Matching" in questionnaireWrite.body.fields, false);

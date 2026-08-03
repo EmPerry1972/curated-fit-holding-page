@@ -8,6 +8,9 @@
     "lint": "next lint",
     "test": "node --test tests/*.test.mjs",
     "matching:invite": "node scripts/generate-professional-invitation.mjs",
+    "matching:schema": "node scripts/migrate-matching-staging-schema.mjs",
+    "matching:locations:build": "node scripts/build-nz-locations-import.mjs",
+    "matching:locations:import": "node scripts/import-nz-service-areas.mjs",
     "build": "next build",
     "start": "next start"
   },

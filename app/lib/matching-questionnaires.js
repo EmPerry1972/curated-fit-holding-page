@@ -57,6 +57,9 @@ export const PROFESSIONAL_ROLES = [
 ];
 
 export const INSURANCE_CONFIRMATIONS = ["Yes", "No"];
+export const QUALIFICATION_COMPLETION_STATUSES = ["Completed", "Currently studying", "Prefer to discuss"];
+export const CLIENT_WORK_MODES = ["Clients can come to me", "I can travel to clients", "I work with clients online"];
+export const ALL_CLIENT_WORK_MODES = "All of the above";
 export const AVAILABILITY_OPTIONS = [
   "Yes",
   "Yes, with limited availability",
@@ -73,14 +76,28 @@ export const EXPERIENCE_FACTORS = Object.freeze({
   "Substantial or specialist": 1,
 });
 
+export function qualificationYears(currentYear = new Date().getFullYear()) {
+  return Array.from({ length: currentYear - 1949 }, (_, index) => String(currentYear - index));
+}
+
+export function normaliseClientWorkModes(values) {
+  if (!Array.isArray(values) || !unique(values)) return null;
+  if (values.includes(ALL_CLIENT_WORK_MODES)) return values.length === 1 ? [...CLIENT_WORK_MODES] : null;
+  return hasOnly(values, CLIENT_WORK_MODES) && values.length > 0 ? [...values] : null;
+}
+
+export function isServiceAreaId(value) {
+  return value === "AREA-ONLINE" || /^AREA-LINZ-\d+$/.test(value || "");
+}
+
 export const PROFESSIONAL_QUESTIONS = [
   { number: 1, id: "roles", title: "Professional roles", options: PROFESSIONAL_ROLES },
   { number: 2, id: "qualifications", title: "Qualifications, registration and insurance" },
   { number: 3, id: "availability", title: "Availability", options: AVAILABILITY_OPTIONS },
-  { number: 4, id: "experiencedClientStages", title: "Client exercise stages", options: EXERCISE_STAGES, max: 3 },
-  { number: 5, id: "expertise", title: "Relevant professional experience", options: EXPERTISE_OPTIONS },
+  { number: 4, id: "experiencedClientStages", title: "Which types of clients do you have the most experience supporting?", options: EXERCISE_STAGES, max: 3 },
+  { number: 5, id: "expertise", title: "Tell us where your experience is strongest", options: EXPERTISE_OPTIONS },
   { number: 6, id: "workingSettings", title: "Working settings", options: SETTINGS },
-  { number: 7, id: "locationAndTravel", title: "Location and travel" },
+  { number: 7, id: "locationAndTravel", title: "Where are you based?" },
   { number: 8, id: "supportStyles", title: "Support style", options: SUPPORT_STYLES, max: 2 },
   { number: 9, id: "gender", title: "Gender", options: PROFESSIONAL_GENDERS },
 ];
@@ -110,11 +127,12 @@ export function isValidInvitationToken(token) {
 export function validateProfessionalSubmission(data) {
   const errors = {};
   validateMulti(errors, "roles", data?.roles, PROFESSIONAL_ROLES);
+  if (data?.roles?.includes("Other") && !data?.otherRole?.trim()) errors.otherRole = "Please describe your role.";
   if (!data?.matchingQualifications?.trim()) errors.matchingQualifications = "Add your qualification.";
   if (!data?.matchingTrainingProvider?.trim()) errors.matchingTrainingProvider = "Add the training provider.";
-  if (!/^\d{4}$/.test(String(data?.matchingQualificationYear || ""))) errors.matchingQualificationYear = "Add a four-digit qualification year.";
+  if (!QUALIFICATION_COMPLETION_STATUSES.includes(data?.qualificationCompletionStatus)) errors.qualificationCompletionStatus = "Choose a qualification completion status.";
+  if (data?.qualificationCompletionStatus === "Completed" && !qualificationYears().includes(String(data?.matchingQualificationYear || ""))) errors.matchingQualificationYear = "Choose the year your qualification was completed.";
   if (!INSURANCE_CONFIRMATIONS.includes(data?.matchingInsuranceConfirmation)) errors.matchingInsuranceConfirmation = "Choose Yes or No.";
-  if (data?.matchingInsuranceConfirmation === "Yes" && !data?.matchingInsuranceDetails?.trim()) errors.matchingInsuranceDetails = "Add the insurance details.";
   if (!AVAILABILITY_OPTIONS.includes(data?.structuredAvailability)) errors.structuredAvailability = "Choose an approved availability option.";
   validateMulti(errors, "experiencedClientStages", data?.experiencedClientStages, EXERCISE_STAGES.map(({ id }) => id), { max: 3 });
 
@@ -136,11 +154,15 @@ export function validateProfessionalSubmission(data) {
 
   validateMulti(errors, "workingSettings", data?.workingSettings, SETTINGS.map(({ id }) => id));
   const baseSuburb = data?.baseSuburb || "";
-  if (baseSuburb && !SERVICE_AREAS.some(({ id }) => id === baseSuburb)) errors.baseSuburb = "Choose a canonical service area.";
-  if (!baseSuburb && !data?.otherArea?.trim()) errors.otherArea = "Add your base suburb or area if it is not listed.";
-  if (typeof data?.travelsToClients !== "boolean") errors.travelsToClients = "Choose whether you travel to clients.";
-  validateMulti(errors, "travelAreas", data?.travelAreas || [], SERVICE_AREAS.map(({ id }) => id), { min: 0 });
-  if (data?.travelCharge !== "" && data?.travelCharge !== undefined && (!Number.isFinite(Number(String(data.travelCharge).trim())) || Number(String(data.travelCharge).trim()) < 0)) errors.travelCharge = "Enter a valid non-negative travel charge.";
+  if (data?.locationNotListed === true) {
+    if (baseSuburb) errors.baseSuburb = "Clear the listed location when using a location that is not listed.";
+    if (!data?.otherArea?.trim()) errors.otherArea = "Add your town, suburb or area.";
+  } else if (!isServiceAreaId(baseSuburb)) errors.baseSuburb = "Choose a listed town or suburb, or select that your location is not listed.";
+  const clientWorkModes = normaliseClientWorkModes(data?.clientWorkModes);
+  if (!clientWorkModes) errors.clientWorkModes = "Choose how clients can work with you.";
+  const travelAreas = data?.travelAreas || [];
+  if (!Array.isArray(travelAreas) || !unique(travelAreas) || travelAreas.some((id) => !isServiceAreaId(id))) errors.travelAreas = "Choose only listed travel areas.";
+  if (clientWorkModes && !clientWorkModes.includes("I can travel to clients") && travelAreas.length) errors.travelAreas = "Travel areas apply only when you travel to clients.";
   validateMulti(errors, "supportStyles", data?.supportStyles, SUPPORT_STYLES.map(({ id }) => id), { max: 2 });
   if (!PROFESSIONAL_GENDERS.includes(data?.gender)) errors.gender = "Choose an approved gender option.";
   return errors;
@@ -154,7 +176,7 @@ export function validateClientSubmission(data) {
   validateMulti(errors, "selectedConsiderations", data?.selectedConsiderations || [], EXPERTISE_OPTIONS.filter((item) => item.category === "Consideration").map(({ id }) => id), { min: 0 });
   if (!EXERCISE_STAGES.some(({ id }) => id === data?.exerciseStage)) errors.exerciseStage = "Choose one exercise stage.";
   validateMulti(errors, "preferredSettings", data?.preferredSettings, SETTINGS.map(({ id }) => id), { max: 2 });
-  if (!SERVICE_AREAS.some(({ id }) => id === data?.suburb)) errors.suburb = "Choose a canonical service area.";
+  if (!SERVICE_AREAS.some(({ id }) => id === data?.suburb)) errors.suburb = "Choose a listed service area.";
   if (!data?.postcode?.trim()) errors.postcode = "Add the postcode.";
   validateMulti(errors, "preferredSupportStyles", data?.preferredSupportStyles, SUPPORT_STYLES.map(({ id }) => id), { max: 2 });
   if (!CLIENT_GENDER_PREFERENCES.includes(data?.genderPreference)) errors.genderPreference = "Choose an approved gender preference.";

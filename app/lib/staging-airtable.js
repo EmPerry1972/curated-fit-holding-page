@@ -5,6 +5,7 @@ import {
   REQUIRED_STAGING_BASE_ID,
   factorsForSubmittedLevel,
   isValidInvitationToken,
+  normaliseClientWorkModes,
   validateClientSubmission,
   validateProfessionalSubmission,
 } from "./matching-questionnaires.js";
@@ -26,11 +27,10 @@ export const INVITATION_ADMIN_COOKIE_NAME = "curated_fit_invitation_admin";
 export const INVITATION_ADMIN_COOKIE_MAX_AGE = 15 * 60;
 
 export const PROFESSIONAL_WRITABLE_FIELDS = Object.freeze([
-  "Roles", "Structured Availability", "Experienced Client Stages", "Working Settings", "Base Suburb",
-  "Travel Areas", "Travels To Clients", "Travel Charge", "Other Area", "Support Styles", "Gender",
+  "Roles", "Other Role", "Qualification Completion Status", "Structured Availability", "Experienced Client Stages",
+  "Working Settings", "Base Suburb", "Travel Areas", "Travels To Clients", "Client Work Modes", "Other Area", "Support Styles", "Gender",
   "Questionnaire Status", "Matching Insurance Confirmation", "Matching Qualifications", "Matching Training Provider",
   "Matching Qualification Year", "Matching Professional Registration", "Matching Registration Number",
-  "Matching Insurance Details", "Matching Qualification Evidence", "Matching Insurance Evidence",
   "Questionnaire Completed At", "Invitation Token Status",
 ]);
 
@@ -172,7 +172,11 @@ function escapeFormulaValue(value) {
 async function airtableRequest(table, { recordId, query, method = "GET", fields } = {}) {
   const { baseId, token } = getStagingConfig();
   const recordPath = recordId ? `/${encodeURIComponent(recordId)}` : "";
-  const queryString = query ? `?${new URLSearchParams(query)}` : "";
+  const searchParams = new URLSearchParams();
+  for (const [name, value] of Object.entries(query || {})) {
+    for (const item of Array.isArray(value) ? value : [value]) searchParams.append(name, item);
+  }
+  const queryString = searchParams.size ? `?${searchParams}` : "";
   const response = await fetch(`https://api.airtable.com/v0/${baseId}/${encodeURIComponent(table)}${recordPath}${queryString}`, {
     method,
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
@@ -231,6 +235,39 @@ export async function resolveLinkedRecordIds(table, idField, stableIds) {
   return ids.map((id) => byStableId.get(id));
 }
 
+export async function listCanonicalServiceAreas() {
+  const { tables } = getStagingConfig();
+  const records = [];
+  let offset;
+  do {
+    const result = await airtableRequest(tables.serviceAreas, {
+      query: {
+        pageSize: "100",
+        filterByFormula: 'AND({Status}="Canonical",{Area ID}!="")',
+        "fields[]": ["Area Name", "Area ID", "Region Name", "Region ID", "Location Type", "Online"],
+        ...(offset ? { offset } : {}),
+      },
+    });
+    records.push(...(result.records || []));
+    offset = result.offset;
+  } while (offset);
+  const ids = new Set();
+  return records.map((record) => {
+    const fields = record.fields || {};
+    const id = fields["Area ID"];
+    if (!id || ids.has(id)) throw new AirtableRequestError("Canonical service areas are not configured correctly.");
+    ids.add(id);
+    return {
+      id,
+      label: fields["Area Name"],
+      regionName: fields["Region Name"] || (id === "AREA-ONLINE" ? "Online" : ""),
+      regionId: fields["Region ID"] || (id === "AREA-ONLINE" ? "REGION-ONLINE" : ""),
+      locationType: fields["Location Type"] || (id === "AREA-ONLINE" ? "Online" : ""),
+      online: fields.Online === true,
+    };
+  });
+}
+
 async function upsertProfessionalExpertise(professionalId, expertiseOptionRecordIds, expertise) {
   const { tables } = getStagingConfig();
   for (const option of EXPERTISE_OPTIONS) {
@@ -250,7 +287,7 @@ async function upsertProfessionalExpertise(professionalId, expertiseOptionRecord
       "Submitted Level": response.submittedLevel,
       "Match Factor": matchFactor,
       "Effective Factor": effectiveFactor,
-      ...(response.evidence?.trim() ? { Evidence: response.evidence.trim() } : {}),
+      Evidence: ["Regular", "Substantial or specialist"].includes(response.submittedLevel) ? response.evidence?.trim() || "" : "",
       ...(response.approximateClientsSupported !== "" && response.approximateClientsSupported !== undefined
         ? { "Approximate Clients Supported": Number(response.approximateClientsSupported) }
         : {}),
@@ -264,26 +301,28 @@ async function upsertProfessionalExpertise(professionalId, expertiseOptionRecord
 }
 
 function professionalFields(data, linked, completedAt) {
+  const clientWorkModes = normaliseClientWorkModes(data.clientWorkModes);
   return {
     Roles: data.roles,
+    "Other Role": data.roles.includes("Other") ? data.otherRole.trim() : "",
+    "Qualification Completion Status": data.qualificationCompletionStatus,
     "Structured Availability": data.structuredAvailability,
     "Experienced Client Stages": linked.stages,
     "Working Settings": linked.settings,
     "Base Suburb": linked.baseSuburb,
     "Travel Areas": linked.travelAreas,
-    "Travels To Clients": data.travelsToClients,
-    ...(data.travelCharge !== "" && data.travelCharge !== undefined ? { "Travel Charge": String(data.travelCharge).trim() } : {}),
-    "Other Area": data.otherArea?.trim() || "",
+    "Travels To Clients": clientWorkModes.includes("I can travel to clients"),
+    "Client Work Modes": clientWorkModes,
+    "Other Area": data.locationNotListed ? data.otherArea.trim() : "",
     "Support Styles": linked.supportStyles,
     Gender: data.gender,
     "Questionnaire Status": "Completed",
     "Matching Insurance Confirmation": data.matchingInsuranceConfirmation,
     "Matching Qualifications": data.matchingQualifications.trim(),
     "Matching Training Provider": data.matchingTrainingProvider.trim(),
-    "Matching Qualification Year": Number(data.matchingQualificationYear),
+    ...(data.qualificationCompletionStatus === "Completed" ? { "Matching Qualification Year": Number(data.matchingQualificationYear) } : {}),
     ...(data.matchingProfessionalRegistration?.trim() ? { "Matching Professional Registration": data.matchingProfessionalRegistration.trim() } : {}),
     ...(data.matchingRegistrationNumber?.trim() ? { "Matching Registration Number": data.matchingRegistrationNumber.trim() } : {}),
-    ...(data.matchingInsuranceDetails?.trim() ? { "Matching Insurance Details": data.matchingInsuranceDetails.trim() } : {}),
     "Questionnaire Completed At": completedAt.toISOString(),
     "Invitation Token Status": "Used",
   };
@@ -294,12 +333,14 @@ export async function submitProfessionalQuestionnaire(data, { now = new Date() }
   if (Object.keys(errors).length) throw new QuestionnaireValidationError(errors);
   const initial = await findProfessionalByInvitationToken(data.token, { now });
   const { tables } = getStagingConfig();
+  const clientWorkModes = normaliseClientWorkModes(data.clientWorkModes);
+  const travelAreaStableIds = clientWorkModes.includes("I can travel to clients") ? data.travelAreas || [] : [];
   const [stageIds, settingIds, supportStyleIds, travelAreaIds, baseSuburbIds, expertiseOptionIds] = await Promise.all([
     resolveLinkedRecordIds(tables.exerciseStages, "Stage ID", data.experiencedClientStages),
     resolveLinkedRecordIds(tables.settings, "Setting ID", data.workingSettings),
     resolveLinkedRecordIds(tables.supportStyles, "Style ID", data.supportStyles),
-    resolveLinkedRecordIds(tables.serviceAreas, "Area ID", data.travelAreas || []),
-    resolveLinkedRecordIds(tables.serviceAreas, "Area ID", data.baseSuburb ? [data.baseSuburb] : []),
+    resolveLinkedRecordIds(tables.serviceAreas, "Area ID", travelAreaStableIds),
+    resolveLinkedRecordIds(tables.serviceAreas, "Area ID", data.locationNotListed ? [] : [data.baseSuburb]),
     resolveLinkedRecordIds(tables.expertiseOptions, "Option ID", EXPERTISE_OPTIONS.map(({ id }) => id)),
   ]);
   const expertiseMap = Object.fromEntries(EXPERTISE_OPTIONS.map((option, index) => [option.id, expertiseOptionIds[index]]));
