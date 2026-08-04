@@ -287,10 +287,11 @@ async function upsertProfessionalExpertise(professionalId, expertiseOptionRecord
       "Submitted Level": response.submittedLevel,
       "Match Factor": matchFactor,
       "Effective Factor": effectiveFactor,
-      Evidence: ["Regular", "Substantial or specialist"].includes(response.submittedLevel) ? response.evidence?.trim() || "" : "",
-      ...(response.approximateClientsSupported !== "" && response.approximateClientsSupported !== undefined
-        ? { "Approximate Clients Supported": Number(response.approximateClientsSupported) }
-        : {}),
+      Evidence: response.submittedLevel === "Substantial or specialist" ? response.evidence?.trim() || "" : "",
+      "Approximate Clients Supported": response.submittedLevel === "Substantial or specialist"
+        && response.approximateClientsSupported !== "" && response.approximateClientsSupported !== undefined
+        ? Number(response.approximateClientsSupported)
+        : null,
     };
     const record = existing.records?.[0];
     await airtableRequest(tables.professionalExpertise, {
@@ -320,7 +321,6 @@ function professionalFields(data, linked, completedAt) {
     "Matching Insurance Confirmation": data.matchingInsuranceConfirmation,
     "Matching Qualifications": data.matchingQualifications.trim(),
     "Matching Training Provider": data.matchingTrainingProvider.trim(),
-    ...(data.qualificationCompletionStatus === "Completed" ? { "Matching Qualification Year": Number(data.matchingQualificationYear) } : {}),
     ...(data.matchingProfessionalRegistration?.trim() ? { "Matching Professional Registration": data.matchingProfessionalRegistration.trim() } : {}),
     ...(data.matchingRegistrationNumber?.trim() ? { "Matching Registration Number": data.matchingRegistrationNumber.trim() } : {}),
     "Questionnaire Completed At": completedAt.toISOString(),

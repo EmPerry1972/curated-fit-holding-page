@@ -131,7 +131,6 @@ export function validateProfessionalSubmission(data) {
   if (!data?.matchingQualifications?.trim()) errors.matchingQualifications = "Add your qualification.";
   if (!data?.matchingTrainingProvider?.trim()) errors.matchingTrainingProvider = "Add the training provider.";
   if (!QUALIFICATION_COMPLETION_STATUSES.includes(data?.qualificationCompletionStatus)) errors.qualificationCompletionStatus = "Choose a qualification completion status.";
-  if (data?.qualificationCompletionStatus === "Completed" && !qualificationYears().includes(String(data?.matchingQualificationYear || ""))) errors.matchingQualificationYear = "Choose the year your qualification was completed.";
   if (!INSURANCE_CONFIRMATIONS.includes(data?.matchingInsuranceConfirmation)) errors.matchingInsuranceConfirmation = "Choose Yes or No.";
   if (!AVAILABILITY_OPTIONS.includes(data?.structuredAvailability)) errors.structuredAvailability = "Choose an approved availability option.";
   validateMulti(errors, "experiencedClientStages", data?.experiencedClientStages, EXERCISE_STAGES.map(({ id }) => id), { max: 3 });
@@ -145,7 +144,7 @@ export function validateProfessionalSubmission(data) {
     for (const id of requiredIds) {
       const row = expertise[id];
       if (!row || !EXPERIENCE_LEVELS.includes(row.submittedLevel)) errors[`expertise.${id}`] = "Choose an approved experience level.";
-      if (row?.approximateClientsSupported !== "" && row?.approximateClientsSupported !== undefined) {
+      if (row?.submittedLevel === "Substantial or specialist" && row?.approximateClientsSupported !== "" && row?.approximateClientsSupported !== undefined) {
         const count = Number(row.approximateClientsSupported);
         if (!Number.isInteger(count) || count < 0) errors[`expertise.${id}.approximateClientsSupported`] = "Use a whole number of zero or more.";
       }

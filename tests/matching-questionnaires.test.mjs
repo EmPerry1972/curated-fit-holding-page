@@ -20,7 +20,6 @@ import {
   factorsForSubmittedLevel,
   isValidInvitationToken,
   normaliseClientWorkModes,
-  qualificationYears,
   validateClientSubmission,
   validateProfessionalSubmission,
 } from "../app/lib/matching-questionnaires.js";
@@ -322,16 +321,18 @@ test("Other Role is cleared when Other is not selected", async () => {
   });
 });
 
-test("qualification completion status controls the numeric completion year", async () => {
+test("qualification completion status does not collect or write a completion year", async () => {
   assert.deepEqual(QUALIFICATION_COMPLETION_STATUSES, ["Completed", "Currently studying", "Prefer to discuss"]);
-  assert.ok(validateProfessionalSubmission(validProfessional({ qualificationCompletionStatus: "Completed", matchingQualificationYear: "" })).matchingQualificationYear);
+  assert.equal(validateProfessionalSubmission(validProfessional({ qualificationCompletionStatus: "Completed", matchingQualificationYear: "" })).matchingQualificationYear, undefined);
   assert.equal(validateProfessionalSubmission(validProfessional({ qualificationCompletionStatus: "Currently studying", matchingQualificationYear: "" })).matchingQualificationYear, undefined);
-  assert.equal(qualificationYears()[0], String(new Date().getFullYear()));
+  const source = await readFile("app/components/HiddenMatchingQuestionnaire.tsx", "utf8");
+  assert.doesNotMatch(source, /Qualification year|matchingQualificationYear|qualificationYears/);
+  assert.equal(PROFESSIONAL_WRITABLE_FIELDS.includes("Matching Qualification Year"), true);
   const mock = createAirtableMock();
   await withMock(mock, async (calls) => {
-    await submitProfessionalQuestionnaire(validProfessional({ qualificationCompletionStatus: "Currently studying", matchingQualificationYear: "" }));
+    await submitProfessionalQuestionnaire(validProfessional({ qualificationCompletionStatus: "Completed", matchingQualificationYear: "2024" }));
     const fields = calls.find((call) => call.body?.fields?.["Questionnaire Status"] === "Completed").body.fields;
-    assert.equal(fields["Qualification Completion Status"], "Currently studying");
+    assert.equal(fields["Qualification Completion Status"], "Completed");
     assert.equal("Matching Qualification Year" in fields, false);
   });
 });
@@ -353,10 +354,51 @@ test("Q4 and Q5 use the approved wording and conditional experience text", async
   assert.match(source, /Choose up to three areas where your experience is strongest\./);
   assert.match(source, /Tell us where your experience is strongest/);
   assert.match(source, /Tell us a little about your experience in this area/);
-  assert.match(source, /const showExperience = \["Regular", "Substantial or specialist"\]/);
+  assert.match(source, /const showExperience = form\.expertise\[option\.id\]\.submittedLevel === "Substantial or specialist"/);
+  assert.doesNotMatch(source, /\["Regular", "Substantial or specialist"\]\.includes/);
   assert.doesNotMatch(source, />Evidence</);
   assert.equal(EXERCISE_STAGES.length, 6);
   assert.equal(EXERCISE_STAGES.some(({ label }) => /all stages/i.test(label)), false);
+});
+
+test("non-specialist expertise clears specialist-only details", async () => {
+  const expertise = Object.fromEntries(EXPERTISE_OPTIONS.map(({ id }) => [id, {
+    submittedLevel: "Regular",
+    evidence: "must not persist",
+    approximateClientsSupported: "99",
+  }]));
+  assert.deepEqual(validateProfessionalSubmission(validProfessional({ expertise })), {});
+  const mock = createAirtableMock();
+  await withMock(mock, async (calls) => {
+    await submitProfessionalQuestionnaire(validProfessional({ expertise }));
+    const writes = calls.filter((call) => call.table === "Professional Expertise" && ["POST", "PATCH"].includes(call.method));
+    assert.equal(writes.length, 12);
+    for (const write of writes) {
+      const fields = write.body.records[0].fields;
+      assert.equal(fields.Evidence, "");
+      assert.equal(fields["Approximate Clients Supported"], null);
+    }
+  });
+});
+
+test("specialist expertise validates and persists specialist details", async () => {
+  const expertise = Object.fromEntries(EXPERTISE_OPTIONS.map(({ id }) => [id, {
+    submittedLevel: "Substantial or specialist",
+    evidence: "Relevant specialist training and client experience.",
+    approximateClientsSupported: "12",
+  }]));
+  assert.deepEqual(validateProfessionalSubmission(validProfessional({ expertise })), {});
+  const mock = createAirtableMock();
+  await withMock(mock, async (calls) => {
+    await submitProfessionalQuestionnaire(validProfessional({ expertise }));
+    const writes = calls.filter((call) => call.table === "Professional Expertise" && ["POST", "PATCH"].includes(call.method));
+    assert.equal(writes.length, 12);
+    for (const write of writes) {
+      const fields = write.body.records[0].fields;
+      assert.equal(fields.Evidence, "Relevant specialist training and client experience.");
+      assert.equal(fields["Approximate Clients Supported"], 12);
+    }
+  });
 });
 
 test("professional must supply either a listed Base Suburb or a not-listed Other Area", () => {
@@ -379,6 +421,19 @@ test("professional location choices expose approved region and location fields",
   const mock = createAirtableMock({ serviceAreaRecords });
   await withMock(mock, async () => {
     assert.deepEqual(await listCanonicalServiceAreas(), [{ id: "AREA-LINZ-101", label: "Herne Bay", regionName: "Auckland Region", regionId: "02", locationType: "Suburb", online: false }]);
+  });
+});
+
+test("professional location labels are human-readable while stable IDs remain internal", async () => {
+  const source = await readFile("app/components/HiddenMatchingQuestionnaire.tsx", "utf8");
+  assert.match(source, /const locationDisplay = \(area: ServiceAreaOption\) => area\.label;/);
+  assert.doesNotMatch(source, /const locationDisplay = .*area\.id/);
+  const serviceAreaRecords = [{ id: "recArea101", fields: { "Area Name": "Herne Bay", "Area ID": "AREA-LINZ-101", "Region Name": "Auckland Region", "Region ID": "02", "Location Type": "Suburb", Online: false, Status: "Canonical" } }];
+  const mock = createAirtableMock({ serviceAreaRecords });
+  await withMock(mock, async () => {
+    const [area] = await listCanonicalServiceAreas();
+    assert.equal(area.label, "Herne Bay");
+    assert.equal(area.id, "AREA-LINZ-101");
   });
 });
 
