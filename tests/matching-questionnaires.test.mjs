@@ -687,6 +687,24 @@ test("client API refuses unauthenticated requests with a generic unavailable res
   assert.deepEqual(await response.json(), { error: "This facility is unavailable." });
 });
 
+test("client location validation accepts stable LINZ IDs and rejects uncontrolled values", () => {
+  assert.equal(validateClientSubmission(validClient({ suburb: "AREA-LINZ-101" })).suburb, undefined);
+  assert.ok(validateClientSubmission(validClient({ suburb: "Herne Bay" })).suburb);
+});
+
+test("authenticated client location API returns canonical Service Areas", async () => {
+  const serviceAreaRecords = [{ id: "recArea101", fields: { "Area Name": "Herne Bay", "Area ID": "AREA-LINZ-101", "Region Name": "Auckland Region", "Region ID": "02", "Location Type": "Suburb", Online: false, Status: "Canonical" } }];
+  const mock = createAirtableMock({ serviceAreaRecords });
+  await withMock(mock, async () => {
+    const { POST: authenticate } = await import("../app/api/matching-staging/client-auth/route.js");
+    const { GET: getLocations } = await import("../app/api/matching-staging/client/route.js");
+    const authResponse = await authenticate(new Request("https://questionnaire.example/api/matching-staging/client-auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: process.env.MATCHING_CLIENT_TEST_SECRET }) }));
+    const response = await getLocations(new Request("https://questionnaire.example/api/matching-staging/client", { headers: { Cookie: authResponse.headers.get("set-cookie") } }));
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { serviceAreas: [{ id: "AREA-LINZ-101", label: "Herne Bay", regionName: "Auckland Region", regionId: "02", locationType: "Suburb", online: false }] });
+  });
+});
+
 test("wrong and missing client-test passwords receive the same generic failure", async () => {
   installEnv();
   const { POST } = await import("../app/api/matching-staging/client-auth/route.js");

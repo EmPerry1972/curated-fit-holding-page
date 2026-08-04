@@ -15,7 +15,6 @@ import {
   PROFESSIONAL_GENDERS,
   PROFESSIONAL_ROLES,
   QUALIFICATION_COMPLETION_STATUSES,
-  SERVICE_AREAS,
   SETTINGS,
   SUPPORT_STYLES,
 } from "../lib/matching-questionnaires";
@@ -193,8 +192,22 @@ function ProfessionalQuestionnaire({ token }: { token: string }) {
 
 function ClientQuestionnaire() {
   const [submitting, setSubmitting] = useState(false); const [done, setDone] = useState(false); const [fatalError, setFatalError] = useState(""); const [errors, setErrors] = useState<FieldErrors>({});
+  const [serviceAreas, setServiceAreas] = useState<ServiceAreaOption[]>([]);
+  const [locationsLoading, setLocationsLoading] = useState(true);
+  const [regionName, setRegionName] = useState("");
   const [form, setForm] = useState({ clientName: "", email: "", phoneNumber: "", selectedOutcomes: [] as string[], selectedConsiderations: [] as string[], exerciseStage: "", preferredSettings: [] as string[], suburb: "", postcode: "", preferredSupportStyles: [] as string[], genderPreference: "" });
   const update = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) => setForm((current) => ({ ...current, [key]: value }));
+  const regions = Array.from(new Set(serviceAreas.filter((area) => !area.online && area.regionName).map((area) => area.regionName))).sort((left, right) => left.localeCompare(right));
+  const suburbOptions = serviceAreas.filter((area) => !area.online && area.regionName === regionName);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/matching-staging/client", { cache: "no-store", signal: controller.signal })
+      .then(async (response) => { const data = await response.json(); if (!response.ok) throw new Error(); setServiceAreas(data.serviceAreas || []); })
+      .catch((error) => { if (error.name !== "AbortError") setFatalError("Locations could not be loaded."); })
+      .finally(() => setLocationsLoading(false));
+    return () => controller.abort();
+  }, []);
+  function updateClientRegion(value: string) { setRegionName(value); update("suburb", ""); }
   async function submit(event: FormEvent) { event.preventDefault(); setSubmitting(true); setErrors({}); setFatalError(""); try { const response = await fetch("/api/matching-staging/client", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) }); const data = await response.json(); if (!response.ok) { setErrors(data.fields || {}); throw new Error(data.error || "The test record could not be saved."); } setDone(true); window.scrollTo({ top: 0, behavior: "smooth" }); } catch (error) { setFatalError(error instanceof Error ? error.message : "The test record could not be saved."); } finally { setSubmitting(false); } }
   if (done) return <Frame><p style={styles.eyebrow}>Test record saved</p><h1 style={styles.heading}>Client responses received.</h1><p style={styles.body}>No match has been selected, assigned or contacted.</p></Frame>;
   return <Frame><p style={styles.eyebrow}>Internal staging questionnaire</p><h1 style={styles.heading}>Client matching test</h1><p style={styles.body}>This route creates a test record only. It does not trigger matching, introductions, email or notifications.</p><form onSubmit={submit}>
@@ -203,7 +216,7 @@ function ClientQuestionnaire() {
     <Question title="Selected Considerations"><MultiChoice options={expertiseOptions.filter((item) => item.category === "Consideration")} values={form.selectedConsiderations} onChange={(value) => update("selectedConsiderations", value)} error={errors.selectedConsiderations} /></Question>
     <Question title="Exercise Stage"><SelectIdField label="Exercise Stage" value={form.exerciseStage} onChange={(value) => update("exerciseStage", value)} options={EXERCISE_STAGES} error={errors.exerciseStage} /></Question>
     <Question title="Preferred Settings"><p style={styles.body}>Choose up to two.</p><MultiChoice options={SETTINGS} values={form.preferredSettings} onChange={(value) => update("preferredSettings", value)} max={2} error={errors.preferredSettings} /></Question>
-    <Question title="Location"><div style={styles.grid}><SelectIdField label="Suburb" value={form.suburb} onChange={(value) => update("suburb", value)} options={SERVICE_AREAS} error={errors.suburb} /><Field label="Postcode" value={form.postcode} onChange={(value) => update("postcode", value)} error={errors.postcode} required /></div><p style={styles.body}>Only listed Service Areas may be linked. No suburb or region records are created automatically.</p></Question>
+    <Question title="Location"><div style={styles.grid}><SelectField label="Region" value={regionName} onChange={updateClientRegion} options={regions} required />{regionName ? <SelectIdField label="Town or suburb" value={form.suburb} onChange={(value) => update("suburb", value)} options={suburbOptions} error={errors.suburb} /> : null}<Field label="Postcode" value={form.postcode} onChange={(value) => update("postcode", value)} error={errors.postcode} required /></div>{locationsLoading ? <p style={styles.body}>Loading towns and suburbs…</p> : null}<p style={styles.body}>Choose a listed town or suburb. No location records are created automatically.</p></Question>
     <Question title="Preferred Support Styles"><p style={styles.body}>Choose up to two.</p><MultiChoice options={SUPPORT_STYLES} values={form.preferredSupportStyles} onChange={(value) => update("preferredSupportStyles", value)} max={2} error={errors.preferredSupportStyles} /></Question>
     <Question title="Gender Preference"><SelectField label="Gender Preference" value={form.genderPreference} onChange={(value) => update("genderPreference", value)} options={CLIENT_GENDER_PREFERENCES} error={errors.genderPreference} required /></Question>
     {fatalError && <p role="alert" style={styles.error}>{fatalError}</p>}<button type="submit" disabled={submitting} style={{ ...styles.button, opacity: submitting ? 0.5 : 1 }}>{submitting ? "Saving…" : "Create test record"}</button>

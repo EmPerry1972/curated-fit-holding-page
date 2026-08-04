@@ -175,7 +175,7 @@ export function validateClientSubmission(data) {
   validateMulti(errors, "selectedConsiderations", data?.selectedConsiderations || [], EXPERTISE_OPTIONS.filter((item) => item.category === "Consideration").map(({ id }) => id), { min: 0 });
   if (!EXERCISE_STAGES.some(({ id }) => id === data?.exerciseStage)) errors.exerciseStage = "Choose one exercise stage.";
   validateMulti(errors, "preferredSettings", data?.preferredSettings, SETTINGS.map(({ id }) => id), { max: 2 });
-  if (!SERVICE_AREAS.some(({ id }) => id === data?.suburb)) errors.suburb = "Choose a listed service area.";
+  if (!isServiceAreaId(data?.suburb)) errors.suburb = "Choose a listed town or suburb.";
   if (!data?.postcode?.trim()) errors.postcode = "Add the postcode.";
   validateMulti(errors, "preferredSupportStyles", data?.preferredSupportStyles, SUPPORT_STYLES.map(({ id }) => id), { max: 2 });
   if (!CLIENT_GENDER_PREFERENCES.includes(data?.genderPreference)) errors.genderPreference = "Choose an approved gender preference.";
