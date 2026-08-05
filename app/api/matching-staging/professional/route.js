@@ -5,6 +5,7 @@ import {
   STAGING_RESPONSE_HEADERS,
   StagingConfigError,
   findProfessionalByInvitationToken,
+  getProfessionalMatchingConfig,
   listCanonicalServiceAreas,
   submitProfessionalQuestionnaire,
 } from "../../../lib/staging-airtable.js";
@@ -28,9 +29,10 @@ function errorResponse(error) {
 
 export async function GET(request) {
   try {
+    const config = getProfessionalMatchingConfig();
     const rawToken = new URL(request.url).searchParams.get("token") || "";
-    const professional = await findProfessionalByInvitationToken(rawToken);
-    const serviceAreas = await listCanonicalServiceAreas();
+    const professional = await findProfessionalByInvitationToken(rawToken, { config });
+    const serviceAreas = await listCanonicalServiceAreas(config);
     return json({ professional: { name: professional.name }, serviceAreas });
   } catch (error) {
     return errorResponse(error);
