@@ -104,6 +104,24 @@ export function getClientMatchingConfig() {
   };
 }
 
+export function getProfessionalMatchingConfig() {
+  if (process.env.MATCHING_PROFESSIONAL_ROLLOUT_ENABLED !== "true") return getStagingConfig();
+  const baseId = process.env.AIRTABLE_MATCHING_PROFESSIONAL_ROLLOUT_BASE_ID;
+  const token = process.env.AIRTABLE_MATCHING_PROFESSIONAL_ROLLOUT_TOKEN;
+  const origin = process.env.MATCHING_PROFESSIONAL_QUESTIONNAIRE_ORIGIN;
+  const reviewed = process.env.MATCHING_PROFESSIONAL_ROLLOUT_REVIEWED === "true";
+  if (baseId !== REQUIRED_MAIN_MATCHING_BASE_ID || !token || !origin || !reviewed) {
+    throw new StagingConfigError("The matching professional rollout is not enabled safely.");
+  }
+  return {
+    baseId,
+    token,
+    origin,
+    mode: "professional-rollout",
+    tables: { ...DEFAULT_TABLES },
+  };
+}
+
 function getClientTestSecret() {
   getClientMatchingConfig();
   const secret = process.env.MATCHING_CLIENT_TEST_SECRET;
@@ -112,7 +130,7 @@ function getClientTestSecret() {
 }
 
 function getInvitationAdminSecret() {
-  getStagingConfig();
+  getProfessionalMatchingConfig();
   const secret = process.env.MATCHING_INVITATION_ADMIN_SECRET;
   if (!secret) throw new StagingConfigError("The invitation administration facility is unavailable.");
   return secret;
@@ -267,12 +285,12 @@ function assertActiveInvitationRecord(records, now) {
   return record;
 }
 
-export async function findProfessionalByInvitationToken(rawToken, { now = new Date() } = {}) {
+export async function findProfessionalByInvitationToken(rawToken, { now = new Date(), config = getProfessionalMatchingConfig() } = {}) {
   if (!isValidInvitationToken(rawToken)) throw new InvitationTokenError("This questionnaire link is not valid.");
-  const { tables } = getStagingConfig();
+  const { tables } = config;
   const tokenHash = hashInvitationToken(rawToken);
   const formula = `{Invitation Token Hash}="${escapeFormulaValue(tokenHash)}"`;
-  const result = await listByFormula(tables.waitlist, formula, 2);
+  const result = await listByFormula(tables.waitlist, formula, 2, config);
   const record = assertActiveInvitationRecord(result.records, now);
   return { id: record.id, name: record.fields?.Name || "there" };
 }
@@ -293,8 +311,7 @@ export async function resolveLinkedRecordIds(table, idField, stableIds, config =
   return ids.map((id) => byStableId.get(id));
 }
 
-export async function listCanonicalServiceAreas() {
-  const config = getClientMatchingConfig();
+export async function listCanonicalServiceAreas(config = getClientMatchingConfig()) {
   const { tables } = config;
   const records = [];
   let offset;
@@ -328,8 +345,8 @@ export async function listCanonicalServiceAreas() {
   });
 }
 
-async function upsertProfessionalExpertise(professionalId, expertiseOptionRecordIds, expertise) {
-  const { tables } = getStagingConfig();
+async function upsertProfessionalExpertise(professionalId, expertiseOptionRecordIds, expertise, config) {
+  const { tables } = config;
   for (const option of EXPERTISE_OPTIONS) {
     const response = expertise[option.id];
     const expertiseRecord = `${professionalId}:${option.id}`;
@@ -337,6 +354,7 @@ async function upsertProfessionalExpertise(professionalId, expertiseOptionRecord
       tables.professionalExpertise,
       `{Expertise Record}="${escapeFormulaValue(expertiseRecord)}"`,
       2,
+      config,
     );
     if ((existing.records || []).length > 1) throw new AirtableRequestError("Professional expertise contains duplicate records.");
     const { matchFactor, effectiveFactor } = factorsForSubmittedLevel(response.submittedLevel);
@@ -357,6 +375,7 @@ async function upsertProfessionalExpertise(professionalId, expertiseOptionRecord
     await airtableRequest(tables.professionalExpertise, {
       ...(record ? { recordId: record.id, method: "PATCH" } : { method: "POST" }),
       fields,
+      config,
     });
   }
 }
@@ -391,28 +410,30 @@ function professionalFields(data, linked, completedAt) {
 export async function submitProfessionalQuestionnaire(data, { now = new Date() } = {}) {
   const errors = validateProfessionalSubmission(data);
   if (Object.keys(errors).length) throw new QuestionnaireValidationError(errors);
-  const initial = await findProfessionalByInvitationToken(data.token, { now });
-  const { tables } = getStagingConfig();
+  const config = getProfessionalMatchingConfig();
+  const initial = await findProfessionalByInvitationToken(data.token, { now, config });
+  const { tables } = config;
   const clientWorkModes = normaliseClientWorkModes(data.clientWorkModes);
   const travelAreaStableIds = clientWorkModes.includes("I can travel to clients") ? data.travelAreas || [] : [];
   const [stageIds, settingIds, supportStyleIds, travelAreaIds, baseSuburbIds, expertiseOptionIds] = await Promise.all([
-    resolveLinkedRecordIds(tables.exerciseStages, "Stage ID", data.experiencedClientStages),
-    resolveLinkedRecordIds(tables.settings, "Setting ID", data.workingSettings),
-    resolveLinkedRecordIds(tables.supportStyles, "Style ID", data.supportStyles),
-    resolveLinkedRecordIds(tables.serviceAreas, "Area ID", travelAreaStableIds),
-    resolveLinkedRecordIds(tables.serviceAreas, "Area ID", data.locationNotListed ? [] : [data.baseSuburb]),
-    resolveLinkedRecordIds(tables.expertiseOptions, "Option ID", EXPERTISE_OPTIONS.map(({ id }) => id)),
+    resolveLinkedRecordIds(tables.exerciseStages, "Stage ID", data.experiencedClientStages, config),
+    resolveLinkedRecordIds(tables.settings, "Setting ID", data.workingSettings, config),
+    resolveLinkedRecordIds(tables.supportStyles, "Style ID", data.supportStyles, config),
+    resolveLinkedRecordIds(tables.serviceAreas, "Area ID", travelAreaStableIds, config),
+    resolveLinkedRecordIds(tables.serviceAreas, "Area ID", data.locationNotListed ? [] : [data.baseSuburb], config),
+    resolveLinkedRecordIds(tables.expertiseOptions, "Option ID", EXPERTISE_OPTIONS.map(({ id }) => id), config),
   ]);
   const expertiseMap = Object.fromEntries(EXPERTISE_OPTIONS.map((option, index) => [option.id, expertiseOptionIds[index]]));
 
-  const rechecked = await findProfessionalByInvitationToken(data.token, { now: new Date(Math.max(Date.now(), now.getTime())) });
+  const rechecked = await findProfessionalByInvitationToken(data.token, { now: new Date(Math.max(Date.now(), now.getTime())), config });
   if (rechecked.id !== initial.id) throw new InvitationTokenError("This questionnaire link is not valid.");
 
-  await upsertProfessionalExpertise(initial.id, expertiseMap, data.expertise);
+  await upsertProfessionalExpertise(initial.id, expertiseMap, data.expertise, config);
   await airtableRequest(tables.waitlist, {
     recordId: initial.id,
     method: "PATCH",
     fields: professionalFields(data, { stages: stageIds, settings: settingIds, supportStyles: supportStyleIds, travelAreas: travelAreaIds, baseSuburb: baseSuburbIds }, now),
+    config,
   });
   return { ok: true };
 }
@@ -520,16 +541,16 @@ async function calculateAndStoreClientMatches(clientRecord, config) {
   }
 }
 
-async function invitationHashExists(hash) {
-  const { tables } = getStagingConfig();
-  const result = await listByFormula(tables.waitlist, `{Invitation Token Hash}="${escapeFormulaValue(hash)}"`, 1);
+async function invitationHashExists(hash, config) {
+  const { tables } = config;
+  const result = await listByFormula(tables.waitlist, `{Invitation Token Hash}="${escapeFormulaValue(hash)}"`, 1, config);
   return Boolean(result.records?.length);
 }
 
-export async function getWaitlistProfessional(professionalRecordId) {
+export async function getWaitlistProfessional(professionalRecordId, config = getProfessionalMatchingConfig()) {
   if (!/^rec[A-Za-z0-9]{10,}$/.test(professionalRecordId || "")) throw new AirtableRequestError("A valid professional record is required.", 400);
-  const { tables } = getStagingConfig();
-  const record = await airtableRequest(tables.waitlist, { recordId: professionalRecordId });
+  const { tables } = config;
+  const record = await airtableRequest(tables.waitlist, { recordId: professionalRecordId, config });
   return { id: record.id, name: record.fields?.Name || "Unnamed professional" };
 }
 
@@ -539,15 +560,17 @@ export async function generateProfessionalInvitation({ professionalRecordId, exp
   if (!Number.isFinite(expiryDate.getTime()) || expiryDate <= new Date()) throw new Error("A future expiry date/time is required.");
   const parsedOrigin = new URL(origin);
   if (!/^https?:$/.test(parsedOrigin.protocol)) throw new Error("An HTTP or HTTPS questionnaire origin is required.");
-  const { tables } = getStagingConfig();
-  await getWaitlistProfessional(professionalRecordId);
+  const config = getProfessionalMatchingConfig();
+  const { tables } = config;
+  if (parsedOrigin.origin !== new URL(config.origin).origin) throw new Error("The questionnaire origin is not approved.");
+  await getWaitlistProfessional(professionalRecordId, config);
 
   let rawToken;
   let tokenHash;
   for (let attempt = 0; attempt < 5; attempt += 1) {
     rawToken = randomBytes(32).toString("base64url");
     tokenHash = hashInvitationToken(rawToken);
-    if (!(await invitationHashExists(tokenHash))) break;
+    if (!(await invitationHashExists(tokenHash, config))) break;
     rawToken = undefined;
   }
   if (!rawToken) throw new Error("A unique invitation token could not be generated.");
@@ -559,6 +582,7 @@ export async function generateProfessionalInvitation({ professionalRecordId, exp
       "Invitation Token Expiry": expiryDate.toISOString(),
       "Invitation Token Status": "Active",
     },
+    config,
   });
   const invitationUrl = new URL("/professional-questionnaire", parsedOrigin);
   invitationUrl.searchParams.set("token", rawToken);

@@ -30,6 +30,7 @@ import {
   INVITATION_ADMIN_COOKIE_NAME,
   InvitationTokenError,
   PROFESSIONAL_WRITABLE_FIELDS,
+  REQUIRED_MAIN_MATCHING_BASE_ID,
   StagingConfigError,
   createClientQuestionnaire,
   createInvitationAdminCookieHeader,
@@ -50,6 +51,13 @@ const TOKEN_HASH = hashInvitationToken(RAW_TOKEN);
 const FUTURE_EXPIRY = "2999-01-01T00:00:00.000Z";
 
 function installEnv() {
+  for (const key of [
+    "MATCHING_PROFESSIONAL_ROLLOUT_ENABLED",
+    "MATCHING_PROFESSIONAL_ROLLOUT_REVIEWED",
+    "AIRTABLE_MATCHING_PROFESSIONAL_ROLLOUT_BASE_ID",
+    "AIRTABLE_MATCHING_PROFESSIONAL_ROLLOUT_TOKEN",
+    "MATCHING_PROFESSIONAL_QUESTIONNAIRE_ORIGIN",
+  ]) delete process.env[key];
   process.env.MATCHING_STAGING_ENABLED = "true";
   process.env.AIRTABLE_MATCHING_BASE_ID = "apphwcmdSVSl7H0iR";
   process.env.AIRTABLE_MATCHING_TOKEN = "secret-test-pat";
@@ -176,9 +184,9 @@ test("disabled feature refuses matching operations", () => {
   assert.throws(() => getStagingConfig(), StagingConfigError);
 });
 
-test("configuration defaults use only canonical staging tables", () => {
+test("configuration defaults use only canonical matching tables", () => {
   installEnv();
-  assert.deepEqual(getStagingConfig().tables, { waitlist: "Waitlist", clients: "Clients", professionalExpertise: "Professional Expertise", expertiseOptions: "Expertise Options", exerciseStages: "Exercise Stages", supportStyles: "Support Styles", settings: "Settings", serviceAreas: "Service Areas" });
+  assert.deepEqual(getStagingConfig().tables, { waitlist: "Waitlist", clients: "Clients", professionalExpertise: "Professional Expertise", expertiseOptions: "Expertise Options", exerciseStages: "Exercise Stages", supportStyles: "Support Styles", settings: "Settings", serviceAreas: "Service Areas", matchingConfiguration: "Matching Configuration", automatedMatchResults: "Automated Match Results" });
 });
 
 test("staging schema migration defines exactly the six approved additions", () => {
@@ -623,10 +631,10 @@ test("invitation generator requires a future expiry and explicit HTTP origin", a
   await assert.rejects(() => generateProfessionalInvitation({ professionalRecordId: "recProfessional123", expiry: FUTURE_EXPIRY, origin: "file:///tmp" }), /HTTP or HTTPS/i);
 });
 
-test("hidden implementation does not call public waitlist, email or production base", async () => {
+test("hidden implementation does not call public waitlist or email services", async () => {
   const files = ["app/components/HiddenMatchingQuestionnaire.tsx", "app/api/matching-staging/professional/route.js", "app/api/matching-staging/client/route.js", "app/lib/staging-airtable.js"];
   const source = (await Promise.all(files.map((file) => readFile(file, "utf8")))).join("\n");
-  assert.doesNotMatch(source, /\/api\/waitlist/); assert.doesNotMatch(source, /sendConfirmationEmail|resend\.com/); assert.doesNotMatch(source, /appgYLxrpdZXXULDf/);
+  assert.doesNotMatch(source, /\/api\/waitlist/); assert.doesNotMatch(source, /sendConfirmationEmail|resend\.com/);
 });
 
 test("hidden layouts remain noindex and nofollow", async () => {
@@ -810,13 +818,35 @@ test("authenticated admin verifies one exact Waitlist professional and returns N
   });
 });
 
+test("invitation admin verifies a main-base professional with the dedicated rollout token", async () => {
+  const mock = createAirtableMock({ tokenRecords: [] });
+  await withMock(mock, async (calls) => {
+    process.env.AIRTABLE_MATCHING_BASE_ID = "appWrongStagingBase";
+    process.env.MATCHING_PROFESSIONAL_ROLLOUT_ENABLED = "true";
+    process.env.MATCHING_PROFESSIONAL_ROLLOUT_REVIEWED = "true";
+    process.env.AIRTABLE_MATCHING_PROFESSIONAL_ROLLOUT_BASE_ID = REQUIRED_MAIN_MATCHING_BASE_ID;
+    process.env.AIRTABLE_MATCHING_PROFESSIONAL_ROLLOUT_TOKEN = "pat-professional-rollout-test";
+    process.env.MATCHING_PROFESSIONAL_QUESTIONNAIRE_ORIGIN = "https://preview.example";
+    const { POST: authenticate } = await import("../app/api/matching-staging/invitation-auth/route.js");
+    const { POST: invitations } = await import("../app/api/matching-staging/invitations/route.js");
+    const auth = await authenticate(new Request("https://preview.example/api/matching-staging/invitation-auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: process.env.MATCHING_INVITATION_ADMIN_SECRET }) }));
+    const response = await invitations(new Request("https://preview.example/api/matching-staging/invitations", { method: "POST", headers: { "Content-Type": "application/json", Cookie: auth.headers.get("set-cookie") }, body: JSON.stringify({ action: "verify", professionalRecordId: "recProfessional123" }) }));
+    assert.equal(auth.status, 200);
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { professional: { id: "recProfessional123", name: "Alex" } });
+    assert.equal(calls.length, 1);
+    assert.match(calls[0].url, new RegExp(`/v0/${REQUIRED_MAIN_MATCHING_BASE_ID}/Waitlist/recProfessional123$`));
+    assert.equal(calls[0].authorization, "Bearer pat-professional-rollout-test");
+  });
+});
+
 test("admin generation writes only the three invitation fields and never creates Waitlist records", async () => {
   const mock = createAirtableMock({ tokenRecords: [] });
   await withMock(mock, async (calls) => {
     const { POST: authenticate } = await import("../app/api/matching-staging/invitation-auth/route.js");
     const { POST: invitations } = await import("../app/api/matching-staging/invitations/route.js");
     const auth = await authenticate(new Request("https://questionnaire.example/api/matching-staging/invitation-auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: process.env.MATCHING_INVITATION_ADMIN_SECRET }) }));
-    const response = await invitations(new Request("https://questionnaire.example/api/matching-staging/invitations", { method: "POST", headers: { "Content-Type": "application/json", Cookie: auth.headers.get("set-cookie") }, body: JSON.stringify({ action: "generate", professionalRecordId: "recProfessional123", expiry: FUTURE_EXPIRY, origin: "https://preview.example" }) }));
+    const response = await invitations(new Request("https://questionnaire.example/api/matching-staging/invitations", { method: "POST", headers: { "Content-Type": "application/json", Cookie: auth.headers.get("set-cookie") }, body: JSON.stringify({ action: "generate", professionalRecordId: "recProfessional123", expiry: FUTURE_EXPIRY, origin: "https://questionnaire.example" }) }));
     assert.equal(response.status, 200);
     const patch = calls.find((call) => call.table === "Waitlist" && call.method === "PATCH");
     assert.deepEqual(Object.keys(patch.body.fields), ["Invitation Token Hash", "Invitation Token Expiry", "Invitation Token Status"]);
@@ -840,7 +870,7 @@ test("admin generation never stores or logs the plaintext token and outputs its 
       const { POST: authenticate } = await import("../app/api/matching-staging/invitation-auth/route.js");
       const { POST: invitations } = await import("../app/api/matching-staging/invitations/route.js");
       const auth = await authenticate(new Request("https://questionnaire.example/api/matching-staging/invitation-auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: process.env.MATCHING_INVITATION_ADMIN_SECRET }) }));
-      const response = await invitations(new Request("https://questionnaire.example/api/matching-staging/invitations", { method: "POST", headers: { "Content-Type": "application/json", Cookie: auth.headers.get("set-cookie") }, body: JSON.stringify({ action: "generate", professionalRecordId: "recProfessional123", expiry: FUTURE_EXPIRY, origin: "https://preview.example" }) }));
+      const response = await invitations(new Request("https://questionnaire.example/api/matching-staging/invitations", { method: "POST", headers: { "Content-Type": "application/json", Cookie: auth.headers.get("set-cookie") }, body: JSON.stringify({ action: "generate", professionalRecordId: "recProfessional123", expiry: FUTURE_EXPIRY, origin: "https://questionnaire.example" }) }));
       const data = await response.json();
       const rawToken = new URL(data.invitationUrl).searchParams.get("token");
       assert.equal(isValidInvitationToken(rawToken), true);
