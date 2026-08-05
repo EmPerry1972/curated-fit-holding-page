@@ -9,6 +9,7 @@ import {
   validateClientSubmission,
   validateProfessionalSubmission,
 } from "./matching-questionnaires.js";
+import { calculateDryRunMatches, matchResultFields } from "./matching-engine.js";
 
 const DEFAULT_TABLES = Object.freeze({
   waitlist: "Waitlist",
@@ -19,7 +20,11 @@ const DEFAULT_TABLES = Object.freeze({
   supportStyles: "Support Styles",
   settings: "Settings",
   serviceAreas: "Service Areas",
+  matchingConfiguration: "Matching Configuration",
+  automatedMatchResults: "Automated Match Results",
 });
+
+export const REQUIRED_MAIN_MATCHING_BASE_ID = "appgYLxrpdZXXULDf";
 
 export const CLIENT_TEST_COOKIE_NAME = "curated_fit_client_test";
 const CLIENT_TEST_COOKIE_MAX_AGE = 30 * 60;
@@ -76,12 +81,31 @@ export function getStagingConfig({ requireOrigin = false } = {}) {
       supportStyles: process.env.AIRTABLE_MATCHING_SUPPORT_STYLES_TABLE || DEFAULT_TABLES.supportStyles,
       settings: process.env.AIRTABLE_MATCHING_SETTINGS_TABLE || DEFAULT_TABLES.settings,
       serviceAreas: process.env.AIRTABLE_MATCHING_SERVICE_AREAS_TABLE || DEFAULT_TABLES.serviceAreas,
+      matchingConfiguration: DEFAULT_TABLES.matchingConfiguration,
+      automatedMatchResults: DEFAULT_TABLES.automatedMatchResults,
     },
+    mode: "staging",
+  };
+}
+
+export function getClientMatchingConfig() {
+  if (process.env.MATCHING_CLIENT_ROLLOUT_ENABLED !== "true") return getStagingConfig();
+  const baseId = process.env.AIRTABLE_MATCHING_ROLLOUT_BASE_ID;
+  const token = process.env.AIRTABLE_MATCHING_ROLLOUT_TOKEN;
+  const dryRunOnly = process.env.MATCHING_ROLLOUT_DRY_RUN_ONLY === "true";
+  if (baseId !== REQUIRED_MAIN_MATCHING_BASE_ID || !token || !dryRunOnly) {
+    throw new StagingConfigError("The matching client rollout is not enabled safely.");
+  }
+  return {
+    baseId,
+    token,
+    mode: "rollout",
+    tables: { ...DEFAULT_TABLES },
   };
 }
 
 function getClientTestSecret() {
-  getStagingConfig();
+  getClientMatchingConfig();
   const secret = process.env.MATCHING_CLIENT_TEST_SECRET;
   if (!secret) throw new StagingConfigError("The client test facility is unavailable.");
   return secret;
@@ -169,8 +193,8 @@ function escapeFormulaValue(value) {
   return String(value).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
 
-async function airtableRequest(table, { recordId, query, method = "GET", fields } = {}) {
-  const { baseId, token } = getStagingConfig();
+async function airtableRequest(table, { recordId, query, method = "GET", fields, config = getStagingConfig() } = {}) {
+  const { baseId, token } = config;
   const recordPath = recordId ? `/${encodeURIComponent(recordId)}` : "";
   const searchParams = new URLSearchParams();
   for (const [name, value] of Object.entries(query || {})) {
@@ -184,14 +208,48 @@ async function airtableRequest(table, { recordId, query, method = "GET", fields 
     cache: "no-store",
   });
   if (!response.ok) {
-    console.error("Matching staging Airtable request failed", response.status, table);
+    console.error("Matching Airtable request failed", response.status, table);
     throw new AirtableRequestError(undefined, response.status === 404 ? 404 : 502);
   }
   return response.json();
 }
 
-async function listByFormula(table, formula, maxRecords) {
-  return airtableRequest(table, { query: { maxRecords: String(maxRecords), filterByFormula: formula } });
+async function listByFormula(table, formula, maxRecords, config = getStagingConfig()) {
+  return airtableRequest(table, { query: { maxRecords: String(maxRecords), filterByFormula: formula }, config });
+}
+
+async function listAllRecords(table, config, query = {}) {
+  const records = [];
+  let offset;
+  do {
+    const result = await airtableRequest(table, {
+      config,
+      query: { pageSize: "100", ...query, ...(offset ? { offset } : {}) },
+    });
+    records.push(...(result.records || []));
+    offset = result.offset;
+  } while (offset);
+  return records;
+}
+
+function chunks(items, size = 10) {
+  const result = [];
+  for (let index = 0; index < items.length; index += size) result.push(items.slice(index, index + size));
+  return result;
+}
+
+async function writeRecordBatch(table, records, method, config) {
+  const response = await fetch(`https://api.airtable.com/v0/${config.baseId}/${encodeURIComponent(table)}`, {
+    method,
+    headers: { Authorization: `Bearer ${config.token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ records, typecast: true }),
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    console.error("Matching Airtable batch request failed", response.status, table);
+    throw new AirtableRequestError(undefined, response.status === 404 ? 404 : 502);
+  }
+  return response.json();
 }
 
 export function hashInvitationToken(rawToken) {
@@ -219,12 +277,12 @@ export async function findProfessionalByInvitationToken(rawToken, { now = new Da
   return { id: record.id, name: record.fields?.Name || "there" };
 }
 
-export async function resolveLinkedRecordIds(table, idField, stableIds) {
+export async function resolveLinkedRecordIds(table, idField, stableIds, config = getStagingConfig()) {
   const ids = [...new Set(stableIds || [])];
   if (ids.length === 0) return [];
   const clauses = ids.map((id) => `{${idField}}="${escapeFormulaValue(id)}"`);
   const formula = clauses.length === 1 ? clauses[0] : `OR(${clauses.join(",")})`;
-  const result = await listByFormula(table, formula, ids.length + 1);
+  const result = await listByFormula(table, formula, ids.length + 1, config);
   const byStableId = new Map();
   for (const record of result.records || []) {
     const stableId = record.fields?.[idField];
@@ -236,11 +294,13 @@ export async function resolveLinkedRecordIds(table, idField, stableIds) {
 }
 
 export async function listCanonicalServiceAreas() {
-  const { tables } = getStagingConfig();
+  const config = getClientMatchingConfig();
+  const { tables } = config;
   const records = [];
   let offset;
   do {
     const result = await airtableRequest(tables.serviceAreas, {
+      config,
       query: {
         pageSize: "100",
         filterByFormula: 'AND({Status}="Canonical",{Area ID}!="")',
@@ -360,14 +420,15 @@ export async function submitProfessionalQuestionnaire(data, { now = new Date() }
 export async function createClientQuestionnaire(data) {
   const errors = validateClientSubmission(data);
   if (Object.keys(errors).length) throw new QuestionnaireValidationError(errors);
-  const { tables } = getStagingConfig();
+  const config = getClientMatchingConfig();
+  const { tables } = config;
   const [outcomes, considerations, stage, settings, supportStyles, suburb] = await Promise.all([
-    resolveLinkedRecordIds(tables.expertiseOptions, "Option ID", data.selectedOutcomes),
-    resolveLinkedRecordIds(tables.expertiseOptions, "Option ID", data.selectedConsiderations || []),
-    resolveLinkedRecordIds(tables.exerciseStages, "Stage ID", [data.exerciseStage]),
-    resolveLinkedRecordIds(tables.settings, "Setting ID", data.preferredSettings),
-    resolveLinkedRecordIds(tables.supportStyles, "Style ID", data.preferredSupportStyles),
-    resolveLinkedRecordIds(tables.serviceAreas, "Area ID", [data.suburb]),
+    resolveLinkedRecordIds(tables.expertiseOptions, "Option ID", data.selectedOutcomes, config),
+    resolveLinkedRecordIds(tables.expertiseOptions, "Option ID", data.selectedConsiderations || [], config),
+    resolveLinkedRecordIds(tables.exerciseStages, "Stage ID", [data.exerciseStage], config),
+    resolveLinkedRecordIds(tables.settings, "Setting ID", data.preferredSettings, config),
+    resolveLinkedRecordIds(tables.supportStyles, "Style ID", data.preferredSupportStyles, config),
+    resolveLinkedRecordIds(tables.serviceAreas, "Area ID", [data.suburb], config),
   ]);
   const fields = {
     "Client Name": data.clientName.trim(),
@@ -384,8 +445,79 @@ export async function createClientQuestionnaire(data) {
     "Matching Status": "Ready",
     "Is Test Record": true,
   };
-  await airtableRequest(tables.clients, { method: "POST", fields });
+  const created = await airtableRequest(tables.clients, { method: "POST", fields, config });
+  const clientRecord = created.records?.[0];
+  if (!clientRecord?.id) throw new AirtableRequestError("The client record was not returned by Airtable.");
+  if (config.mode === "rollout") await calculateAndStoreClientMatches({ ...clientRecord, fields }, config);
   return { ok: true };
+}
+
+async function calculateAndStoreClientMatches(clientRecord, config) {
+  const { tables } = config;
+  const [professionals, expertiseRecords, expertiseOptions, settingRecords, configurationRecords, existingMatches] = await Promise.all([
+    listAllRecords(tables.waitlist, config),
+    listAllRecords(tables.professionalExpertise, config),
+    listAllRecords(tables.expertiseOptions, config),
+    listAllRecords(tables.settings, config),
+    listAllRecords(tables.matchingConfiguration, config, {
+      filterByFormula: '{Configuration Name}="Curated Fit Matching Engine"',
+    }),
+    listAllRecords(tables.automatedMatchResults, config),
+  ]);
+  if (configurationRecords.length !== 1) throw new AirtableRequestError("Matching configuration is not unique.");
+  const settingByStableId = new Map(settingRecords.map((record) => [record.fields?.["Setting ID"], record.id]));
+  const { candidates, clientIssues } = calculateDryRunMatches({
+    client: clientRecord,
+    professionals,
+    expertiseRecords,
+    expertiseOptions,
+    onlineSettingId: settingByStableId.get("SET-06"),
+    homeSettingId: settingByStableId.get("SET-01"),
+    configRecord: configurationRecords[0],
+  });
+  if (clientIssues.length) throw new AirtableRequestError("The stored client record did not pass matching validation.");
+  const existingByMatchId = new Map(existingMatches.map((record) => [record.fields?.["Match ID"], record]));
+  const matchRecordIdByMatchId = new Map();
+  const calculatedAt = new Date();
+  const creates = [];
+  const updates = [];
+  for (const candidate of candidates) {
+    const matchId = `${candidate.clientId}::${candidate.professionalId}`;
+    const existing = existingByMatchId.get(matchId);
+    const fields = matchResultFields(candidate, calculatedAt);
+    if (existing) {
+      updates.push({ id: existing.id, fields });
+      matchRecordIdByMatchId.set(matchId, existing.id);
+    } else creates.push({ fields });
+  }
+  for (const batch of chunks(creates)) {
+    const result = await writeRecordBatch(tables.automatedMatchResults, batch, "POST", config);
+    for (const record of result.records || []) {
+      const matchId = record.fields?.["Match ID"];
+      if (matchId && record.id) matchRecordIdByMatchId.set(matchId, record.id);
+    }
+  }
+  for (const batch of chunks(updates)) {
+    await writeRecordBatch(tables.automatedMatchResults, batch, "PATCH", config);
+  }
+  if (matchRecordIdByMatchId.size !== candidates.length) {
+    throw new AirtableRequestError("One or more match result records were not returned by Airtable.");
+  }
+  const replacementUpdates = [];
+  for (const candidate of candidates) {
+    if (!candidate.replacedByMatchId) continue;
+    const matchId = `${candidate.clientId}::${candidate.professionalId}`;
+    const recordId = matchRecordIdByMatchId.get(matchId);
+    const replacementId = matchRecordIdByMatchId.get(candidate.replacedByMatchId);
+    if (!recordId || !replacementId) throw new AirtableRequestError("A replacement match result could not be resolved.");
+    replacementUpdates.push({
+      id: recordId,
+      fields: { "Replaced By": [replacementId], "Internal Follow-up Action": "Show another available match" },
+    });
+  }
+  for (const batch of chunks(replacementUpdates)) {
+    await writeRecordBatch(tables.automatedMatchResults, batch, "PATCH", config);
+  }
 }
 
 async function invitationHashExists(hash) {
