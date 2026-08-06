@@ -8,6 +8,7 @@ import {
   StagingConfigError,
   getProfessionalMatchingConfig,
 } from "../app/lib/staging-airtable.js";
+import { GET as getRolloutStatus } from "../app/api/matching-rollout-check/route.js";
 
 const ENV_KEYS = [
   "MATCHING_STAGING_ENABLED",
@@ -19,6 +20,12 @@ const ENV_KEYS = [
   "AIRTABLE_MATCHING_PROFESSIONAL_ROLLOUT_BASE_ID",
   "AIRTABLE_MATCHING_PROFESSIONAL_ROLLOUT_TOKEN",
   "MATCHING_PROFESSIONAL_QUESTIONNAIRE_ORIGIN",
+  "MATCHING_INVITATION_ADMIN_SECRET",
+  "MATCHING_CLIENT_ROLLOUT_ENABLED",
+  "MATCHING_ROLLOUT_DRY_RUN_ONLY",
+  "AIRTABLE_MATCHING_ROLLOUT_BASE_ID",
+  "AIRTABLE_MATCHING_ROLLOUT_TOKEN",
+  "MATCHING_CLIENT_TEST_SECRET",
 ];
 
 function resetEnvironment() {
@@ -40,6 +47,7 @@ function installProfessionalRolloutEnvironment() {
   process.env.AIRTABLE_MATCHING_PROFESSIONAL_ROLLOUT_BASE_ID = REQUIRED_MAIN_MATCHING_BASE_ID;
   process.env.AIRTABLE_MATCHING_PROFESSIONAL_ROLLOUT_TOKEN = "pat-professional-test";
   process.env.MATCHING_PROFESSIONAL_QUESTIONNAIRE_ORIGIN = "https://preview.example";
+  process.env.MATCHING_INVITATION_ADMIN_SECRET = "professional-admin-test";
 }
 
 test.afterEach(resetEnvironment);
@@ -78,6 +86,25 @@ test("approved professional rollout resolves only the exact main base", () => {
   assert.equal(config.mode, "professional-rollout");
   assert.equal(config.baseId, REQUIRED_MAIN_MATCHING_BASE_ID);
   assert.equal(config.origin, "https://preview.example");
+});
+
+test("professional readiness can pass without enabling the client rollout", async () => {
+  installProfessionalRolloutEnvironment();
+  const response = await getRolloutStatus(new Request("https://preview.example/api/matching-rollout-check?scope=professional"));
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { ok: true, scope: "professional", missing: [] });
+
+  const combinedResponse = await getRolloutStatus(new Request("https://preview.example/api/matching-rollout-check"));
+  const combined = await combinedResponse.json();
+  assert.equal(combined.ok, false);
+  assert.equal(combined.scope, "all");
+  assert.ok(combined.missing.includes("MATCHING_CLIENT_ROLLOUT_ENABLED"));
+});
+
+test("rollout readiness rejects an unknown scope", async () => {
+  const response = await getRolloutStatus(new Request("https://preview.example/api/matching-rollout-check?scope=unknown"));
+  assert.equal(response.status, 400);
+  assert.deepEqual(await response.json(), { ok: false, error: "Unknown rollout scope." });
 });
 
 test("professional questionnaire never writes manual approval fields", () => {

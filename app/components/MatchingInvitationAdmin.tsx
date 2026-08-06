@@ -48,7 +48,7 @@ function AccessGate() {
       setSubmitting(false);
     }
   }
-  return <Frame><p style={styles.eyebrow}>Internal staging access</p><h1 style={styles.heading}>Professional invitations</h1><p style={styles.body}>Enter the separate invitation administration password to continue.</p><form onSubmit={authenticate}><Field label="Invitation administration password" type="password" value={password} onChange={setPassword} />{error && <p role="alert" style={styles.error}>{error}</p>}<button type="submit" disabled={submitting} style={{ ...styles.button, opacity: submitting ? 0.5 : 1 }}>{submitting ? "Checking..." : "Continue"}</button></form></Frame>;
+  return <Frame><p style={styles.eyebrow}>Internal access</p><h1 style={styles.heading}>Professional invitations</h1><p style={styles.body}>Enter the separate invitation administration password to continue.</p><form onSubmit={authenticate}><Field label="Invitation administration password" type="password" value={password} onChange={setPassword} />{error && <p role="alert" style={styles.error}>{error}</p>}<button type="submit" disabled={submitting} style={{ ...styles.button, opacity: submitting ? 0.5 : 1 }}>{submitting ? "Checking..." : "Continue"}</button></form></Frame>;
 }
 
 function InvitationForm() {
@@ -99,10 +99,10 @@ function InvitationForm() {
     await navigator.clipboard.writeText(invitationUrl); setCopied(true);
   }
 
-  return <Frame><p style={styles.eyebrow}>Internal staging tool</p><h1 style={styles.heading}>Create a professional invitation</h1><p style={styles.body}>Verify one Waitlist professional, then create a link. The plaintext token is shown only in the generated link and is not stored.</p><form onSubmit={verify}>
+  return <Frame><p style={styles.eyebrow}>Internal tool</p><h1 style={styles.heading}>Create a professional invitation</h1><p style={styles.body}>Verify one Waitlist professional, then create a link. The plaintext token is shown only in the generated link and is not stored.</p><form onSubmit={verify}>
     <Field label="Waitlist Professional ID" value={professionalRecordId} onChange={changeProfessionalId} />
     <Field label="Invitation expiry date and time" type="datetime-local" value={expiry} onChange={setExpiry} />
-    <Field label="Questionnaire Preview origin" type="url" value={origin} onChange={setOrigin} />
+    <Field label="Questionnaire origin" type="url" value={origin} onChange={setOrigin} />
     <button type="submit" disabled={working} style={{ ...styles.secondaryButton, opacity: working ? 0.5 : 1 }}>{working ? "Checking..." : "Verify professional"}</button>
   </form>
   {professional && !invitationUrl ? <section style={styles.panel}><p style={styles.eyebrow}>Confirm professional</p><h2 style={{ margin: "0 0 8px" }}>{professional.name}</h2><p style={styles.body}>{professional.id}</p><button type="button" disabled={working} onClick={() => request("generate")} style={{ ...styles.button, opacity: working ? 0.5 : 1 }}>{working ? "Generating..." : "Generate questionnaire link"}</button></section> : null}
