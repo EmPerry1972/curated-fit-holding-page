@@ -2,19 +2,28 @@
   "name": "curated-fit-holding-page",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
+    "lint": "next lint",
+    "test": "node --test tests/*.test.mjs",
+    "matching:invite": "node scripts/generate-professional-invitation.mjs",
+    "matching:schema": "node scripts/migrate-matching-staging-schema.mjs",
+    "matching:locations:build": "node scripts/build-nz-locations-import.mjs",
+    "matching:locations:import": "node scripts/import-nz-service-areas.mjs",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
-    "next": "14.2.5",
+    "next": "14.2.35",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "@vercel/blob": "^0.27.0",
     "@vercel/analytics": "^1.3.1"
   },
   "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-next": "14.2.35",
     "typescript": "^5.4.5",
     "@types/react": "^18.3.1",
     "@types/node": "^20.14.2"
