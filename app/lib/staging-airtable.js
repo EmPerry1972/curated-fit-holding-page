@@ -211,7 +211,6 @@ export function isInvitationAdminRequestAuthenticated(request, options) {
   const cookies = parseCookies(request.headers.get("cookie"));
   return isInvitationAdminCookieValid(cookies[INVITATION_ADMIN_COOKIE_NAME], options);
 }
-}
 
 function escapeFormulaValue(value) {
   return String(value).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
