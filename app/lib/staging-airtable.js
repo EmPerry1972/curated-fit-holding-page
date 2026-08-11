@@ -203,8 +203,14 @@ export function isInvitationAdminCookieValid(cookieValue, { now = new Date() } =
 }
 
 export function isInvitationAdminRequestAuthenticated(request, options) {
+  const apiKey = process.env.INVITATION_API_KEY;
+  const providedKey = request.headers.get("x-api-key");
+  if (apiKey && providedKey && safeStringEqual(providedKey, apiKey)) {
+    return true;
+  }
   const cookies = parseCookies(request.headers.get("cookie"));
   return isInvitationAdminCookieValid(cookies[INVITATION_ADMIN_COOKIE_NAME], options);
+}
 }
 
 function escapeFormulaValue(value) {
