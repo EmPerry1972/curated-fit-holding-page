@@ -207,6 +207,9 @@ function ResultsView({ submission }: { submission: Record<string, unknown> }) {
                 </p>
               ) : openId === m.id ? (
                 <div style={{ marginTop: 12 }}>
+                  <p style={{ ...note, fontSize: 14, marginTop: 0, marginBottom: 12 }}>
+                    We’ll use these details to email {m.name} directly and introduce you. You’ll be copied in on the same email, so you can reply and take it from there. A copy also goes to the Curated Fit team.
+                  </p>
                   <input
                     style={field}
                     placeholder="Your name"
