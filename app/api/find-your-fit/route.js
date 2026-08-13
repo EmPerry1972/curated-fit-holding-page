@@ -4,6 +4,7 @@ import {
   STAGING_RESPONSE_HEADERS,
   StagingConfigError,
   createClientQuestionnaire,
+  previewClientMatches,
   listCanonicalServiceAreas,
 } from "../../lib/staging-airtable.js";
 
@@ -30,7 +31,12 @@ export async function GET() {
 export async function POST(request) {
   try {
     const data = await request.json();
-    const result = await createClientQuestionnaire({ ...data, isTestRecord: false });
+    let result;
+    if (data.intent === "connect") {
+      result = await createClientQuestionnaire({ ...data, isTestRecord: false });
+    } else {
+      result = await previewClientMatches(data);
+    }
     return json({ ok: true, matches: result.matches || [] });
   } catch (error) {
     if (error instanceof StagingConfigError) return json({ error: "This service is unavailable." }, 404);
