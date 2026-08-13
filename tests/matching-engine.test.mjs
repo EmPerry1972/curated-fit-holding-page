@@ -301,3 +301,71 @@ test("rollout submission writes one client and idempotent match results without 
   assert.equal(matchWrites[0].body.records[0].fields["Selected Internally"], false);
   assert.equal(writes.some((item) => item.table === "Waitlist Requests"), false);
 });
+
+// --- Fix 1: location matching by region, not exact suburb --------------------
+// Service-area records keyed by Airtable record id, carrying Region ID.
+const area = (id, regionId) => record(id, { "Region ID": regionId });
+const serviceAreas = [
+  area("recAreaAklMorningside", "02"), // AREA-LINZ-8939 (Auckland)
+  area("recAreaNthMorningside", "01"), // AREA-LINZ-2844 (Northland)
+  area("recAreaGreyLynn", "02"),       // AREA-LINZ-475  (Auckland)
+  area("recAreaMountEden", "02"),      // AREA-LINZ-995  (Auckland)
+  area("recAreaPapakura", "02"),       // AREA-LINZ-1196 (Auckland)
+];
+
+// Amber: Auckland-based, in-person coach whose base is Auckland Morningside.
+const amber = record("recAmber", {
+  "Questionnaire Status": "Completed",
+  "Qualification Status": "Verified",
+  "Insurance Status": "Verified",
+  "Approved for Matching": true,
+  "Structured Availability": "Yes",
+  "Experienced Client Stages": ["recStage"],
+  "Working Settings": ["recHome"],
+  "Support Styles": ["recStyle"],
+  Gender: "Woman",
+  "Base Suburb": ["recAreaAklMorningside"],
+  "Travels To Clients": true,
+});
+const amberExpertise = [
+  expertise("recAmber", "recOutcome", "Substantial or specialist", { evidenceStatus: "Verified" }),
+  expertise("recAmber", "recConsideration", "Regular", { scopeApproved: true }),
+];
+
+// Client tuned like the ticket payload, in-person, varying only the suburb.
+const clientInSuburb = (suburbRecordId) => record("recClient", {
+  "Selected Outcomes": ["recOutcome"],
+  "Selected Considerations": ["recConsideration"],
+  "Exercise Stage": ["recStage"],
+  "Preferred Settings": ["recHome"],
+  "Preferred Support Styles": ["recStyle"],
+  "Gender Preference": "Woman",
+  Suburb: [suburbRecordId],
+});
+
+const amberCandidateFrom = (suburbRecordId) => calculateDryRunMatches({
+  client: clientInSuburb(suburbRecordId),
+  professionals: [amber],
+  expertiseRecords: amberExpertise,
+  expertiseOptions: [option("recOutcome", "Outcome"), option("recConsideration", "Consideration")],
+  onlineSettingId: "recOnline",
+  homeSettingId: "recHome",
+  configRecord: config,
+  serviceAreas,
+}).candidates[0];
+
+test("region matching: Northland Morningside does NOT match an Auckland coach", () => {
+  const candidate = amberCandidateFrom("recAreaNthMorningside");
+  assert.ok(candidate.eligibilityReasons.includes("No compatible service area"));
+  assert.equal(candidate.eligible, false);
+});
+
+test("region matching: Auckland-region suburbs match an Auckland coach", () => {
+  for (const suburb of ["recAreaAklMorningside", "recAreaGreyLynn", "recAreaMountEden", "recAreaPapakura"]) {
+    const candidate = amberCandidateFrom(suburb);
+    assert.ok(
+      !candidate.eligibilityReasons.includes("No compatible service area"),
+      `expected region-02 suburb ${suburb} to be location-eligible for an Auckland coach`
+    );
+  }
+});
