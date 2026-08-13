@@ -203,7 +203,7 @@ function ResultsView({ submission }: { submission: Record<string, unknown> }) {
 
               {sent[m.id] ? (
                 <p style={{ ...note, marginTop: 12 }}>
-                  Thank you. We will introduce you to {m.name} and be in touch shortly.
+                  Thank you. We've connected you with {m.name} by email — you'll both hear from each other shortly.
                 </p>
               ) : openId === m.id ? (
                 <div style={{ marginTop: 12 }}>
