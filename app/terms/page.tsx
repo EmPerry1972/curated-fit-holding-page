@@ -17,7 +17,7 @@ export default function TermsPage() {
   return (
     <main>
       <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 24px", maxWidth: 1080, margin: "0 auto" }}>
-        <Link href="/"><img src="/logo.png" alt="Curated Fit" style={{ height: 26 }} /></Link>
+        <Link href="/"><img src="/logo.png" alt="Curated Fit" style={{ height: 26, filter: "brightness(0)" }} /></Link>
         <Link href="/" style={{ fontSize: 14, color: "var(--muted)" }}>Back to home</Link>
       </nav>
 
