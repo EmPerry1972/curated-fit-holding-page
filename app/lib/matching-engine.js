@@ -20,6 +20,22 @@ const selected = (record, field) => {
 const checked = (record, field) => fieldsOf(record)[field] === true;
 const intersects = (left, right) => left.some((item) => right.has(item));
 
+// Maps each service-area linked-record id to its Region ID, so the location
+// gate can compare by region rather than by exact area identity. Built from the
+// existing service-areas table records — no professional/coach data is changed.
+const buildRegionByAreaRecordId = (serviceAreas) =>
+  new Map(
+    (serviceAreas || [])
+      .map((record) => [record.id, fieldsOf(record)["Region ID"]])
+      .filter(([, regionId]) => Boolean(regionId))
+  );
+const regionsOf = (record, field, regionByAreaRecordId) =>
+  new Set(
+    linkedIds(record, field)
+      .map((areaId) => regionByAreaRecordId.get(areaId))
+      .filter(Boolean)
+  );
+
 export function availabilityOffer(value) {
   if (value === "Yes") return "Available";
   if (value === "Yes, with limited availability") return "Limited";
@@ -130,7 +146,7 @@ function reasonForMatch(candidate) {
   return reasons.length ? reasons.join("; ") : "limited scored alignment";
 }
 
-function scorePair({ client, professional, expertise, optionsByRecordId, onlineSettingId, homeSettingId, minimumScore }) {
+function scorePair({ client, professional, expertise, optionsByRecordId, onlineSettingId, homeSettingId, minimumScore, regionByAreaRecordId }) {
   const reasons = professionalBaseReasons(professional, expertise);
   const outcomes = linkedIds(client, "Selected Outcomes");
   const considerations = linkedIds(client, "Selected Considerations");
@@ -145,11 +161,18 @@ function scorePair({ client, professional, expertise, optionsByRecordId, onlineS
   if (!intersects(clientSettings, professionalSettings)) reasons.push("No compatible training setting");
   const onlineCompatible = clientSettings.includes(onlineSettingId) && professionalSettings.has(onlineSettingId);
   if (!onlineCompatible) {
-    const clientArea = linkedIds(client, "Suburb")[0];
-    const locationMatches = Boolean(clientArea) && (
-      linkedIds(professional, "Base Suburb").includes(clientArea)
-      || linkedIds(professional, "Travel Areas").includes(clientArea)
-    );
+    // Region-level match: eligible when the client's suburb region matches the
+    // region of the professional's base suburb or any travel area. This replaces
+    // exact area-identity matching, which both accepted distant same-name suburbs
+    // and rejected genuinely nearby same-region suburbs.
+    const clientRegions = regionsOf(client, "Suburb", regionByAreaRecordId);
+    const professionalRegions = new Set([
+      ...regionsOf(professional, "Base Suburb", regionByAreaRecordId),
+      ...regionsOf(professional, "Travel Areas", regionByAreaRecordId),
+    ]);
+    const locationMatches =
+      clientRegions.size > 0 &&
+      [...clientRegions].some((regionId) => professionalRegions.has(regionId));
     if (!locationMatches) reasons.push("No compatible service area");
     if (clientSettings.includes(homeSettingId) && professionalSettings.has(homeSettingId) && !checked(professional, "Travels To Clients")) {
       reasons.push("Home training selected but professional does not travel to clients");
@@ -221,6 +244,7 @@ export function calculateDryRunMatches({
   onlineSettingId,
   homeSettingId,
   configRecord,
+  serviceAreas,
 }) {
   const { minimumScore, waitlistAdvantage } = assertDryRunConfiguration(configRecord);
   if (!onlineSettingId || !homeSettingId) throw new Error("Required setting options are missing.");
@@ -232,6 +256,7 @@ export function calculateDryRunMatches({
   const clientIssues = validateClient(client, optionsByRecordId, onlineSettingId);
   if (clientIssues.length) return { candidates: [], clientIssues };
   const expertiseByProfessional = buildProfessionalExpertise(expertiseRecords);
+  const regionByAreaRecordId = buildRegionByAreaRecordId(serviceAreas);
   const candidates = (professionals || []).map((professional) => scorePair({
     client,
     professional,
@@ -240,6 +265,7 @@ export function calculateDryRunMatches({
     onlineSettingId,
     homeSettingId,
     minimumScore,
+    regionByAreaRecordId,
   }));
   const ranked = candidates.filter((candidate) => candidate.eligible && candidate.normalisedScore >= minimumScore)
     .sort(comparator(waitlistAdvantage));
