@@ -497,6 +497,8 @@ export async function createClientQuestionnaire(data) {
 
 export async function previewClientMatches(data) {
   const errors = validateClientSubmission(data);
+  delete errors.clientName;
+  delete errors.email;
   if (Object.keys(errors).length) throw new QuestionnaireValidationError(errors);
 
   const config = getClientMatchingConfig();
