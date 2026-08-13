@@ -465,7 +465,7 @@ export async function createClientQuestionnaire(data) {
     "Exercise Stage": stage,
     "Preferred Settings": settings,
     Suburb: suburb,
-    Postcode: data.postcode.trim(),
+    Postcode: data.postcode?.trim() || "",
     "Preferred Support Styles": supportStyles,
     "Gender Preference": data.genderPreference,
     "Matching Status": "Ready",
