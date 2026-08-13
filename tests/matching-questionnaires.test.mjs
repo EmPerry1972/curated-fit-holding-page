@@ -592,6 +592,21 @@ test("client validation enforces outcome, settings and support-style maximums pl
 });
 
 test("client gender values are exact", () => {
+  test("client validation treats suburb and postcode as optional when Online (SET-06) is selected", () => {
+  const online = validateClientSubmission(
+    validClient({ preferredSettings: ["SET-06"], suburb: "", postcode: "" })
+  );
+  assert.equal(online.suburb, undefined);
+  assert.equal(online.postcode, undefined);
+});
+
+test("client validation still requires suburb and postcode when Online is not selected", () => {
+  const inPerson = validateClientSubmission(
+    validClient({ preferredSettings: ["SET-01"], suburb: "", postcode: "" })
+  );
+  assert.ok(inPerson.suburb);
+  assert.ok(inPerson.postcode);
+});
   assert.deepEqual(CLIENT_GENDER_PREFERENCES, ["Woman", "Man", "No preference"]);
   assert.ok(validateClientSubmission(validClient({ genderPreference: "Prefer not to say" })).genderPreference);
 });
