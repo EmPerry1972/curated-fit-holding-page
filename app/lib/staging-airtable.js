@@ -469,13 +469,126 @@ export async function createClientQuestionnaire(data) {
     "Preferred Support Styles": supportStyles,
     "Gender Preference": data.genderPreference,
     "Matching Status": "Ready",
-    "Is Test Record": true,
+    "Is Test Record": data.isTestRecord === true,
   };
   const created = await airtableRequest(tables.clients, { method: "POST", fields, config });
   const clientRecord = created.records?.[0];
   if (!clientRecord?.id) throw new AirtableRequestError("The client record was not returned by Airtable.");
-  if (config.mode === "rollout") await calculateAndStoreClientMatches({ ...clientRecord, fields }, config);
-  return { ok: true };
+    let matches = [];
+  if (config.mode === "rollout") {
+    const selectedMatches = await calculateAndStoreClientMatches(clientRecord, config);
+    matches = await Promise.all((selectedMatches || []).map(async (match) => {
+      const professional = await airtableRequest(tables.waitlist, { recordId: match.professionalId, config });
+      const professionalFields = professional.fields || {};
+      const attachment = Array.isArray(professionalFields["Attachments"]) ? professionalFields["Attachments"][0] : null;
+      return {
+        name: professionalFields["Name"] || "",
+        photo: attachment ? attachment.url : null,
+        email: professionalFields["Email"] || "",
+        phone: professionalFields["Phone"] || "",
+        reason: match.reasonForMatch,
+        scoreBand: match.scoreBand,
+        rank: match.rank,
+      };
+    }));
+  }
+  return { ok: true, matches };
+}
+
+export async function previewClientMatches(data) {
+  const errors = validateClientSubmission(data);
+  if (Object.keys(errors).length) throw new QuestionnaireValidationError(errors);
+
+  const config = getClientMatchingConfig();
+  if (config.mode !== "rollout") return { matches: [] };
+
+  const tables = config.tables;
+
+  const [outcomes, considerations, stage, settings, supportStyles, suburb] = await Promise.all([
+    resolveLinkedRecordIds(tables.expertiseOptions, "Option ID", data.selectedOutcomes, config),
+    resolveLinkedRecordIds(tables.expertiseOptions, "Option ID", data.selectedConsiderations || [], config),
+    resolveLinkedRecordIds(tables.exerciseStages, "Stage ID", [data.exerciseStage], config),
+    resolveLinkedRecordIds(tables.settings, "Setting ID", data.preferredSettings, config),
+    resolveLinkedRecordIds(tables.supportStyles, "Style ID", data.preferredSupportStyles, config),
+    resolveLinkedRecordIds(tables.serviceAreas, "Area ID", [data.suburb], config),
+  ]);
+
+  const clientRecord = {
+    id: "preview",
+    fields: {
+      "Client Name": (data.clientName || "Preview").trim(),
+      Email: (data.email || "preview@example.com").trim().toLowerCase(),
+      "Phone Number": data.phoneNumber?.trim() || "",
+      "Selected Outcomes": outcomes,
+      "Selected Considerations": considerations,
+      "Exercise Stage": stage,
+      "Preferred Settings": settings,
+      Suburb: suburb,
+      Postcode: (data.postcode || "").trim(),
+      "Preferred Support Styles": supportStyles,
+      "Gender Preference": data.genderPreference,
+    },
+  };
+
+  const [professionals, expertiseRecords, expertiseOptions, settingRecords, configurationRecords] =
+    await Promise.all([
+      listAllRecords(tables.waitlist, config),
+      listAllRecords(tables.professionalExpertise, config),
+      listAllRecords(tables.expertiseOptions, config),
+      listAllRecords(tables.settings, config),
+      listAllRecords(tables.matchingConfiguration, config, {
+        filterByFormula: '{Configuration Name}="Curated Fit Matching Engine"',
+      }),
+    ]);
+
+  if (configurationRecords.length !== 1) {
+    throw new StagingConfigError("Matching configuration is not unique.");
+  }
+
+  const settingByStableId = new Map(
+    settingRecords.map((record) => [record.fields["Setting ID"], record.id])
+  );
+
+  const { candidates } = calculateDryRunMatches({
+    client: clientRecord,
+    professionals,
+    expertiseRecords,
+    expertiseOptions,
+    onlineSettingId: settingByStableId.get("SET-06"),
+    homeSettingId: settingByStableId.get("SET-01"),
+    configRecord: configurationRecords[0],
+  });
+
+  const professionalById = new Map(professionals.map((p) => [p.id, p]));
+
+  const selected = candidates
+    .filter((candidate) => candidate.dryRunResult)
+    .sort((left, right) => left.suggestedRank - right.suggestedRank)
+    .slice(0, 3);
+
+  const matches = selected.map((candidate) => {
+    const professional = professionalById.get(candidate.professionalId);
+    const fields = professional ? professional.fields : {};
+    const attachment = Array.isArray(fields.Attachments) ? fields.Attachments : [];
+    const name = fields.Name || "Coach";
+    const initials = name
+      .split(/\s+/)
+      .map((part) => part.charAt(0).toUpperCase())
+      .slice(0, 2)
+      .join("");
+    return {
+      id: candidate.professionalId,
+      name,
+      initials,
+      photo: attachment[0]?.url || null,
+      suburb: fields.Suburb || fields["Service Area"] || "",
+      reason: candidate.reasonForMatch || "",
+      scoreBand: candidate.scoreBand || "",
+      rank: candidate.suggestedRank,
+    };
+  });
+
+  return { matches };
 }
 
 async function calculateAndStoreClientMatches(clientRecord, config) {
@@ -544,6 +657,15 @@ async function calculateAndStoreClientMatches(clientRecord, config) {
   for (const batch of chunks(replacementUpdates)) {
     await writeRecordBatch(tables.automatedMatchResults, batch, "PATCH", config);
   }
+  return candidates
+    .filter((candidate) => candidate.dryRunResult)
+    .sort((left, right) => left.suggestedRank - right.suggestedRank)
+    .map((candidate) => ({
+      professionalId: candidate.professionalId,
+      reasonForMatch: candidate.reasonForMatch,
+      scoreBand: candidate.scoreBand,
+      rank: candidate.suggestedRank,
+    }));
 }
 
 async function invitationHashExists(hash, config) {

@@ -1,234 +1,250 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-type Trainer = {
+type Match = {
   id: string;
   name: string;
   initials: string;
-  photo?: string;
-  speciality: string;
-  suburb: string;
-  formats: string;
-  baseFit: number;
-  tags: {
-    focus: string[];
-    experience: string[];
-    setting: string[];
-    style: string[];
-  };
-  why: string;
+  photo?: string | null;
+  suburb?: string;
+  reason?: string;
+  scoreBand?: string;
+  rank?: number;
 };
 
-const TRAINERS: Trainer[] = [
-  {
-    id: "jessica",
-    name: "Jessica Wacey",
-    initials: "JW",
-    photo: "/jessica.jpg",
-    speciality: "Strength, muscle and menopause support",
-    suburb: "Massey, Auckland",
-    formats: "In-person and online",
-    baseFit: 96,
-    tags: {
-      focus: ["strength", "weight"],
-      experience: ["menopause"],
-      setting: ["gym", "online", "home"],
-      style: ["clear"],
-    },
-    why: "Strong on building strength and supporting you through menopause.",
-  },
-  {
-    id: "aroha",
-    name: "Aroha Ngata",
-    initials: "AN",
-    speciality: "Confidence, stability and returning to movement",
-    suburb: "Mount Eden, Auckland",
-    formats: "In-person and outdoors",
-    baseFit: 93,
-    tags: {
-      focus: ["stability", "comfort", "routine"],
-      experience: ["bone", "injury"],
-      setting: ["outdoors", "home", "studio"],
-      style: ["calm"],
-    },
-    why: "Gentle, reassuring support to rebuild confidence and stability.",
-  },
-  {
-    id: "daniel",
-    name: "Daniel Reeve",
-    initials: "DR",
-    speciality: "Energy, stamina and weight support",
-    suburb: "Ponsonby, Auckland",
-    formats: "In-person and online",
-    baseFit: 91,
-    tags: {
-      focus: ["energy", "weight"],
-      experience: [],
-      setting: ["gym", "online"],
-      style: ["direct"],
-    },
-    why: "Focused on lifting your energy, stamina and everyday capacity.",
-  },
-];
-
-function overlap(a: string[], b: string[]) {
-  if (!a || !b) return 0;
-  return a.filter((x) => b.includes(x)).length;
-}
-
-function rankTrainers(answers: Record<string, string[]>) {
-  const focus = answers["support"] || [];
-  const setting = answers["setting"] || [];
-  const experience = answers["experience"] || [];
-  const style = answers["style"] || [];
-  const hasAnswers = focus.length + setting.length + experience.length + style.length > 0;
-
-  const scored = TRAINERS.map((t) => {
-    const score =
-      overlap(focus, t.tags.focus) * 3 +
-      overlap(setting, t.tags.setting) * 2 +
-      overlap(experience, t.tags.experience) * 2 +
-      overlap(style, t.tags.style) * 1;
-    const maxScore = focus.length * 3 + setting.length * 2 + experience.length * 2 + style.length * 1;
-    const fit = hasAnswers && maxScore > 0
-      ? Math.min(98, Math.max(78, Math.round(78 + (score / maxScore) * 20)))
-      : t.baseFit;
-    return { ...t, fit, score };
-  });
-
-  scored.sort((a, b) => b.fit - a.fit || b.score - a.score);
-  return scored.slice(0, 3);
-}
-
-function Avatar({ trainer }: { trainer: Trainer }) {
+function Avatar({ photo, name, initials }: { photo?: string | null; name: string; initials: string }) {
   const [failed, setFailed] = useState(false);
-  const box: React.CSSProperties = {
-    width: 84,
-    height: 84,
+  const size = 64;
+  const base: React.CSSProperties = {
+    width: size,
+    height: size,
     borderRadius: "50%",
-    flexShrink: 0,
-    overflow: "hidden",
-    background: "var(--stone)",
+    flex: "0 0 auto",
+    objectFit: "cover",
+    background: "var(--field)",
+    border: "1px solid var(--line)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    fontFamily: "var(--font-display)",
+    fontSize: 20,
+    color: "var(--text-secondary)",
+    overflow: "hidden",
   };
-  if (trainer.photo && !failed) {
-    return (
-      <div style={box}>
-        <img
-          src={trainer.photo}
-          alt={trainer.name}
-          onError={() => setFailed(true)}
-          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", filter: "grayscale(1)" }}
-        />
-      </div>
-    );
+  if (photo && !failed) {
+    return <img src={photo} alt={name} style={base} onError={() => setFailed(true)} />;
   }
-  return (
-    <div style={box}>
-      <span style={{ fontFamily: "var(--font-display)", fontSize: 26, color: "var(--text-primary)" }}>
-        {trainer.initials}
-      </span>
-    </div>
-  );
+  return <div style={base}>{initials}</div>;
 }
 
-function ResultsView({ answers }: { answers: Record<string, string[]> }) {
-  const matches = useMemo(() => rankTrainers(answers), [answers]);
-  const wrap: React.CSSProperties = {
-    maxWidth: 720,
-    margin: "0 auto",
-    padding: "clamp(56px, 9vw, 96px) 24px",
-  };
-  return (
-    <section style={wrap}>
-      <p
-        style={{
-          fontFamily: "var(--font-mono)",
-          fontSize: 12,
-          letterSpacing: "0.14em",
-          textTransform: "uppercase",
-          color: "var(--text-label)",
-          marginBottom: 16,
-        }}
-      >
-        Your matches
-      </p>
-      <h2
-        style={{
-          fontFamily: "var(--font-display)",
-          fontWeight: 400,
-          letterSpacing: "-0.01em",
-          fontSize: "clamp(28px, 4.4vw, 40px)",
-          lineHeight: 1.1,
-          color: "var(--text-primary)",
-          margin: 0,
-        }}
-      >
-        Three coaches, chosen for you.
-      </h2>
-      <p
-        style={{
-          fontFamily: "var(--font-sans)",
-          fontSize: 16,
-          lineHeight: 1.5,
-          color: "var(--text-secondary)",
-          marginTop: 12,
-          marginBottom: 40,
-        }}
-      >
-        Ranked on how you want to move, feel and be supported.
-      </p>
+function ResultsView({ submission }: { submission: Record<string, unknown> }) {
+  const [status, setStatus] = useState<"loading" | "ready" | "empty" | "error">("loading");
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [contact, setContact] = useState({ name: "", email: "", phone: "" });
+  const [sent, setSent] = useState<Record<string, boolean>>({});
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        {matches.map((t) => (
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/find-your-fit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(submission),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!active) return;
+        const list: Match[] = Array.isArray(data?.matches) ? data.matches : [];
+        if (res.ok && list.length > 0) {
+          setMatches(list);
+          setStatus("ready");
+        } else if (res.ok) {
+          setStatus("empty");
+        } else {
+          setStatus("error");
+        }
+      } catch {
+        if (active) setStatus("error");
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [submission]);
+
+  async function connect(match: Match) {
+    if (!contact.name.trim() || !contact.email.trim()) return;
+    try {
+      await fetch("/api/find-your-fit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...submission,
+          intent: "connect",
+          clientName: contact.name.trim(),
+          email: contact.email.trim(),
+          phoneNumber: contact.phone.trim(),
+          professionalId: match.id,
+        }),
+      });
+    } catch {
+      // best effort; we still confirm to the visitor
+    }
+    setSent((prev) => ({ ...prev, [match.id]: true }));
+    setOpenId(null);
+    setContact({ name: "", email: "", phone: "" });
+  }
+
+  const outer: React.CSSProperties = { maxWidth: 640, margin: "0 auto", padding: "0 24px" };
+  const eyebrow: React.CSSProperties = {
+    fontFamily: "var(--font-sans)",
+    fontSize: 12,
+    letterSpacing: "0.14em",
+    textTransform: "uppercase",
+    color: "var(--text-secondary)",
+    marginBottom: 12,
+  };
+  const heading: React.CSSProperties = {
+    fontFamily: "var(--font-display)",
+    fontWeight: 400,
+    letterSpacing: "-0.01em",
+    fontSize: 34,
+    lineHeight: 1.1,
+    color: "var(--text-primary)",
+    margin: 0,
+  };
+  const sub: React.CSSProperties = {
+    fontFamily: "var(--font-sans)",
+    fontSize: 16,
+    lineHeight: 1.6,
+    color: "var(--text-secondary)",
+    marginTop: 12,
+    marginBottom: 28,
+  };
+  const note: React.CSSProperties = {
+    fontFamily: "var(--font-sans)",
+    color: "var(--text-secondary)",
+    lineHeight: 1.6,
+  };
+  const field: React.CSSProperties = {
+    width: "100%",
+    boxSizing: "border-box",
+    background: "var(--field)",
+    border: "1px solid var(--line)",
+    borderRadius: 8,
+    padding: "10px 12px",
+    fontFamily: "var(--font-sans)",
+    fontSize: 15,
+    color: "var(--text-primary)",
+    marginTop: 8,
+    outline: "none",
+  };
+  const primaryBtn: React.CSSProperties = {
+    display: "inline-block",
+    background: "var(--charcoal)",
+    color: "var(--warm-white)",
+    border: "none",
+    borderRadius: 8,
+    padding: "10px 18px",
+    fontFamily: "var(--font-sans)",
+    fontSize: 15,
+    cursor: "pointer",
+    marginTop: 12,
+  };
+
+  return (
+    <section style={outer}>
+      <p style={eyebrow}>Your matches</p>
+      <h2 style={heading}>Three coaches, chosen for you.</h2>
+      <p style={sub}>Ranked on how you want to move, feel and be supported.</p>
+
+      {status === "loading" && <p style={note}>Finding your matches…</p>}
+
+      {status === "empty" && (
+        <p style={note}>
+          Thank you. We do not have a confirmed match to show you just yet, but we have noted what
+          you are looking for and will be in touch soon.
+        </p>
+      )}
+
+      {status === "error" && (
+        <p style={note}>Something went wrong finding your matches. Please try again shortly.</p>
+      )}
+
+      {status === "ready" &&
+        matches.map((m) => (
           <div
-            key={t.id}
+            key={m.id}
             style={{
               display: "flex",
-              gap: 20,
-              alignItems: "center",
-              padding: 20,
-              border: "1px solid var(--line)",
-              background: "var(--field)",
+              gap: 16,
+              alignItems: "flex-start",
+              padding: "20px 0",
+              borderTop: "1px solid var(--line)",
             }}
           >
-            <Avatar trainer={t} />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
-                <span style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--text-primary)" }}>
-                  {t.name}
-                </span>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: "var(--text-label)", whiteSpace: "nowrap" }}>
-                  {t.fit}% fit
-                </span>
-              </div>
-              <p style={{ fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--text-secondary)", margin: "4px 0 0" }}>
-                {t.speciality} · {t.suburb}
+            <Avatar photo={m.photo} name={m.name} initials={m.initials} />
+            <div style={{ flex: 1 }}>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--text-primary)", margin: 0 }}>
+                {m.name}
               </p>
-              <p style={{ fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--text-primary)", margin: "10px 0 0", lineHeight: 1.5 }}>
-                {t.why}
-              </p>
-              <a
-                href="/early-access"
-                style={{
-                  display: "inline-block",
-                  marginTop: 14,
-                  fontFamily: "var(--font-sans)",
-                  fontSize: 14,
-                  color: "var(--text-primary)",
-                  textDecoration: "underline",
-                  textUnderlineOffset: 3,
-                }}
-              >
-                Register your interest →
-              </a>
+              {m.suburb && (
+                <p style={{ fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--text-secondary)", margin: "4px 0 0" }}>
+                  {m.suburb}
+                </p>
+              )}
+              {m.reason && (
+                <p style={{ fontFamily: "var(--font-sans)", fontSize: 15, lineHeight: 1.6, color: "var(--text-secondary)", margin: "8px 0 0" }}>
+                  {m.reason}
+                </p>
+              )}
+
+              {sent[m.id] ? (
+                <p style={{ ...note, marginTop: 12 }}>
+                  Thank you. We will introduce you to {m.name} and be in touch shortly.
+                </p>
+              ) : openId === m.id ? (
+                <div style={{ marginTop: 12 }}>
+                  <input
+                    style={field}
+                    placeholder="Your name"
+                    value={contact.name}
+                    onChange={(e) => setContact({ ...contact, name: e.target.value })}
+                  />
+                  <input
+                    style={field}
+                    placeholder="Your email"
+                    type="email"
+                    value={contact.email}
+                    onChange={(e) => setContact({ ...contact, email: e.target.value })}
+                  />
+                  <input
+                    style={field}
+                    placeholder="Your phone (optional)"
+                    value={contact.phone}
+                    onChange={(e) => setContact({ ...contact, phone: e.target.value })}
+                  />
+                  <button type="button" style={primaryBtn} onClick={() => connect(m)}>
+                    Send my details
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  style={primaryBtn}
+                  onClick={() => {
+                    setOpenId(m.id);
+                    setSent({});
+                  }}
+                >
+                  Connect with {m.name}
+                </button>
+              )}
             </div>
           </div>
         ))}
-      </div>
     </section>
   );
 }
@@ -242,6 +258,8 @@ type Question = {
   helper: string;
   mode: Mode;
   maxSelect?: number;
+  allowOther?: boolean;
+  allowNote?: boolean;
   options: Option[];
 };
 
@@ -250,49 +268,48 @@ const QUESTIONS: Question[] = [
     id: "support",
     eyebrow: "A considered question",
     question: "What would you most like support with right now?",
-    helper: "Choose up to two.",
+    helper: "Choose up to two. There are no wrong answers.",
     mode: "multi",
     maxSelect: 2,
+    allowOther: true,
     options: [
-      { id: "strength", title: "Build strength and maintain muscle", desc: "I want to feel stronger and maintain the muscle I have." },
-      { id: "energy", title: "Improve my energy and stamina", desc: "I want everyday activity to feel easier and have more energy for the things I enjoy." },
-      { id: "weight", title: "Support a change in my weight", desc: "I want exercise that supports weight loss, weight maintenance or maintaining muscle as my weight changes." },
-      { id: "stability", title: "Move with greater confidence and stability", desc: "I want to improve my balance, support my bone health and feel more capable in everyday activity." },
-      { id: "comfort", title: "Exercise more comfortably or return after time away", desc: "I want support that takes account of pain, injury, illness, surgery or time away from exercise." },
-      { id: "routine", title: "Build confidence and find a routine that works for me", desc: "I want guidance, accountability and support to exercise more consistently." },
-      { id: "unsure", title: "I\u2019m not sure yet", desc: "I know I would like support, but I am not completely sure where to begin.", exclusive: true },
+      { id: "OUT-01", title: "Build strength and maintain muscle", desc: "I want to feel stronger and maintain the muscle I have." },
+      { id: "OUT-02", title: "Improve my energy and stamina", desc: "I want everyday activity to feel easier and to have more energy for the things I enjoy." },
+      { id: "OUT-05", title: "Move with greater confidence and stability", desc: "I want to improve my balance, support my bone health and feel more capable day to day." },
+      { id: "OUT-06", title: "Return to exercise after time away", desc: "I want support that takes account of time away, pain, injury, illness or surgery." },
+      { id: "OUT-04", title: "Build confidence with exercise", desc: "I want to feel more confident and at ease when I exercise." },
+      { id: "OUT-03", title: "Find a routine that works for me", desc: "I want guidance, accountability and support to exercise more consistently." },
     ],
   },
   {
     id: "current",
     eyebrow: "A considered question",
     question: "Which best describes exercise in your life at the moment?",
-    helper: "Choose one.",
+    helper: "Choose the one that fits best.",
     mode: "single",
     options: [
-      { id: "regular", title: "I exercise regularly and would like more focused support." },
-      { id: "sometimes", title: "I exercise sometimes and would like greater consistency." },
-      { id: "everyday", title: "Most of my activity comes from walking, golf, gardening or everyday life." },
-      { id: "returning", title: "I am returning after some time away." },
-      { id: "new", title: "Regular exercise would be new for me." },
-      { id: "unsure2", title: "I\u2019m not sure how to describe where I am at the moment." },
+      { id: "STG-01", title: "I exercise regularly and would like more focused support." },
+      { id: "STG-02", title: "I exercise sometimes and would like greater consistency." },
+      { id: "STG-03", title: "Most of my activity comes from walking, golf, gardening or everyday life." },
+      { id: "STG-04", title: "I am returning after some time away." },
+      { id: "STG-05", title: "Regular exercise would be new for me." },
     ],
   },
   {
     id: "experience",
     eyebrow: "A considered question",
-    question: "Is there anything you would like your professional to have particular experience with?",
-    helper: "Choose all that apply.",
+    question: "Is there anything you would like your professional to keep in mind?",
+    helper: "Choose any that apply, or add a note of your own. This is optional.",
     mode: "all",
+    allowNote: true,
     options: [
-      { id: "menopause", title: "Perimenopause or menopause" },
-      { id: "injury", title: "Injury, ongoing pain or returning after surgery" },
-      { id: "bone", title: "Bone health, balance or stability" },
-      { id: "condition", title: "A health condition that affects how I exercise" },
-      { id: "pelvic", title: "Pelvic health considerations" },
-      { id: "weightmed", title: "Weight change or weight-loss medication" },
+      { id: "CON-01", title: "Perimenopause or menopause" },
+      { id: "CON-02", title: "Injury, ongoing pain or returning after surgery" },
+      { id: "CON-03", title: "Bone health, balance or stability" },
+      { id: "CON-04", title: "A health condition that affects how I exercise" },
+      { id: "CON-05", title: "Pelvic health considerations" },
+      { id: "CON-06", title: "Weight change or weight-loss medication" },
       { id: "none", title: "None of these", exclusive: true },
-      { id: "later", title: "I would prefer to discuss this later", exclusive: true },
     ],
   },
   {
@@ -303,12 +320,12 @@ const QUESTIONS: Question[] = [
     mode: "multi",
     maxSelect: 2,
     options: [
-      { id: "home", title: "At home" },
-      { id: "studio", title: "In a private studio" },
-      { id: "gym", title: "In a gym" },
-      { id: "outdoors", title: "Outdoors" },
-      { id: "online", title: "Online" },
-      { id: "open", title: "I am open to different settings" },
+      { id: "SET-01", title: "At home" },
+      { id: "SET-02", title: "In a private studio" },
+      { id: "SET-03", title: "In a shared studio" },
+      { id: "SET-04", title: "In a gym" },
+      { id: "SET-05", title: "Outdoors" },
+      { id: "SET-06", title: "Online" },
     ],
   },
   {
@@ -319,45 +336,28 @@ const QUESTIONS: Question[] = [
     mode: "multi",
     maxSelect: 2,
     options: [
-      { id: "calm", title: "Calm and reassuring", desc: "I value patience and support that helps me build confidence." },
-      { id: "clear", title: "Clear and structured", desc: "I want a considered plan and a clear sense of progress." },
-      { id: "direct", title: "Direct and accountable", desc: "I respond well to honest challenge and regular follow-through." },
-      { id: "detailed", title: "Detailed and explanatory", desc: "I like understanding what I am doing and why." },
-      { id: "flexible", title: "Flexible and responsive", desc: "I want support that adapts as my needs and confidence change." },
-      { id: "warm", title: "Warm and conversational", desc: "Feeling comfortable with the person I work with matters to me." },
-      { id: "unsure5", title: "I\u2019m not sure yet", desc: "I would prefer to keep an open mind.", exclusive: true },
+      { id: "STY-01", title: "Calm and reassuring", desc: "I value patience and support that helps me build confidence." },
+      { id: "STY-02", title: "Clear and structured", desc: "I want a considered plan and a clear sense of progress." },
+      { id: "STY-03", title: "Encouraging and motivating", desc: "I respond well to regular encouragement and follow-through." },
+      { id: "STY-04", title: "Direct and accountable", desc: "I respond well to honest challenge and progress-focused support." },
+      { id: "STY-05", title: "Detailed and explanatory", desc: "I like understanding what I am doing and why." },
+      { id: "STY-06", title: "Flexible and responsive", desc: "I want support that adapts as my needs and confidence change." },
     ],
   },
   {
     id: "preference",
     eyebrow: "A final considered question",
     question: "Do you have a preference for who you work with?",
-    helper: "Choose one.",
+    helper: "Choose the one that fits best.",
     mode: "single",
     options: [
-      { id: "woman", title: "I would prefer to work with a woman." },
-      { id: "man", title: "I would prefer to work with a man." },
-      { id: "nopref", title: "I do not have a preference." },
+      { id: "Woman", title: "I would prefer to work with a woman." },
+      { id: "Man", title: "I would prefer to work with a man." },
+      { id: "No preference", title: "I do not have a preference." },
     ],
   },
 ];
 
-// A compact seed list for the predictive location field. Not exhaustive — replace with a
-// geocoding autocomplete API in a later phase. Typing filters these; free text is also allowed.
-const LOCATIONS: string[] = [
-  "Auckland CBD 1010", "Ponsonby 1011", "Grey Lynn 1021", "Mount Eden 1024",
-  "Epsom 1023", "Remuera 1050", "Newmarket 1023", "Parnell 1052", "Mission Bay 1071",
-  "St Heliers 1071", "Takapuna 0622", "Devonport 0624", "Milford 0620", "Albany 0632",
-  "Henderson 0612", "New Lynn 0600", "Mount Albert 1025", "Point Chevalier 1022",
-  "Manukau 2104", "Botany Downs 2010", "Howick 2014", "Papakura 2110", "Pukekohe 2120",
-  "Wellington Central 6011", "Te Aro 6011", "Thorndon 6011", "Kelburn 6012", "Newtown 6021",
-  "Miramar 6022", "Karori 6012", "Lower Hutt 5010", "Porirua 5022", "Petone 5012",
-  "Christchurch Central 8011", "Riccarton 8011", "Merivale 8014", "Fendalton 8052",
-  "Papanui 8053", "Sumner 8081", "Addington 8024", "Ilam 8041",
-  "Hamilton Central 3204", "Chartwell 3210", "Rototuna 3210", "Tauranga 3110", "Mount Maunganui 3116",
-  "Rotorua 3010", "Napier 4110", "Hastings 4122", "Palmerston North 4410", "New Plymouth 4310",
-  "Whangarei 0110", "Dunedin Central 9016", "Queenstown 9300", "Nelson 7010", "Invercargill 9810",
-];
 
 export default function SupportQuiz() {
   const [showMatches, setShowMatches] = useState(false);
@@ -365,6 +365,26 @@ export default function SupportQuiz() {
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
   const [location, setLocation] = useState("");
   const [locationFocused, setLocationFocused] = useState(false);
+  const [postcode, setPostcode] = useState("");
+  const [areas, setAreas] = useState<{ id: string; label: string }[]>([]);
+  const [suburbId, setSuburbId] = useState("");
+  const [otherText, setOtherText] = useState("");
+  const [noteText, setNoteText] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/find-your-fit")
+      .then((r) => r.json())
+      .then((d) => {
+        if (active && Array.isArray(d?.serviceAreas)) {
+          setAreas(d.serviceAreas.map((a: { id: string; label: string }) => ({ id: a.id, label: a.label })));
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const total = QUESTIONS.length;
   const q = QUESTIONS[step];
@@ -408,20 +428,20 @@ export default function SupportQuiz() {
   }
 
   const isSetting = q.id === "setting";
-  const onlineSelected = isSetting && selected.includes("online");
+  const onlineSelected = isSetting && selected.includes("SET-06");
   const locationRequired = isSetting && !onlineSelected;
 
   const canContinue = (() => {
     if (selected.length === 0) return false;
-    if (isSetting && locationRequired && location.trim() === "") return false;
+    if (isSetting && locationRequired && !suburbId) return false;
     return true;
   })();
 
-  const locationSuggestions = useMemo(() => {
+    const locationSuggestions = useMemo(() => {
     const term = location.trim().toLowerCase();
     if (term.length < 2) return [];
-    return LOCATIONS.filter((l) => l.toLowerCase().includes(term)).slice(0, 6);
-  }, [location]);
+    return areas.filter((a) => a.label.toLowerCase().includes(term)).slice(0, 8);
+  }, [location, areas]);
 
   function goNext() {
     if (step < total - 1) setStep(step + 1);
@@ -555,7 +575,22 @@ export default function SupportQuiz() {
   };
 
   if (showMatches) {
-    return <ResultsView answers={answers} />;
+        return (
+      <ResultsView
+        submission={{
+          selectedOutcomes: answers.support || [],
+          selectedConsiderations: (answers.experience || []).filter((id) => id.startsWith("CON-")),
+          exerciseStage: (answers.current || [])[0],
+          preferredSettings: answers.setting || [],
+          preferredSupportStyles: answers.style || [],
+          genderPreference: (answers.preference || [])[0],
+          suburb: onlineSelected ? "AREA-ONLINE" : suburbId,
+          postcode: onlineSelected ? "0000" : postcode.trim() || "0000",
+          otherText: otherText.trim(),
+          noteText: noteText.trim(),
+        }}
+      />
+    );
   }
 
   return (
@@ -600,6 +635,28 @@ export default function SupportQuiz() {
           );
         })}
       </div>
+        {q.allowOther && (
+          <input
+            type="text"
+            value={otherText}
+            onChange={(e) => setOtherText(e.target.value)}
+            placeholder="Something else? Tell us in your own words (optional)"
+            aria-label="Anything else you would like support with"
+            autoComplete="off"
+            style={{ ...input, marginTop: 12 }}
+          />
+        )}
+        {q.allowNote && (
+          <input
+            type="text"
+            value={noteText}
+            onChange={(e) => setNoteText(e.target.value)}
+            placeholder="Fill in your answer (optional)"
+            aria-label="Anything you would like your professional to keep in mind"
+            autoComplete="off"
+            style={{ ...input, marginTop: 12 }}
+          />
+        )}
 
       {isSetting && (
         <div style={{ marginTop: 36 }}>
@@ -611,7 +668,7 @@ export default function SupportQuiz() {
             <input
               type="text"
               value={location}
-              onChange={(e) => setLocation(e.target.value)}
+              onChange={(e) => { setLocation(e.target.value); setSuburbId(""); }}
               onFocus={() => setLocationFocused(true)}
               onBlur={() => setTimeout(() => setLocationFocused(false), 120)}
               placeholder="Start typing a suburb or postcode"
@@ -636,10 +693,10 @@ export default function SupportQuiz() {
                 }}
               >
                 {locationSuggestions.map((s) => (
-                  <li key={s}>
+                  <li key={s.id}>
                     <button
                       type="button"
-                      onMouseDown={() => setLocation(s)}
+                      onMouseDown={() => { setLocation(s.label); setSuburbId(s.id); }}
                       style={{
                         display: "block",
                         width: "100%",
@@ -656,13 +713,24 @@ export default function SupportQuiz() {
                         letterSpacing: "normal",
                       }}
                     >
-                      {s}
+                      {s.label}
                     </button>
                   </li>
                 ))}
               </ul>
             )}
           </div>
+          {!onlineSelected && (
+            <input
+              type="text"
+              value={postcode}
+              onChange={(e) => setPostcode(e.target.value)}
+              placeholder="Postcode"
+              aria-label="Postcode"
+              autoComplete="off"
+              style={{ ...input, marginTop: 8 }}
+            />
+          )}
         </div>
       )}
 
