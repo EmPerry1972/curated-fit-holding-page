@@ -442,7 +442,14 @@ export async function submitProfessionalQuestionnaire(data, { now = new Date() }
   });
   return { ok: true };
 }
-
+// When the client selects Online (SET-06), treat a missing suburb as the
+// canonical Online service area so downstream Airtable lookups don't fail.
+function resolveClientSuburb(data) {
+  const onlineSelected =
+    Array.isArray(data?.preferredSettings) &&
+    data.preferredSettings.includes("SET-06");
+  return onlineSelected && !data?.suburb?.trim() ? "AREA-ONLINE" : data.suburb;
+}
 export async function createClientQuestionnaire(data) {
   const errors = validateClientSubmission(data);
   if (Object.keys(errors).length) throw new QuestionnaireValidationError(errors);
