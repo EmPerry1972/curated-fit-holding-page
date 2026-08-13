@@ -59,7 +59,7 @@ export default function EarlyAccessPage() {
       <header style={{ borderBottom: "1px solid var(--line)" }}>
         <div style={{ maxWidth: 1080, margin: "0 auto", display: "flex", alignItems: "center", padding: "22px 24px" }}>
           <a href="/">
-            <img src="/logo.png" alt="Curated Fit" style={{ height: 64 }} />
+            <img src="/logo.png" alt="Curated Fit" style={{ height: 64, filter: "brightness(0)" }} />
           </a>
         </div>
       </header>
