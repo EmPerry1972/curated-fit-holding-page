@@ -482,6 +482,7 @@ export async function createClientQuestionnaire(data) {
       const professionalFields = professional.fields || {};
       const attachment = Array.isArray(professionalFields["Attachments"]) ? professionalFields["Attachments"][0] : null;
       return {
+        id: match.professionalId,
         name: professionalFields["Name"] || "",
         photo: attachment ? attachment.url : null,
         email: professionalFields["Email"] || "",
@@ -491,12 +492,25 @@ export async function createClientQuestionnaire(data) {
         rank: match.rank,
       };
     }));
+    // Double opt-in intro: email the chosen coach and the client so they connect directly.
+    const chosen = matches.find((m) => m.id === data.professionalId) || matches[0];
+    if (chosen) {
+      await sendIntroEmail({
+        coachName: chosen.name,
+        coachEmail: chosen.email,
+        clientName: data.clientName ? data.clientName.trim() : "",
+        clientEmail: data.email ? data.email.trim() : "",
+        clientPhone: data.phoneNumber ? data.phoneNumber.trim() : "",
+      }).catch((error) => {
+        console.error("Intro email failed", error instanceof Error ? error.name : "UnknownError");
+      });
+    }
   }
   return { ok: true, matches };
 }
 
 export async function previewClientMatches(data) {
-  const errors = validateClientSubmission(data);
+  const errors = validateClientSubmission(data, { requireContact: false });
   if (Object.keys(errors).length) throw new QuestionnaireValidationError(errors);
 
   const config = getClientMatchingConfig();
@@ -724,3 +738,39 @@ export const STAGING_RESPONSE_HEADERS = Object.freeze({
   "Cache-Control": "no-store, max-age=0",
   "X-Robots-Tag": "noindex, nofollow, noarchive",
 });
+
+async function sendIntroEmail({ coachName, coachEmail, clientName, clientEmail, clientPhone }) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return;
+  if (!coachEmail || !clientEmail) return;
+
+  const safeCoach = coachName || "your Curated Fit professional";
+  const safeClient = clientName || "a new client";
+  const html = `
+    <p>Hi ${safeCoach} and ${safeClient},</p>
+    <p>We're connecting you both through Curated Fit's Find your Fit.</p>
+    <p><strong>Client:</strong> ${safeClient}<br />Email: ${clientEmail}${clientPhone ? "<br />Phone: " + clientPhone : ""}</p>
+    <p><strong>Professional:</strong> ${safeCoach}<br />Email: ${coachEmail}</p>
+    <p>You're both on this thread, so feel free to reply directly to arrange next steps.</p>
+    <p>Warmly,<br />Curated Fit</p>
+  `;
+
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "Curated Fit <emma@curatedfit.co.nz>",
+      to: [coachEmail, clientEmail],
+      reply_to: [clientEmail, coachEmail],
+      subject: `Curated Fit intro: ${safeClient} <> ${safeCoach}`,
+      html,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Resend responded with status ${response.status}`);
+  }
+}
