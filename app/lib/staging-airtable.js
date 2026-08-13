@@ -497,8 +497,6 @@ export async function createClientQuestionnaire(data) {
 
 export async function previewClientMatches(data) {
   const errors = validateClientSubmission(data);
-  delete errors.clientName;
-  delete errors.email;
   if (Object.keys(errors).length) throw new QuestionnaireValidationError(errors);
 
   const config = getClientMatchingConfig();
@@ -532,7 +530,7 @@ export async function previewClientMatches(data) {
     },
   };
 
-  const [professionals, expertiseRecords, expertiseOptions, settingRecords, configurationRecords] =
+  const [professionals, expertiseRecords, expertiseOptions, settingRecords, configurationRecords, serviceAreas] =
     await Promise.all([
       listAllRecords(tables.waitlist, config),
       listAllRecords(tables.professionalExpertise, config),
@@ -541,6 +539,7 @@ export async function previewClientMatches(data) {
       listAllRecords(tables.matchingConfiguration, config, {
         filterByFormula: '{Configuration Name}="Curated Fit Matching Engine"',
       }),
+      listAllRecords(tables.serviceAreas, config),
     ]);
 
   if (configurationRecords.length !== 1) {
@@ -559,6 +558,7 @@ export async function previewClientMatches(data) {
     onlineSettingId: settingByStableId.get("SET-06"),
     homeSettingId: settingByStableId.get("SET-01"),
     configRecord: configurationRecords[0],
+    serviceAreas,
   });
 
   const professionalById = new Map(professionals.map((p) => [p.id, p]));
@@ -595,7 +595,7 @@ export async function previewClientMatches(data) {
 
 async function calculateAndStoreClientMatches(clientRecord, config) {
   const { tables } = config;
-  const [professionals, expertiseRecords, expertiseOptions, settingRecords, configurationRecords, existingMatches] = await Promise.all([
+  const [professionals, expertiseRecords, expertiseOptions, settingRecords, configurationRecords, existingMatches, serviceAreas] = await Promise.all([
     listAllRecords(tables.waitlist, config),
     listAllRecords(tables.professionalExpertise, config),
     listAllRecords(tables.expertiseOptions, config),
@@ -604,6 +604,7 @@ async function calculateAndStoreClientMatches(clientRecord, config) {
       filterByFormula: '{Configuration Name}="Curated Fit Matching Engine"',
     }),
     listAllRecords(tables.automatedMatchResults, config),
+    listAllRecords(tables.serviceAreas, config),
   ]);
   if (configurationRecords.length !== 1) throw new AirtableRequestError("Matching configuration is not unique.");
   const settingByStableId = new Map(settingRecords.map((record) => [record.fields?.["Setting ID"], record.id]));
@@ -615,6 +616,7 @@ async function calculateAndStoreClientMatches(clientRecord, config) {
     onlineSettingId: settingByStableId.get("SET-06"),
     homeSettingId: settingByStableId.get("SET-01"),
     configRecord: configurationRecords[0],
+    serviceAreas,
   });
   if (clientIssues.length) throw new AirtableRequestError("The stored client record did not pass matching validation.");
   const existingByMatchId = new Map(existingMatches.map((record) => [record.fields?.["Match ID"], record]));
