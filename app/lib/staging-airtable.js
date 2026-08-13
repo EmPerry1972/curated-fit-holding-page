@@ -469,13 +469,30 @@ export async function createClientQuestionnaire(data) {
     "Preferred Support Styles": supportStyles,
     "Gender Preference": data.genderPreference,
     "Matching Status": "Ready",
-    "Is Test Record": true,
+    "Is Test Record": data.isTestRecord === true,
   };
   const created = await airtableRequest(tables.clients, { method: "POST", fields, config });
   const clientRecord = created.records?.[0];
   if (!clientRecord?.id) throw new AirtableRequestError("The client record was not returned by Airtable.");
-  if (config.mode === "rollout") await calculateAndStoreClientMatches({ ...clientRecord, fields }, config);
-  return { ok: true };
+    let matches = [];
+  if (config.mode === "rollout") {
+    const selectedMatches = await calculateAndStoreClientMatches(clientRecord, config);
+    matches = await Promise.all((selectedMatches || []).map(async (match) => {
+      const professional = await airtableRequest(tables.waitlist, { recordId: match.professionalId, config });
+      const professionalFields = professional.fields || {};
+      const attachment = Array.isArray(professionalFields["Attachments"]) ? professionalFields["Attachments"][0] : null;
+      return {
+        name: professionalFields["Name"] || "",
+        photo: attachment ? attachment.url : null,
+        email: professionalFields["Email"] || "",
+        phone: professionalFields["Phone"] || "",
+        reason: match.reasonForMatch,
+        scoreBand: match.scoreBand,
+        rank: match.rank,
+      };
+    }));
+  }
+  return { ok: true, matches };
 }
 
 async function calculateAndStoreClientMatches(clientRecord, config) {
@@ -544,6 +561,15 @@ async function calculateAndStoreClientMatches(clientRecord, config) {
   for (const batch of chunks(replacementUpdates)) {
     await writeRecordBatch(tables.automatedMatchResults, batch, "PATCH", config);
   }
+  return candidates
+    .filter((candidate) => candidate.dryRunResult)
+    .sort((left, right) => left.suggestedRank - right.suggestedRank)
+    .map((candidate) => ({
+      professionalId: candidate.professionalId,
+      reasonForMatch: candidate.reasonForMatch,
+      scoreBand: candidate.scoreBand,
+      rank: candidate.suggestedRank,
+    }));
 }
 
 async function invitationHashExists(hash, config) {
