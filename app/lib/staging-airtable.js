@@ -461,7 +461,7 @@ export async function createClientQuestionnaire(data) {
     resolveLinkedRecordIds(tables.exerciseStages, "Stage ID", [data.exerciseStage], config),
     resolveLinkedRecordIds(tables.settings, "Setting ID", data.preferredSettings, config),
     resolveLinkedRecordIds(tables.supportStyles, "Style ID", data.preferredSupportStyles, config),
-    resolveLinkedRecordIds(tables.serviceAreas, "Area ID", [data.suburb], config),
+resolveLinkedRecordIds(tables.serviceAreas, "Area ID", [resolveClientSuburb(data)], config),
   ]);
   const fields = {
     "Client Name": data.clientName.trim(),
@@ -524,7 +524,14 @@ export async function previewClientMatches(data) {
   if (config.mode !== "rollout") return { matches: [] };
 
   const tables = config.tables;
-
+// When the client selects Online (SET-06), treat a missing suburb as the
+// canonical Online service area so downstream Airtable lookups don't fail.
+function resolveClientSuburb(data) {
+  const onlineSelected =
+    Array.isArray(data?.preferredSettings) &&
+    data.preferredSettings.includes("SET-06");
+  return onlineSelected && !data?.suburb?.trim() ? "AREA-ONLINE" : data.suburb;
+}
   const [outcomes, considerations, stage, settings, supportStyles, suburb] = await Promise.all([
     resolveLinkedRecordIds(tables.expertiseOptions, "Option ID", data.selectedOutcomes, config),
     resolveLinkedRecordIds(tables.expertiseOptions, "Option ID", data.selectedConsiderations || [], config),
