@@ -65,7 +65,7 @@ export default function Page() {
             </p>
             <div style={{ marginTop: 30, display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
               <a href="/find-your-fit" style={{ fontFamily: sans, backgroundColor: "var(--ink)", color: "var(--warm-white)", padding: "16px 32px", fontSize: 13, letterSpacing: "1px", fontWeight: 600, textDecoration: "none", display: "inline-block" }}>Find your Fit</a>
-              <a href="/curated-conversations" className="conversations-link" style={{ fontFamily: sans, fontSize: 12, color: "#8a8a82", textDecoration: "underline" }}>Curated Conversations →</a>
+              <a href="/curated-conversations" className="conversations-link" style={{ fontFamily: sans, fontSize: 13, fontWeight: 600, color: "#8a8a82", textDecoration: "underline" }}>Curated Conversations →</a>
             </div>
           </div>
           <div className="hero-imgcol" style={{ position: "relative", height: "100%", alignSelf: "stretch", overflow: "hidden" }}>
