@@ -95,9 +95,9 @@ export default function Content() {
 
       <section style={{ ...sectionPad, paddingBottom: 0 }}>
         <div style={wrap}>
-          <div style={{ ...sectionLabel, marginBottom: 16 }}>Stories, listening and reflection</div>
+          <div style={{ ...sectionLabel, marginBottom: 16 }}>The Curated Fit journal</div>
           <h1 style={h1}>Curated Conversations</h1>
-          <div style={lede}>Every title carries a moment she&rsquo;d recognise before it carries a subject.</div>
+          <div style={lede}>The questions that usually go unasked, answered honestly.</div>
         </div>
       </section>
 
