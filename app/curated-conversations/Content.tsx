@@ -1,4 +1,5 @@
-"use client";
+import { ConversationsFooter, ConversationsNav } from "./Chrome";
+import { CALL_TO_ACTION, POSTS } from "./posts";
 
 const serif = "var(--font-serif), 'Playfair Display', Georgia, serif";
 const mono = "var(--font-mono), 'IBM Plex Mono', ui-monospace, monospace";
@@ -6,15 +7,6 @@ const sans = "var(--font-sans), 'Inter', -apple-system, Helvetica, Arial, sans-s
 
 const wrap = { maxWidth: 1080, margin: "0 auto", padding: "0 24px" } as const;
 const sectionPad = { padding: "clamp(48px, 8vw, 88px) 0" } as const;
-
-const eyebrow = {
-  fontFamily: mono,
-  fontSize: 11,
-  letterSpacing: "0.14em",
-  textTransform: "uppercase",
-  color: "var(--warm-grey)",
-  marginBottom: 16,
-} as const;
 
 const h1 = {
   fontFamily: serif,
@@ -26,6 +18,8 @@ const h1 = {
   margin: 0,
 } as const;
 
+// Display copy sits in divs rather than paragraphs: globals.css styles every
+// <p> with !important, which would otherwise flatten these to body text.
 const lede = {
   fontFamily: serif,
   fontWeight: 300,
@@ -37,216 +31,112 @@ const lede = {
   fontStyle: "italic",
 } as const;
 
-const h2 = {
-  fontFamily: serif,
-  fontWeight: 300,
-  fontSize: "clamp(24px, 3.4vw, 32px)",
-  lineHeight: 1.15,
-  color: "var(--text-primary)",
-  margin: 0,
-} as const;
-
 const sectionLabel = {
   fontFamily: mono,
   fontSize: 11,
   letterSpacing: "0.14em",
   textTransform: "uppercase",
   color: "var(--warm-grey)",
-  marginBottom: 12,
 } as const;
 
-const cardEyebrow = {
+const postMeta = {
   fontFamily: mono,
-  fontSize: 10,
+  fontSize: 11,
   letterSpacing: "0.12em",
   textTransform: "uppercase",
   color: "var(--warm-grey)",
-  margin: 0,
 } as const;
 
-const cardTitle = {
+const postTitle = {
   fontFamily: serif,
-  fontWeight: 400,
-  fontSize: 20,
-  lineHeight: 1.25,
+  fontWeight: 300,
+  lineHeight: 1.2,
   color: "var(--text-primary)",
-  margin: "10px 0 0",
+  margin: "12px 0 0",
 } as const;
 
-const cardBody = {
+const postExcerpt = {
   fontFamily: sans,
-  fontSize: 15,
+  fontSize: 17,
   lineHeight: 1.6,
   color: "var(--text-secondary)",
-  margin: "10px 0 0",
+  margin: "14px 0 0",
+  maxWidth: 620,
 } as const;
 
-const cardMeta = {
-  fontFamily: mono,
-  fontSize: 11,
-  letterSpacing: "0.06em",
-  color: "var(--warm-grey)",
-  margin: "16px 0 0",
+const readMore = {
+  fontFamily: sans,
+  fontSize: 13,
+  fontWeight: 600,
+  letterSpacing: "0.04em",
+  color: "var(--text-primary)",
+  textDecoration: "underline",
+  display: "inline-block",
+  marginTop: 18,
 } as const;
 
-type Item = { kind: string; title: string; body: string; meta: string };
-
-const PODCASTS: Item[] = [
-  {
-    kind: "Podcast",
-    title: "Why knowing strength matters still does not make us do it",
-    body: "On why information alone rarely changes behaviour, and what actually makes strength training feel safe enough to begin.",
-    meta: "Dr Peter Steidl, neuroscientist, with a qualified Curated Fit professional · Curated Fit Journal",
-  },
-  {
-    kind: "Podcast",
-    title: "Creatine is creatine. Or is it?",
-    body: "How creatine monohydrate is made and tested, and what the evidence really supports for strength, performance and cognition.",
-    meta: "An Alzchem technical specialist with an independent creatine researcher · Curated Wellness, Cross-Linked",
-  },
-  {
-    kind: "Podcast",
-    title: "Bovine, marine or ovine: does the source of collagen matter?",
-    body: "What separates ovine collagen from other sources, and why a development story should not substitute for product-specific evidence.",
-    meta: "A Silver Fern Farms product developer with an independent collagen specialist · Curated Wellness, Cross-Linked",
-  },
-  {
-    kind: "Podcast",
-    title: "You reached your goal weight. What needs protecting now?",
-    body: "On protecting muscle and building a sustainable maintenance plan once the number on the scale stops moving.",
-    meta: "An independent obesity-medicine doctor or endocrinologist with an exercise physiologist · Curated Fit Journal",
-  },
-  {
-    kind: "Podcast",
-    title: "Can a blood test tell you whether you are healthy?",
-    body: "What blood tests can and cannot tell you about your health, and why a single result rarely tells the whole story.",
-    meta: "A laboratory-medicine specialist or independent GP · Curated Wellness, Cross-Linked",
-  },
-  {
-    kind: "Podcast",
-    title: 'When a supplement says "tested," what was actually tested?',
-    body: "What supplement testing claims actually mean, and how to tell identity, potency and purity testing apart.",
-    meta: "An independent analytical laboratory specialist · Curated Wellness, Cross-Linked",
-  },
-  ];
-
-const BLOGS: Item[] = [
-  {
-    kind: "Written by a professional",
-    title: "The afternoon she carried the shopping without thinking",
-    body: "A trainer on building strength that disappears into everyday life, so capability becomes something you simply have.",
-    meta: "Jessica Wacey · 6 min read",
-  },
-  {
-    kind: "Written by a professional",
-    title: "Returning after the season you stepped away",
-    body: "Gentle, practical guidance for coming back to movement without starting from a place of pressure.",
-    meta: "Aroha Ngata · 5 min read",
-  },
-  {
-    kind: "Written by a professional",
-    title: "The energy you notice by Thursday",
-    body: "How consistent, well-matched training changes the way an ordinary week feels by the time you reach its end.",
-    meta: "Daniel Reeve · 4 min read",
-  },
-];
-
-function Grid({ items }: { items: Item[] }) {
-  return (
-    <div
-      className="three-col"
-      style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", border: "1px solid var(--line)", marginTop: 28 }}
-    >
-      {items.map((item, i) => (
-        <div
-          key={i}
-          style={i === items.length - 1 ? { padding: 28 } : { padding: 28, borderRight: "1px solid var(--line)" }}
-        >
-          <p style={cardEyebrow}>{item.kind}</p>
-          <h3 style={cardTitle}>{item.title}</h3>
-          <p style={cardBody}>{item.body}</p>
-          <p style={cardMeta}>{item.meta}</p>
-        </div>
-      ))}
-    </div>
-  );
-}
+const cta = {
+  display: "inline-block",
+  background: "var(--ink)",
+  color: "var(--warm-white)",
+  border: "none",
+  borderRadius: 10,
+  padding: "15px 30px",
+  fontFamily: sans,
+  fontSize: 16,
+  fontWeight: 600,
+  textDecoration: "none",
+} as const;
 
 export default function Content() {
   return (
     <main style={{ minHeight: "100vh", background: "var(--warm-white)" }}>
-      <nav
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "22px 24px",
-          maxWidth: 1080,
-          margin: "0 auto",
-          width: "100%",
-          flexWrap: "wrap",
-          gap: 12,
-          borderBottom: "1px solid var(--line)",
-        }}
-      >
-        <a href="/">
-          <img src="/logo.png" alt="Curated Fit" style={{ height: 64 }} />
-        </a>
-        <a
-          href="/register"
-          id="register-pro-link"
-          style={{
-            fontFamily: mono,
-            fontSize: 11,
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-            color: "#000000",
-            fontWeight: 700,
-            textDecoration: "none",
-            backgroundColor: "#ffffff",
-            padding: "8px 14px",
-            borderRadius: 4,
-            display: "inline-block",
-            border: "1px solid var(--line)",
-          }}
-        >
-          Register here as an Exercise Professional
-        </a>
-      </nav>
+      <ConversationsNav />
 
       <section style={{ ...sectionPad, paddingBottom: 0 }}>
         <div style={wrap}>
-          <p style={eyebrow}>Stories, listening and reflection</p>
+          <div style={{ ...sectionLabel, marginBottom: 16 }}>Stories, listening and reflection</div>
           <h1 style={h1}>Curated Conversations</h1>
-          <p style={lede}>
-            Every title carries a moment she&rsquo;d recognise before it carries a subject.
-          </p>
+          <div style={lede}>Every title carries a moment she&rsquo;d recognise before it carries a subject.</div>
         </div>
       </section>
 
       <section style={sectionPad}>
         <div style={wrap}>
-          <p style={sectionLabel}>Listen</p>
-          <h2 style={h2}>Podcasts</h2>
-          <Grid items={PODCASTS} />
+          <div style={sectionLabel}>Read</div>
+          <div style={{ borderTop: "1px solid var(--line)", marginTop: 14 }}>
+            {POSTS.map((post) => (
+              <article key={post.slug} style={{ borderBottom: "1px solid var(--line)", padding: "36px 0" }}>
+                <div style={postMeta}>
+                  {post.dateLabel} &middot; {post.readingTime}
+                </div>
+                <h2 style={postTitle}>
+                  <a href={`/curated-conversations/${post.slug}`} style={{ color: "inherit" }}>
+                    {post.title}
+                  </a>
+                </h2>
+                <div style={postExcerpt}>{post.excerpt}</div>
+                <a href={`/curated-conversations/${post.slug}`} style={readMore}>
+                  Read this piece &rarr;
+                </a>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
       <section style={{ ...sectionPad, paddingTop: 0 }}>
         <div style={wrap}>
-          <p style={sectionLabel}>Read</p>
-          <h2 style={h2}>From our CF professionals</h2>
-          <Grid items={BLOGS} />
+          <div style={{ ...lede, margin: 0, maxWidth: 620 }}>{CALL_TO_ACTION}</div>
+          <div style={{ marginTop: 28 }}>
+            <a href="/find-your-fit" style={cta}>
+              Find your Fit
+            </a>
+          </div>
         </div>
       </section>
 
-      <footer style={{ borderTop: "1px solid var(--line)" }}>
-        <div style={{ ...wrap, padding: "32px 24px" }}>
-          <p style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.06em", color: "var(--warm-grey)", margin: 0 }}>
-            &copy; 2026 Curated Fit &middot; Founded in New Zealand
-          </p>
-        </div>
-      </footer>
+      <ConversationsFooter />
     </main>
   );
 }
