@@ -36,7 +36,7 @@ export function ConversationsNav() {
           textDecoration: "none",
           backgroundColor: "#ffffff",
           padding: "8px 14px",
-          borderRadius: 4,
+          borderRadius: 0,
           display: "inline-block",
           border: "1px solid var(--line)",
         }}

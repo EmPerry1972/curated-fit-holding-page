@@ -27,7 +27,7 @@ const cta = {
   background: "var(--ink)",
   color: "var(--warm-white)",
   border: "none",
-  borderRadius: 10,
+  borderRadius: 0,
   padding: "15px 30px",
   fontFamily: "inherit",
   fontSize: 16,

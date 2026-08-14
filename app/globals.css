@@ -46,6 +46,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .hero-over-video p,
 .hero-over-video a{color:var(--warm-white)!important}
 @media (max-width: 640px){.three-col{grid-template-columns:1fr!important;gap:40px!important}}
+/* Journal index: stack the post image above its summary on narrow screens */
+@media (max-width: 700px){.journal-entry{grid-template-columns:1fr!important;gap:20px!important}}
 @media (max-width: 900px){.why-grid{grid-template-columns:1fr!important;gap:32px!important}}
 
 

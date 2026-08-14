@@ -13,6 +13,9 @@ export type Post = {
   dateLabel: string;
   readingTime: string;
   kind: string;
+  // Optional until artwork exists for a post.
+  image?: string;
+  imageAlt?: string;
   body: Block[];
 };
 
@@ -34,6 +37,9 @@ export const POSTS: Post[] = [
     dateLabel: "14 August 2026",
     readingTime: "3 min read",
     kind: "Curated Fit Journal",
+    image: "/journal/what-happens-in-a-first-session.jpg",
+    imageAlt:
+      "An exercise professional with a clipboard, sitting and talking with a client on a gym floor.",
     body: [
       {
         type: "p",
@@ -111,6 +117,9 @@ export const POSTS: Post[] = [
     dateLabel: "11 August 2026",
     readingTime: "3 min read",
     kind: "Curated Fit Journal",
+    image: "/journal/been-meaning-to-start.jpg",
+    imageAlt:
+      "A woman on a country road with her arms raised, facing snow-covered mountains.",
     body: [
       {
         type: "p",

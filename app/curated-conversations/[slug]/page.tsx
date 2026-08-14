@@ -49,7 +49,7 @@ const cta = {
   background: "var(--ink)",
   color: "var(--warm-white)",
   border: "none",
-  borderRadius: 10,
+  borderRadius: 0,
   padding: "15px 30px",
   fontFamily: sans,
   fontSize: 16,
@@ -139,6 +139,14 @@ export default async function CuratedConversationsPost({
           </div>
           <h1 style={{ marginTop: 14 }}>{post.title}</h1>
           <div style={standfirst}>{post.metaDescription}</div>
+
+          {post.image ? (
+            <img
+              src={post.image}
+              alt={post.imageAlt ?? ""}
+              style={{ width: "100%", height: "auto", display: "block", marginTop: 36 }}
+            />
+          ) : null}
 
           <hr style={{ height: 1, background: "var(--line)", border: 0, margin: "40px 0 0" }} />
 

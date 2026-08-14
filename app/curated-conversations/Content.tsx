@@ -80,7 +80,7 @@ const cta = {
   background: "var(--ink)",
   color: "var(--warm-white)",
   border: "none",
-  borderRadius: 10,
+  borderRadius: 0,
   padding: "15px 30px",
   fontFamily: sans,
   fontSize: 16,
@@ -106,19 +106,41 @@ export default function Content() {
           <div style={sectionLabel}>Read</div>
           <div style={{ borderTop: "1px solid var(--line)", marginTop: 14 }}>
             {POSTS.map((post) => (
-              <article key={post.slug} style={{ borderBottom: "1px solid var(--line)", padding: "36px 0" }}>
-                <div style={postMeta}>
-                  {post.dateLabel} &middot; {post.readingTime}
-                </div>
-                <h2 style={postTitle}>
-                  <a href={`/curated-conversations/${post.slug}`} style={{ color: "inherit" }}>
-                    {post.title}
+              <article
+                key={post.slug}
+                className="journal-entry"
+                style={{
+                  borderBottom: "1px solid var(--line)",
+                  padding: "36px 0",
+                  display: "grid",
+                  gridTemplateColumns: post.image ? "280px 1fr" : "1fr",
+                  gap: 32,
+                  alignItems: "start",
+                }}
+              >
+                {post.image ? (
+                  <a href={`/curated-conversations/${post.slug}`} style={{ display: "block" }}>
+                    <img
+                      src={post.image}
+                      alt={post.imageAlt ?? ""}
+                      style={{ width: "100%", height: "auto", display: "block" }}
+                    />
                   </a>
-                </h2>
-                <div style={postExcerpt}>{post.excerpt}</div>
-                <a href={`/curated-conversations/${post.slug}`} style={readMore}>
-                  Read this piece &rarr;
-                </a>
+                ) : null}
+                <div>
+                  <div style={postMeta}>
+                    {post.dateLabel} &middot; {post.readingTime}
+                  </div>
+                  <h2 style={postTitle}>
+                    <a href={`/curated-conversations/${post.slug}`} style={{ color: "inherit" }}>
+                      {post.title}
+                    </a>
+                  </h2>
+                  <div style={postExcerpt}>{post.excerpt}</div>
+                  <a href={`/curated-conversations/${post.slug}`} style={readMore}>
+                    Read this piece &rarr;
+                  </a>
+                </div>
               </article>
             ))}
           </div>
