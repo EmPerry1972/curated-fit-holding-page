@@ -26,6 +26,86 @@ export const CALL_TO_ACTION =
 // Newest first. The index renders them in this order.
 export const POSTS: Post[] = [
   {
+    slug: "body-feels-different-after-40",
+    title: "“My body feels different and I can’t point to why”",
+    metaTitle: "Muscle Loss After 40 | Curated Fit",
+    metaDescription:
+      "Your body feels different and you cannot point to why. What’s changing and what strength work does about it.",
+    excerpt:
+      "Your body feels different and you cannot point to why. What’s changing and what strength work does about it.",
+    date: "2026-08-15",
+    dateLabel: "15 August 2026",
+    readingTime: "3 min read",
+    kind: "Curated Fit Journal",
+    body: [
+      {
+        type: "p",
+        text: "The scales say roughly what they said five years ago (or crept up a bit) and nothing hurts in a way that’s worth mentioning to anyone.",
+      },
+      {
+        type: "p",
+        text: "But the stairs at the back of the house are a bit more of an event. Getting up off the floor requires a decision. The suitcase into the overhead locker used to be nothing and now it’s a bit of a struggle.",
+      },
+      {
+        type: "p",
+        text: "Muscle loss after 40 is one of the least dramatic things that will happen to your body but one of the most consequential.",
+      },
+      { type: "h2", text: "What’s actually changing" },
+      {
+        type: "p",
+        text: "From your mid-thirties you lose muscle mass gradually - the rate increases through your forties and fifties. Nobody notices it happening because it happens at roughly one percent a year.",
+      },
+      {
+        type: "p",
+        text: "Two things follow. The first is strength, which is what you feel on the stairs. The second is less visible: muscle is where a large share of the body's glucose is taken up, so composition matters for more than appearance.",
+      },
+      { type: "h2", text: "How strength work helps" },
+      {
+        type: "p",
+        text: "Strength work is the intervention for rebuilding muscle rather than simply slowing the loss. Not walking, not swimming, not even being generally active. Those are worth doing but they don’t ask enough of the muscle to make it rebuild.",
+      },
+      {
+        type: "p",
+        text: "What’s needed is less than most people assume. Even just one session a week, working muscles hard enough that the last few repetitions are difficult, is enough to make measurable change at this stage of life.",
+      },
+      {
+        type: "p",
+        text: "The point is not to look different - it’s to keep the suitcase, the stairs and the floor easy for another thirty years.",
+      },
+      { type: "h2", text: "How good is the evidence?" },
+      {
+        type: "p",
+        text: "Resistance work for maintaining and rebuilding muscle in adults over forty is one of the better-supported findings in the field, replicated across decades and populations. It’s certainly not a contested area.",
+      },
+      {
+        type: "p",
+        text: "How much you personally will gain, how fast, and how that translates into the specific things you care most about depends on where you’re starting, your sleep, your protein intake and your consistency.",
+      },
+      {
+        type: "p",
+        text: "There is also no good evidence that any supplement replaces the work. Protein and creatine support what strength work does but they don’t substitute for it.",
+      },
+      { type: "h2", text: "When you’ll notice changes" },
+      {
+        type: "p",
+        text: "Many people find things easier at four to six weeks even though nothing looks different, because early gains are largely your nervous system getting better at recruiting the muscle you already have.",
+      },
+      {
+        type: "p",
+        text: "Measurable changes in muscle generally show up between eight and twelve weeks of consistent work. Consistent means once a week, most weeks. The stairs are a better measure than the mirror, and a much better one than the scales.",
+      },
+      { type: "h2", text: "Where that leaves you" },
+      {
+        type: "p",
+        text: "You are not imagining it and it’s not simply age doing something to you that cannot be answered - it’s a specific, well-understood change with a specific, well-evidenced response.",
+      },
+      {
+        type: "p",
+        text: "The response takes one session a week and someone who knows how to start you off - that’s it.",
+      },
+    ],
+  },
+  {
     slug: "what-happens-in-a-first-session",
     title: "“I don’t know what actually happens in a first session”",
     metaTitle: "What Happens in a First Session | Curated Fit",
