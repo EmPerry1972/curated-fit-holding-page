@@ -37,6 +37,8 @@ export const POSTS: Post[] = [
     dateLabel: "15 August 2026",
     readingTime: "3 min read",
     kind: "Curated Fit Journal",
+    image: "/journal/body-feels-different-after-40.jpg",
+    imageAlt: "A woman doing a bodyweight squat on a mat in her living room.",
     body: [
       {
         type: "p",
