@@ -162,6 +162,36 @@ export default async function CuratedConversationsPost({
             ),
           )}
 
+          {post.sources?.length ? (
+            <section style={{ marginTop: 56, paddingTop: 32, borderTop: "1px solid var(--line)" }}>
+              <div style={{ ...meta, letterSpacing: "0.14em" }}>Sources</div>
+              <ol style={{ margin: "18px 0 0", paddingLeft: 22 }}>
+                {post.sources.map((source, i) => (
+                  <li
+                    key={i}
+                    style={{
+                      fontFamily: sans,
+                      fontSize: 13,
+                      lineHeight: 1.6,
+                      color: "var(--text-secondary)",
+                      marginTop: i === 0 ? 0 : 12,
+                    }}
+                  >
+                    {source.note} &mdash;{" "}
+                    <a
+                      href={source.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: "var(--text-primary)", textDecoration: "underline" }}
+                    >
+                      {source.citation}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ) : null}
+
           <div
             style={{
               marginTop: 56,

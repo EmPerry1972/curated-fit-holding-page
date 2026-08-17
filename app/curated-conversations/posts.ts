@@ -3,6 +3,9 @@
 
 export type Block = { type: "h2" | "p"; text: string };
 
+// A footnote entry: which claim it supports, and where that comes from.
+export type Source = { note: string; citation: string; url: string };
+
 export type Post = {
   slug: string;
   title: string;
@@ -17,6 +20,9 @@ export type Post = {
   image?: string;
   imageAlt?: string;
   body: Block[];
+  // Footnoted at the end of the post, where a piece makes claims worth
+  // substantiating.
+  sources?: Source[];
 };
 
 // Shared closing line across the journal.
@@ -108,6 +114,58 @@ export const POSTS: Post[] = [
       {
         type: "p",
         text: "It won’t fix everything you’re feeling, and it should sit alongside your doctor rather than instead of them. What it will do is protect the bone and the muscle, which are the two things you can’t get back later.",
+      },
+    ],
+    sources: [
+      {
+        note: "Perimenopause as years of hormonal fluctuation, and how its stages are defined",
+        citation: "Harlow et al., Stages of Reproductive Aging Workshop +10, 2012",
+        url: "https://pubmed.ncbi.nlm.nih.gov/22344196/",
+      },
+      {
+        note: "Bone loss accelerating around the final menstrual period",
+        citation:
+          "Bone mineral density changes during the menopause transition in a multiethnic cohort of women (SWAN), 2008",
+        url: "https://pubmed.ncbi.nlm.nih.gov/18160467/",
+      },
+      {
+        note: "Muscle responding less to the same work as oestrogen falls",
+        citation: "Role of exercise in estrogen deficiency-induced sarcopenia",
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC8934617/",
+      },
+      {
+        note: "Strength work loading and maintaining bone",
+        citation:
+          "Watson et al., LIFTMOR randomised controlled trial, Journal of Bone and Mineral Research, 2018",
+        url: "https://pubmed.ncbi.nlm.nih.gov/28975661/",
+      },
+      {
+        note: "Strength work holding on to muscle after menopause",
+        citation:
+          "The effect of resistance training programs on lean body mass in postmenopausal and elderly women: a meta-analysis, 2021",
+        url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8595144/",
+      },
+      {
+        note: "Sleep: a consistent direction, short of conclusive",
+        citation:
+          "Sleep quality in perimenopausal and postmenopausal women: which exercise therapy is most effective? Network meta-analysis of 31 trials, Climacteric, 2025",
+        url: "https://doi.org/10.1080/13697137.2025.2509866",
+      },
+      {
+        note: "Why we do not claim exercise treats hot flushes",
+        citation: "Daley et al., Exercise for vasomotor menopausal symptoms, Cochrane Review, 2014",
+        url: "https://www.cochranelibrary.com/cdsr/doi/10.1002/14651858.CD006108.pub4/references",
+      },
+      {
+        note: "Why we do not recommend protocols timed to your cycle",
+        citation:
+          "McNulty et al., The effects of menstrual cycle phase on exercise performance, Sports Medicine, 2020",
+        url: "https://pubmed.ncbi.nlm.nih.gov/32661839/",
+      },
+      {
+        note: "Early gains being largely neural, before muscle change is measurable",
+        citation: "Moritani and deVries, Neural factors versus hypertrophy, 1979",
+        url: "https://pubmed.ncbi.nlm.nih.gov/453338/",
       },
     ],
   },
