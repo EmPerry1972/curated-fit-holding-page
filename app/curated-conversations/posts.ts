@@ -26,6 +26,77 @@ export const CALL_TO_ACTION =
 // Newest first. The index renders them in this order.
 export const POSTS: Post[] = [
   {
+    slug: "out-of-place-in-a-gym",
+    title: "“I felt out of place the last time I walked into a gym”",
+    metaTitle: "Women’s Gym Auckland: A Different Start | Curated Fit",
+    metaDescription:
+      "Feeling out of place in a gym is common and reasonable. What a different starting point actually looks like.",
+    excerpt:
+      "Feeling out of place in a gym is common and reasonable. What a different starting point actually looks like.",
+    date: "2026-08-15",
+    dateLabel: "15 August 2026",
+    readingTime: "3 min read",
+    kind: "Curated Fit Journal",
+    body: [
+      {
+        type: "p",
+        text: "The detail people remember about gyms is rarely the equipment. It’s the mirrors, the music or the fact that everyone else appeared to know exactly where they were going and what they were doing when they got there.",
+      },
+      {
+        type: "p",
+        text: "You left or you finished the session and did not go back, and you filed it under something you’re not suited to. Searching for a women’s gym in Auckland afterwards is a reasonable next move but it’s also not the only choice you have, and it may not even be the right one for you.",
+      },
+      { type: "h2", text: "Why gyms can make you feel insecure" },
+      {
+        type: "p",
+        text: "A conventional gym is a space where everyone’s competence is on display. Everyone can see everyone. The equipment assumes you already know how it works. Nothing in the design of the room accounts for someone arriving without much of a plan.",
+      },
+      {
+        type: "p",
+        text: "That is not a criticism of gyms - they’re built for people who already go to gyms and they serve those people well.",
+      },
+      {
+        type: "p",
+        text: "But it does mean the feeling you had was a response to the environment rather than anything to do with your ability.",
+      },
+      { type: "h2", text: "What actually changes it" },
+      {
+        type: "p",
+        text: "Someone expecting you - not a membership card and a room, but a person who knows your name and has already thought about what you are going to do before you arrive.",
+      },
+      {
+        type: "p",
+        text: "A setting you would return to - this might mean a small studio, a garage with good equipment in it, a park, or your own living room. It may also be a conventional gym, once someone is meeting you there.",
+      },
+      {
+        type: "p",
+        text: "A first session you finish knowing you could have done more - feeling capable at the end of the hour is what makes the second hour possible.",
+      },
+      {
+        type: "p",
+        text: "Self-efficacy, meaning your belief that you can do the thing, is one of the more reliable predictors of whether someone continues with exercise. Environment and social support both feed into it.",
+      },
+      {
+        type: "p",
+        text: "The setting has almost no bearing on whether the work is effective. A well-designed programme in a living room does what a well-designed programme in a gym does - your muscles aren’t fussed about where they are.",
+      },
+      { type: "h2", text: "When would you notice NOT being out of place?" },
+      {
+        type: "p",
+        text: "The out-of-place feeling generally fades faster than people expect once the environment changes, often within the first two or three sessions.",
+      },
+      {
+        type: "p",
+        text: "Physical change follows the same timeline it always does. Things feel easier at four to six weeks. Measurable strength changes between eight and twelve.",
+      },
+      { type: "h2", text: "Where that leaves you" },
+      {
+        type: "p",
+        text: "You do not need to become someone who is comfortable in a conventional gym. You need one professional, in one setting you would willingly return to - a much easier thing to arrange.",
+      },
+    ],
+  },
+  {
     slug: "body-feels-different-after-40",
     title: "“My body feels different and I can’t point to why”",
     metaTitle: "Muscle Loss After 40 | Curated Fit",
