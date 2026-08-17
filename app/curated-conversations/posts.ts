@@ -26,6 +26,90 @@ export const CALL_TO_ACTION =
 // Newest first. The index renders them in this order.
 export const POSTS: Post[] = [
   {
+    slug: "perimenopause-and-exercise",
+    title: "“I’m sleeping badly and everything aches”",
+    metaTitle: "Perimenopause and Exercise | Curated Fit",
+    metaDescription:
+      "Sleeping badly, aching, and nothing feels like it used to. What is worth understanding before you start.",
+    excerpt:
+      "Sleeping badly, aching, and nothing feels like it used to. What is worth understanding before you start.",
+    date: "2026-08-15",
+    dateLabel: "15 August 2026",
+    readingTime: "4 min read",
+    kind: "Curated Fit Journal",
+    body: [
+      {
+        type: "p",
+        text: "You wake at three - not worried about anything in particular, but just awake. Your hips are stiff getting out of bed in a way they were not two years ago, and you feel hotter than the room.",
+      },
+      {
+        type: "p",
+        text: "Perimenopause and exercise is a subject with a great deal of confident advice attached to it, and to make things a bit confusing it can be contradictory. Here’s what to understand before you change anything.",
+      },
+      { type: "h2", text: "What’s actually happening" },
+      {
+        type: "p",
+        text: "Perimenopause is the years of hormonal fluctuation before periods stop, and fluctuation is the operative word! Oestrogen does not decline smoothly. It swings and the swings get wilder before they end.",
+      },
+      {
+        type: "p",
+        text: "Oestrogen is involved in more than reproduction. It has roles in sleep regulation, temperature control, connective tissue, bone maintenance and how muscle responds to being worked. That’s why the symptoms arrive as a set rather than one at a time and why they seem unrelated to each other when they’re not.",
+      },
+      {
+        type: "p",
+        text: "The two that matter most for what follows in this post are bone and muscle. Bone loss accelerates in this window. Muscle becomes slightly less responsive to the same amount of work, meaning the same effort produces a little less than it did at thirty-five.",
+      },
+      { type: "h2", text: "What movement does and what it doesn’t" },
+      {
+        type: "p",
+        text: "Strength work is the most useful thing available to you, for two reasons. It loads bone, which is the signal bone needs to maintain itself. And it is the only reliable way to hold onto muscle while your hormones seem to be working against you.",
+      },
+      {
+        type: "p",
+        text: "What it won’t do is regulate your hormones or stop the fluctuation. Anyone telling you that exercise “fixes” perimenopause is overselling.",
+      },
+      {
+        type: "p",
+        text: "What it may do is help with your sleep and how you feel day to day. The research on exercise and sleep quality is promising but not conclusive.",
+      },
+      { type: "h2", text: "The evidence is strong though" },
+      {
+        type: "p",
+        text: "Resistance work for bone density and muscle maintenance through and after menopause is well supported and not too contested.",
+      },
+      {
+        type: "p",
+        text: "With sleep and mood, there is a consistent direction in the research and a lot of variation between individuals.",
+      },
+      {
+        type: "p",
+        text: "The evidence is weaker for the claims that circulate online. Particular exercises for hot flushes, specific protocols timed to your cycle, avoiding certain movements because of cortisol - it may turn out to be right but it’s not particularly established.",
+      },
+      {
+        type: "p",
+        text: "One more thing on this - sleeping badly and aching is a conversation you should definitely have with your GP. Movement is part of the answer but it’s not the whole of it.",
+      },
+      { type: "h2", text: "When you’ll notice changes" },
+      {
+        type: "p",
+        text: "Strength within four to six weeks, in the sense that things feel easier before anything looks different. Measurable muscle change between eight and twelve weeks of consistent work.",
+      },
+      {
+        type: "p",
+        text: "Bone over months rather than weeks. Sleep and general wellbeing are the least predictable. Some people notice something within a fortnight, others notice nothing, and both are normal.",
+      },
+      { type: "h2", text: "Where that leaves you" },
+      {
+        type: "p",
+        text: "Two sessions a week of properly loaded strength work is the highest-value thing you can do for your body in this decade.",
+      },
+      {
+        type: "p",
+        text: "It won’t fix everything you’re feeling, and it should sit alongside your doctor rather than instead of them. What it will do is protect the bone and the muscle, which are the two things you can’t get back later.",
+      },
+    ],
+  },
+  {
     slug: "out-of-place-in-a-gym",
     title: "“I felt out of place the last time I walked into a gym”",
     metaTitle: "Women’s Gym Auckland: A Different Start | Curated Fit",
