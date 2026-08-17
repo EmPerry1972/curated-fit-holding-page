@@ -61,7 +61,7 @@ export const POSTS: Post[] = [
       },
       {
         type: "p",
-        text: "Oestrogen is involved in more than reproduction. It has roles in sleep regulation, temperature control, connective tissue, bone maintenance and how muscle responds to being worked. That’s why the symptoms arrive as a set rather than one at a time and why they seem unrelated to each other when they’re not.",
+        text: "Oestrogen is involved in more than reproduction. It has roles in temperature control, bone maintenance and how muscle responds to being worked, and a less settled role in connective tissue. Sleep is often disturbed too, though the clearest path there runs through night sweats rather than oestrogen acting on sleep directly. That’s why the symptoms arrive as a set rather than one at a time and why they seem unrelated to each other when they’re not.",
       },
       {
         type: "p",
@@ -70,7 +70,7 @@ export const POSTS: Post[] = [
       { type: "h2", text: "What movement does and what it doesn’t" },
       {
         type: "p",
-        text: "Strength work is the most useful thing available to you, for two reasons. It loads bone, which is the signal bone needs to maintain itself. And it is the only reliable way to hold onto muscle while your hormones seem to be working against you.",
+        text: "Strength work is the most useful thing available to you, for two reasons. It loads bone, which is the signal bone needs to maintain itself. And it is a reliable way to hold onto muscle while your hormones seem to be working against you.",
       },
       {
         type: "p",
@@ -127,6 +127,12 @@ export const POSTS: Post[] = [
         citation:
           "Bone mineral density changes during the menopause transition in a multiethnic cohort of women (SWAN), 2008",
         url: "https://pubmed.ncbi.nlm.nih.gov/18160467/",
+      },
+      {
+        note: "Disturbed sleep, and its association with night sweats rather than with oestrogen levels directly",
+        citation:
+          "Vasomotor symptoms and menopause: findings from the Study of Women’s Health Across the Nation",
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC3185243/",
       },
       {
         note: "Muscle responding less to the same work as oestrogen falls",
