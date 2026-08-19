@@ -177,7 +177,7 @@ export default async function CuratedConversationsPost({
                       marginTop: i === 0 ? 0 : 12,
                     }}
                   >
-                    {source.note} &mdash;{" "}
+                    {source.note} -{" "}
                     <a
                       href={source.url}
                       target="_blank"

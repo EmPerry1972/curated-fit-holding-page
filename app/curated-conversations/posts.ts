@@ -32,6 +32,86 @@ export const CALL_TO_ACTION =
 // Newest first. The index renders them in this order.
 export const POSTS: Post[] = [
   {
+    slug: "how-the-matching-works",
+    title: "“How do you decide who’s right for me?”",
+    metaTitle: "How Curated Fit Matching Works | Curated Fit",
+    metaDescription:
+      "Not a directory and not a search box. What we ask and what we know and don’t know about a match.",
+    excerpt:
+      "Not a directory and not a search box. What we ask and what we know and don’t know about a match.",
+    date: "2026-08-17",
+    dateLabel: "17 August 2026",
+    readingTime: "3 min read",
+    kind: "Curated Fit Journal",
+    body: [
+      {
+        type: "p",
+        text: "Searching for a personal trainer near me returns a list. A list isn’t a recommendation and sorting one requires the expertise you’re trying to buy. So here is what we do instead, described so you can judge whether it is worth giving a go.",
+      },
+      { type: "h2", text: "What we ask you" },
+      {
+        type: "p",
+        text: "Where you are and how far you would actually travel. Not how far you would like to think you would travel.",
+      },
+      {
+        type: "p",
+        text: "What you already do in a week. Walking, gardening, golf, swimming, nothing at all - all are useful answers.",
+      },
+      {
+        type: "p",
+        text: "What has hurt, currently or historically. This is the single most useful thing you can tell us and the thing people most often leave out.",
+      },
+      {
+        type: "p",
+        text: "How you want to be spoken to. Some women want to be pushed hard, some want to be explained to, some want to be left to get on with things once shown.",
+      },
+      { type: "h2", text: "What we actually take into consideration" },
+      {
+        type: "p",
+        text: "We look at whether the personal trainer has experience with women north of 40 years old. There’s a difference between someone who has worked with fifty women through perimenopause and someone who has read a course module on it.",
+      },
+      {
+        type: "p",
+        text: "We also consider how their working style matches how you said you want to be treated - this is weighted heavily because it determines whether you are still going with your trainer beyond a few sessions.",
+      },
+      {
+        type: "p",
+        text: "Obviously the practical details have to work too - location, times, setting, cost. Logistics can be the reason plenty of good matches fail.",
+      },
+      { type: "h2", text: "What we can’t know" },
+      {
+        type: "p",
+        text: "We won’t know whether you’ll like them - we can rule out obvious mismatches but we unfortunately can’t manufacture the rapport between you.",
+      },
+      {
+        type: "p",
+        text: "We won’t know how you’ll feel in six weeks. Circumstances change and a match that suits you right now may not suit you in a few months.",
+      },
+      {
+        type: "p",
+        text: "We also won’t know whether they’re the single best professional for you - we are aiming for a great fit, which is a much better starting point than a list.",
+      },
+      { type: "h2", text: "How good is the evidence for good rapport?" },
+      {
+        type: "p",
+        text: "The literature, mostly from healthcare and psychology, finds that the quality of the working relationship predicts outcomes substantially. It’s one of the more robust findings in that field, and there’s no reason it wouldn’t apply here.",
+      },
+      { type: "h2", text: "Where that leaves you" },
+      {
+        type: "p",
+        text: "We review every professional individually and what we’re offering is a considered shortlist rather than a guarantee, and introductions rather than a directory to wade through.",
+      },
+    ],
+    sources: [
+      {
+        note: "The quality of the working relationship predicting outcomes",
+        citation:
+          "Flückiger et al., The alliance in adult psychotherapy: a meta-analytic synthesis, Psychotherapy, 2018",
+        url: "https://pubmed.ncbi.nlm.nih.gov/29792475/",
+      },
+    ],
+  },
+  {
     slug: "perimenopause-and-exercise",
     title: "“I’m sleeping badly and everything aches”",
     metaTitle: "Perimenopause and Exercise | Curated Fit",
