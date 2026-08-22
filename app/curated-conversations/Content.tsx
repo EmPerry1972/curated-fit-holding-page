@@ -123,7 +123,7 @@ export default function Content() {
                     <img
                       src={post.image}
                       alt={post.imageAlt ?? ""}
-                      style={{ width: "100%", height: "auto", display: "block" }}
+                      style={{ width: "100%", height: "auto", display: "block", borderRadius: 6 }}
                     />
                   </a>
                 ) : null}
