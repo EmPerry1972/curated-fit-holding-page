@@ -43,6 +43,9 @@ export const POSTS: Post[] = [
     dateLabel: "17 August 2026",
     readingTime: "3 min read",
     kind: "Curated Fit Journal",
+    image: "/journal/how-the-matching-works.jpg",
+    imageAlt:
+      "An exercise professional with a notebook, talking with a client in a gym.",
     body: [
       {
         type: "p",
