@@ -32,6 +32,112 @@ export const CALL_TO_ACTION =
 // Newest first. The index renders them in this order.
 export const POSTS: Post[] = [
   {
+    slug: "reached-my-goal-weight",
+    title: "“I’ve reached my goal weight.” What needs protecting now",
+    metaTitle: "Protecting Muscle After Weight Loss | Curated Fit",
+    metaDescription:
+      "You’ve reached your goal weight. What’s worth protecting now, and why the movement side matters most.",
+    excerpt:
+      "You’ve reached your goal weight. What’s worth protecting now, and why the movement side matters most.",
+    date: "2026-08-25",
+    dateLabel: "25 August 2026",
+    readingTime: "3 min read",
+    kind: "Curated Fit Journal",
+    image: "/journal/reached-my-goal-weight.jpg",
+    imageAlt: "A woman sitting on driftwood on a beach at dusk, looking out to sea.",
+    body: [
+      {
+        type: "p",
+        text: "Believe it or not, reaching a goal weight can be an anticlimax. The number arrives and the structure that produced it - the plan, the appointments, the advice - stops with it. Almost none of that was aimed at what happens next.",
+      },
+      { type: "h2", text: "What comes off with the weight" },
+      {
+        type: "p",
+        text: "Weight loss isn’t selective. Any reduction in body weight, by any method, draws on both fat mass and lean mass (lean mass is mostly skeletal muscle).",
+      },
+      {
+        type: "p",
+        text: "The proportion varies. The main determinants are the rate of loss, protein intake during it, and whether the muscle was being loaded at the time. Faster loss and lower protein intake both increase the share that comes from lean tissue.",
+      },
+      {
+        type: "p",
+        text: "The result is a lighter body carrying less of the tissue that produces force. This is why some women report feeling weaker at their goal weight than they did carrying more, and why the number on the scale can improve while function doesn’t.",
+      },
+      { type: "h2", text: "What’s worth protecting and why it matters now" },
+      {
+        type: "p",
+        text: "Skeletal muscle, and the force it produces, is totally worth protecting. Muscle mass determines maximum force output, and force output is what carrying shopping, rising from a low chair and climbing stairs under load require. As lean mass falls, those tasks consume a higher percentage of available capacity. That’s what registers as things being harder.",
+      },
+      { type: "h2", text: "What maintains it" },
+      {
+        type: "p",
+        text: "Resistance exercise, two to three times a week. Muscle mass responds to mechanical loading and without a sufficient load stimulus it declines regardless of diet. Walking and other low-intensity activity don’t supply that stimulus, because the load sits well below the threshold that triggers adaptation.",
+      },
+      {
+        type: "p",
+        text: "The effective dose is modest - a small number of compound movements, loaded so the final repetitions approach “failure”, performed consistently.",
+      },
+      {
+        type: "p",
+        text: "Adequate protein is a requirement rather than an addition. It supplies the substrate; the loading supplies the signal.",
+      },
+      { type: "h2", text: "What the evidence supports" },
+      {
+        type: "p",
+        text: "Resistance exercise during and after weight loss preserves more lean mass than the same weight loss without it. This is pretty well evidenced.",
+      },
+      {
+        type: "p",
+        text: "What the evidence doesn’t support is your individual prediction. The magnitude and rate vary with baseline muscle mass, how quickly the weight came off, protein intake and consistency.",
+      },
+      {
+        type: "p",
+        text: "If the weight loss was medically supervised, maintenance is a conversation for the clinician who supervised it, which covers the exercise component only.",
+      },
+      { type: "h2", text: "Strength changes precede visible ones" },
+      {
+        type: "p",
+        text: "Improvements in force production are typically reported at four to six weeks and are largely neural - better recruitment of existing muscle rather than new tissue.",
+      },
+      {
+        type: "p",
+        text: "Measurable change in muscle mass generally occurs between eight and twelve weeks of consistent loading.",
+      },
+      {
+        type: "p",
+        text: "Function is a more useful measure than either the mirror or the scale - getting up from a chair without using your hands, and carrying a load upstairs, are both testable at home.",
+      },
+      { type: "h2", text: "Where that leaves you" },
+      {
+        type: "p",
+        text: "Weight loss and weight maintenance are different beasts and they need different interventions. The first is largely dietary. The second is largely mechanical.",
+      },
+      {
+        type: "p",
+        text: "Even one resistance session a week can start the intervention, so why not start now?",
+      },
+    ],
+    sources: [
+      {
+        note: "Lean mass coming off alongside fat, and the part played by the rate of loss and protein intake",
+        citation:
+          "Cava, Yeat and Mittendorfer, Preserving healthy muscle during weight loss, Advances in Nutrition, 2017",
+        url: "https://academic.oup.com/advances/article/8/3/511/4558114",
+      },
+      {
+        note: "Resistance exercise preserving lean mass through weight loss",
+        citation:
+          "Resistance training prevents muscle loss induced by caloric restriction in obese elderly individuals: a systematic review and meta-analysis, 2018",
+        url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5946208/",
+      },
+      {
+        note: "Early strength gains being largely neural, before muscle change is measurable",
+        citation: "Moritani and deVries, Neural factors versus hypertrophy, 1979",
+        url: "https://pubmed.ncbi.nlm.nih.gov/453338/",
+      },
+    ],
+  },
+  {
     slug: "how-the-matching-works",
     title: "“How do you decide who’s right for me?”",
     metaTitle: "How Curated Fit Matching Works | Curated Fit",
@@ -39,8 +145,8 @@ export const POSTS: Post[] = [
       "Not a directory and not a search box. What we ask and what we know and don’t know about a match.",
     excerpt:
       "Not a directory and not a search box. What we ask and what we know and don’t know about a match.",
-    date: "2026-08-17",
-    dateLabel: "17 August 2026",
+    date: "2026-08-19",
+    dateLabel: "19 August 2026",
     readingTime: "3 min read",
     kind: "Curated Fit Journal",
     image: "/journal/how-the-matching-works.jpg",
