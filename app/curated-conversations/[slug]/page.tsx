@@ -150,17 +150,42 @@ export default async function CuratedConversationsPost({
 
           <hr style={{ height: 1, background: "var(--line)", border: 0, margin: "40px 0 0" }} />
 
-          {post.body.map((block, i) =>
-            block.type === "h2" ? (
-              <h2 key={i} style={{ marginTop: 44 }}>
-                {block.text}
-              </h2>
-            ) : (
+          {post.body.map((block, i) => {
+            if (block.type === "h2") {
+              return (
+                <h2 key={i} style={{ marginTop: 44 }}>
+                  {block.text}
+                </h2>
+              );
+            }
+            if (block.type === "list") {
+              return (
+                <ul key={i} style={{ margin: "18px 0 0", paddingLeft: 22, maxWidth: "65ch" }}>
+                  {block.items.map((item, j) => (
+                    <li
+                      key={j}
+                      style={{
+                        fontFamily: sans,
+                        fontSize: 16,
+                        lineHeight: 1.65,
+                        color: "var(--text-primary)",
+                        marginTop: j === 0 ? 0 : 12,
+                      }}
+                    >
+                      {item.lead ? <strong>{item.lead}</strong> : null}
+                      {item.lead ? " " : null}
+                      {item.text}
+                    </li>
+                  ))}
+                </ul>
+              );
+            }
+            return (
               <p key={i} style={{ marginTop: 18 }}>
                 {block.text}
               </p>
-            ),
-          )}
+            );
+          })}
 
           {post.sources?.length ? (
             <section style={{ marginTop: 56, paddingTop: 32, borderTop: "1px solid var(--line)" }}>

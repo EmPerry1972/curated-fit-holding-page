@@ -1,7 +1,12 @@
 // Curated Conversations journal posts.
 // Copy is held here so the index and the article pages read from one source.
 
-export type Block = { type: "h2" | "p"; text: string };
+// A list item can open with a bold lead-in, as the briefs write them.
+export type ListItem = { lead?: string; text: string };
+
+export type Block =
+  | { type: "h2" | "p"; text: string }
+  | { type: "list"; items: ListItem[] };
 
 // A footnote entry: which claim it supports, and where that comes from.
 export type Source = { note: string; citation: string; url: string };
@@ -31,6 +36,107 @@ export const CALL_TO_ACTION =
 
 // Newest first. The index renders them in this order.
 export const POSTS: Post[] = [
+  {
+    slug: "personal-trainer-cost-auckland",
+    title: "What does a personal trainer actually cost in Auckland?",
+    metaTitle: "Personal Trainer Cost Auckland | Curated Fit",
+    metaDescription:
+      "What you’ll actually pay, what changes the price, and what to ask before you commit to anyone.",
+    excerpt:
+      "What you’ll actually pay, what changes the price, and what to ask before you commit to anyone.",
+    date: "2026-08-25",
+    dateLabel: "25 August 2026",
+    readingTime: "3 min read",
+    kind: "Curated Fit Journal",
+    image: "/journal/personal-trainer-cost-auckland.jpg",
+    imageAlt: "A woman at a kitchen table with a notebook and a laptop, looking out of the window.",
+    body: [
+      {
+        type: "p",
+        text: "Personal trainer rates are rarely published. Most websites describe their approach and then ask you to book a consultation to find out the rate. Here are the numbers and the variables that move them.",
+      },
+      { type: "h2", text: "The range" },
+      {
+        type: "p",
+        text: "One-to-one sessions in Auckland generally fall between $50 and $150 per hour, with the majority near $80.",
+      },
+      {
+        type: "p",
+        text: "Small group sessions of two to four people run lower per person, roughly $30 to $70 per person per session.",
+      },
+      {
+        type: "p",
+        text: "Block pricing is standard. Five and ten-session blocks usually reduce the per-session rate, and single sessions are typically charged at the upper end.",
+      },
+      { type: "h2", text: "What determines the rate" },
+      {
+        type: "list",
+        items: [
+          {
+            lead: "Location.",
+            text: "A commercial gym carries rent, which is reflected in the rate. A professional travelling to your home is charging for travel time. A small private studio generally sits between the two.",
+          },
+          {
+            lead: "Experience.",
+            text: "Longer-practising professionals charge more, which is often justified where there’s a history of injury or a condition to work around.",
+          },
+          {
+            lead: "Specialisation.",
+            text: "Someone working primarily with women over 40, or with return-to-exercise after injury, will generally charge above a generalist.",
+          },
+          {
+            lead: "Frequency.",
+            text: "Twice weekly is nearly always lower per session than once weekly. Fortnightly is usually the most expensive way to buy this service.",
+          },
+        ],
+      },
+      { type: "h2", text: "What the rate doesn’t tell you" },
+      {
+        type: "p",
+        text: "There’s no reliable correlation between hourly rate and whether a client is still going at three months. Retention is determined by fit, scheduling and the first few sessions, not by price.",
+      },
+      {
+        type: "p",
+        text: "The rate does indicate something about supply. A price well below the local range usually reflects part-time operation, which has implications for availability and continuity.",
+      },
+      { type: "h2", text: "What to establish before committing" },
+      {
+        type: "list",
+        items: [
+          {
+            lead: "Is this per session or per block, and what’s the cancellation policy?",
+            text: "Terms vary considerably and this is where most disputes happen.",
+          },
+          {
+            lead: "What’s provided between sessions?",
+            text: "Some professionals include a programme for the other days at no additional cost and some don’t - both are legitimate, but you should know which applies.",
+          },
+          {
+            lead: "What’s the minimum commitment?",
+            text: "A commitment longer than a month before you’ve met them warrants scrutiny.",
+          },
+          {
+            lead: "How many current clients are in a comparable position to me?",
+            text: "Current, not cumulative.",
+          },
+        ],
+      },
+      { type: "h2", text: "Cost relative to the alternative" },
+      {
+        type: "p",
+        text: "The relevant comparison isn’t hourly rate against hourly rate - it’s total spend against sessions actually attended.",
+      },
+      {
+        type: "p",
+        text: "A gym membership used twice a month carries a higher effective cost per session than most one-to-one arrangements. If you already exercise consistently without supervision the calculation runs the other way.",
+      },
+      { type: "h2", text: "Where that leaves you" },
+      {
+        type: "p",
+        text: "You now have the range, the variables and the questions to ask. What remains is narrowing the field to professionals whose rate, location and working method match your requirements.",
+      },
+    ],
+  },
   {
     slug: "reached-my-goal-weight",
     title: "“I’ve reached my goal weight.” What needs protecting now",
