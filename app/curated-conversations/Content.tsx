@@ -165,24 +165,30 @@ export default function Content() {
                 }}
               >
                 {episode.guestImage ? (
-                  <img
-                    src={episode.guestImage}
-                    alt={episode.guestImageAlt ?? ""}
-                    style={{
-                      width: "100%",
-                      height: "auto",
-                      display: "block",
-                      borderRadius: "50%",
-                      aspectRatio: "1 / 1",
-                      objectFit: "cover",
-                    }}
-                  />
+                  <a href={`/curated-conversations/${episode.slug}`} style={{ display: "block" }}>
+                    <img
+                      src={episode.guestImage}
+                      alt={episode.guestImageAlt ?? ""}
+                      style={{
+                        width: "100%",
+                        height: "auto",
+                        display: "block",
+                        borderRadius: "50%",
+                        aspectRatio: "1 / 1",
+                        objectFit: "cover",
+                      }}
+                    />
+                  </a>
                 ) : null}
                 <div>
                   <div style={postMeta}>
                     {episode.dateLabel} &middot; {episode.duration}
                   </div>
-                  <h2 style={{ ...postTitle, fontSize: "clamp(22px, 3vw, 30px)" }}>{episode.title}</h2>
+                  <h2 style={{ ...postTitle, fontSize: "clamp(22px, 3vw, 30px)" }}>
+                    <a href={`/curated-conversations/${episode.slug}`} style={{ color: "inherit" }}>
+                      {episode.title}
+                    </a>
+                  </h2>
                   <div style={postExcerpt}>{episode.excerpt}</div>
                   {episode.guest ? (
                     <div style={{ ...postMeta, marginTop: 14 }}>{episode.guest}</div>
@@ -191,6 +197,9 @@ export default function Content() {
                     <source src={episode.audio} />
                     Your browser does not support the audio element.
                   </audio>
+                  <a href={`/curated-conversations/${episode.slug}`} style={readMore}>
+                    Listen to this episode &rarr;
+                  </a>
                 </div>
               </article>
             ))}
