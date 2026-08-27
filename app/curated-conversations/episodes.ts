@@ -18,7 +18,7 @@ export type Episode = {
 export const EPISODES: Episode[] = [
   {
     slug: "neuroscience-of-changing-behaviours",
-    title: "The neuroscience behind changing behaviours needed to add strength training to your life",
+    title: "The neuroscience of building a lasting strength-training habit",
     excerpt:
       "Why knowing that strength training matters is never enough to start doing it, and what the brain is actually doing when a new habit sticks.",
     guest:
