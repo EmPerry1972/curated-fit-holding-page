@@ -1,4 +1,5 @@
 import { ConversationsFooter, ConversationsNav } from "./Chrome";
+import { EPISODES } from "./episodes";
 import { CALL_TO_ACTION, POSTS } from "./posts";
 
 const serif = "var(--font-serif), 'Playfair Display', Georgia, serif";
@@ -140,6 +141,56 @@ export default function Content() {
                   <a href={`/curated-conversations/${post.slug}`} style={readMore}>
                     Read this piece &rarr;
                   </a>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section style={{ ...sectionPad, paddingTop: 0 }}>
+        <div style={wrap}>
+          <div style={sectionLabel}>Listen</div>
+          <div style={{ borderTop: "1px solid var(--line)", marginTop: 14 }}>
+            {EPISODES.map((episode) => (
+              <article
+                key={episode.slug}
+                style={{
+                  borderBottom: "1px solid var(--line)",
+                  padding: "36px 0",
+                  display: "grid",
+                  gridTemplateColumns: episode.guestImage ? "160px 1fr" : "1fr",
+                  gap: 32,
+                  alignItems: "start",
+                }}
+              >
+                {episode.guestImage ? (
+                  <img
+                    src={episode.guestImage}
+                    alt={episode.guestImageAlt ?? ""}
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      display: "block",
+                      borderRadius: "50%",
+                      aspectRatio: "1 / 1",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : null}
+                <div>
+                  <div style={postMeta}>
+                    {episode.dateLabel} &middot; {episode.duration}
+                  </div>
+                  <h2 style={{ ...postTitle, fontSize: "clamp(22px, 3vw, 30px)" }}>{episode.title}</h2>
+                  <div style={postExcerpt}>{episode.excerpt}</div>
+                  {episode.guest ? (
+                    <div style={{ ...postMeta, marginTop: 14 }}>{episode.guest}</div>
+                  ) : null}
+                  <audio controls preload="none" style={{ width: "100%", maxWidth: 520, marginTop: 20 }}>
+                    <source src={episode.audio} />
+                    Your browser does not support the audio element.
+                  </audio>
                 </div>
               </article>
             ))}
