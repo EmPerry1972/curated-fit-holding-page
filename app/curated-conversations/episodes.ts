@@ -1,5 +1,5 @@
 // Curated Conversations podcast episodes.
-// Audio files live in public/audio/<slug>.m4a (or .mp3).
+// Audio files live in public/audio/slug.m4a (or .mp3).
 
 export type Episode = {
   slug: string;
@@ -31,3 +31,7 @@ export const EPISODES: Episode[] = [
     audio: "/audio/neuroscience-of-changing-behaviours.m4a",
   },
 ];
+
+export function getEpisode(slug: string): Episode | undefined {
+  return EPISODES.find(function (episode) { return episode.slug === slug; });
+}
