@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ConversationsFooter, ConversationsNav } from "../Chrome";
 import { CALL_TO_ACTION, POSTS, getPost } from "../posts";
+import { EPISODES, getEpisode } from "../episodes";
 import { CONVERSATIONS_PUBLISHED } from "../../config";
 
 // While unpublished, a post can still be previewed at:
@@ -61,29 +62,58 @@ type Params = { slug: string };
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPost(slug);
-  if (!post) return {};
 
-  const url = `/curated-conversations/${post.slug}`;
-  return {
-    title: post.metaTitle,
-    description: post.metaDescription,
-    alternates: { canonical: url },
-    openGraph: {
-      type: "article",
-      siteName: "Curated Fit",
+  const post = getPost(slug);
+  if (post) {
+    const url = `/curated-conversations/${post.slug}`;
+    return {
       title: post.metaTitle,
       description: post.metaDescription,
-      url,
-      locale: "en_NZ",
-      publishedTime: post.date,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: post.metaTitle,
-      description: post.metaDescription,
-    },
-  };
+      alternates: { canonical: url },
+      openGraph: {
+        type: "article",
+        siteName: "Curated Fit",
+        title: post.metaTitle,
+        description: post.metaDescription,
+        url,
+        locale: "en_NZ",
+        publishedTime: post.date,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: post.metaTitle,
+        description: post.metaDescription,
+      },
+    };
+  }
+
+  const episode = getEpisode(slug);
+  if (episode) {
+    const url = `/curated-conversations/${episode.slug}`;
+    const images = episode.guestImage ? [{ url: episode.guestImage }] : undefined;
+    return {
+      title: episode.title,
+      description: episode.excerpt,
+      alternates: { canonical: url },
+      openGraph: {
+        type: "article",
+        siteName: "Curated Fit",
+        title: episode.title,
+        description: episode.excerpt,
+        url,
+        locale: "en_NZ",
+        publishedTime: episode.date,
+        images,
+      },
+      twitter: {
+        card: images ? "summary_large_image" : "summary",
+        title: episode.title,
+        description: episode.excerpt,
+      },
+    };
+  }
+
+  return {};
 }
 
 export default async function CuratedConversationsPost({
@@ -102,8 +132,128 @@ export default async function CuratedConversationsPost({
   }
 
   const post = getPost(slug);
-  if (!post) {
+  const episode = post ? undefined : getEpisode(slug);
+
+  if (!post && !episode) {
     notFound();
+  }
+
+  if (episode) {
+    const otherEpisodes = EPISODES.filter((other) => other.slug !== episode.slug);
+
+    return (
+      <main style={{ minHeight: "100vh", background: "var(--warm-white)" }}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "PodcastEpisode",
+              name: episode.title,
+              description: episode.excerpt,
+              datePublished: episode.date,
+              inLanguage: "en-NZ",
+              associatedMedia: { "@type": "MediaObject", contentUrl: episode.audio },
+              partOfSeries: { "@type": "PodcastSeries", name: "Curated Conversations" },
+              publisher: { "@type": "Organization", name: "Curated Fit" },
+              mainEntityOfPage: `https://www.curatedfit.co.nz/curated-conversations/${episode.slug}`,
+            }),
+          }}
+        />
+
+        <ConversationsNav />
+
+        <article style={{ padding: "clamp(40px, 6vw, 72px) 0" }}>
+          <div style={wrap}>
+            <a href="/curated-conversations" style={backLink}>
+              &larr; Curated Conversations
+            </a>
+            <div style={{ ...meta, marginTop: 28 }}>
+              Listen &middot; {episode.dateLabel} &middot; {episode.duration}
+            </div>
+            <h1 style={{ marginTop: 14 }}>{episode.title}</h1>
+            <div style={standfirst}>{episode.excerpt}</div>
+
+            {episode.guestImage ? (
+              <img
+                src={episode.guestImage}
+                alt={episode.guestImageAlt ?? ""}
+                style={{
+                  width: 120,
+                  height: 120,
+                  display: "block",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  marginTop: 36,
+                }}
+              />
+            ) : null}
+
+            {episode.guest ? (
+              <div style={{ ...meta, marginTop: 18, textTransform: "none", letterSpacing: 0, fontSize: 14 }}>
+                {episode.guest}
+              </div>
+            ) : null}
+
+            <audio controls preload="none" style={{ width: "100%", maxWidth: 520, marginTop: 28 }}>
+              <source src={episode.audio} />
+              Your browser does not support the audio element.
+            </audio>
+
+            <div
+              style={{
+                marginTop: 56,
+                paddingTop: 40,
+                borderTop: "1px solid var(--line)",
+              }}
+            >
+              <div style={{ ...standfirst, margin: 0 }}>{CALL_TO_ACTION}</div>
+              <div style={{ marginTop: 28 }}>
+                <a href="/find-your-fit" style={cta}>
+                  Find your Fit
+                </a>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        {(otherEpisodes.length > 0 || POSTS.length > 0) && (
+          <section style={{ padding: "0 0 clamp(48px, 8vw, 88px)" }}>
+            <div style={wrap}>
+              <div style={{ ...meta, letterSpacing: "0.14em" }}>More from Curated Conversations</div>
+              <div style={{ borderTop: "1px solid var(--line)", marginTop: 14 }}>
+                {otherEpisodes.map((other) => (
+                  <div key={other.slug} style={{ borderBottom: "1px solid var(--line)", padding: "28px 0" }}>
+                    <div style={meta}>
+                      {other.dateLabel} &middot; {other.duration}
+                    </div>
+                    <h3 style={{ marginTop: 10 }}>
+                      <a href={`/curated-conversations/${other.slug}`} style={{ color: "inherit" }}>
+                        {other.title}
+                      </a>
+                    </h3>
+                  </div>
+                ))}
+                {POSTS.map((other) => (
+                  <div key={other.slug} style={{ borderBottom: "1px solid var(--line)", padding: "28px 0" }}>
+                    <div style={meta}>
+                      {other.dateLabel} &middot; {other.readingTime}
+                    </div>
+                    <h3 style={{ marginTop: 10 }}>
+                      <a href={`/curated-conversations/${other.slug}`} style={{ color: "inherit" }}>
+                        {other.title}
+                      </a>
+                    </h3>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        <ConversationsFooter />
+      </main>
+    );
   }
 
   const others = POSTS.filter((other) => other.slug !== post.slug);
