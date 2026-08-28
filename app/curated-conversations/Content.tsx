@@ -104,52 +104,6 @@ export default function Content() {
 
       <section style={sectionPad}>
         <div style={wrap}>
-          <div style={sectionLabel}>Read</div>
-          <div style={{ borderTop: "1px solid var(--line)", marginTop: 14 }}>
-            {POSTS.map((post) => (
-              <article
-                key={post.slug}
-                className="journal-entry"
-                style={{
-                  borderBottom: "1px solid var(--line)",
-                  padding: "36px 0",
-                  display: "grid",
-                  gridTemplateColumns: post.image ? "280px 1fr" : "1fr",
-                  gap: 32,
-                  alignItems: "start",
-                }}
-              >
-                {post.image ? (
-                  <a href={`/curated-conversations/${post.slug}`} style={{ display: "block" }}>
-                    <img
-                      src={post.image}
-                      alt={post.imageAlt ?? ""}
-                      style={{ width: "100%", height: "auto", display: "block", borderRadius: 6 }}
-                    />
-                  </a>
-                ) : null}
-                <div>
-                  <div style={postMeta}>
-                    {post.dateLabel} &middot; {post.readingTime}
-                  </div>
-                  <h2 style={postTitle}>
-                    <a href={`/curated-conversations/${post.slug}`} style={{ color: "inherit" }}>
-                      {post.title}
-                    </a>
-                  </h2>
-                  <div style={postExcerpt}>{post.excerpt}</div>
-                  <a href={`/curated-conversations/${post.slug}`} style={readMore}>
-                    Read this piece &rarr;
-                  </a>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section style={{ ...sectionPad, paddingTop: 0 }}>
-        <div style={wrap}>
           <div style={sectionLabel}>Listen</div>
           <div style={{ borderTop: "1px solid var(--line)", marginTop: 14 }}>
             {EPISODES.map((episode) => (
@@ -199,6 +153,52 @@ export default function Content() {
                   </audio>
                   <a href={`/curated-conversations/${episode.slug}`} style={readMore}>
                     Listen to this episode &rarr;
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section style={{ ...sectionPad, paddingTop: 0 }}>
+        <div style={wrap}>
+          <div style={sectionLabel}>Read</div>
+          <div style={{ borderTop: "1px solid var(--line)", marginTop: 14 }}>
+            {POSTS.map((post) => (
+              <article
+                key={post.slug}
+                className="journal-entry"
+                style={{
+                  borderBottom: "1px solid var(--line)",
+                  padding: "36px 0",
+                  display: "grid",
+                  gridTemplateColumns: post.image ? "280px 1fr" : "1fr",
+                  gap: 32,
+                  alignItems: "start",
+                }}
+              >
+                {post.image ? (
+                  <a href={`/curated-conversations/${post.slug}`} style={{ display: "block" }}>
+                    <img
+                      src={post.image}
+                      alt={post.imageAlt ?? ""}
+                      style={{ width: "100%", height: "auto", display: "block", borderRadius: 6 }}
+                    />
+                  </a>
+                ) : null}
+                <div>
+                  <div style={postMeta}>
+                    {post.dateLabel} &middot; {post.readingTime}
+                  </div>
+                  <h2 style={postTitle}>
+                    <a href={`/curated-conversations/${post.slug}`} style={{ color: "inherit" }}>
+                      {post.title}
+                    </a>
+                  </h2>
+                  <div style={postExcerpt}>{post.excerpt}</div>
+                  <a href={`/curated-conversations/${post.slug}`} style={readMore}>
+                    Read this piece &rarr;
                   </a>
                 </div>
               </article>
