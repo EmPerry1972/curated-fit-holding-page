@@ -37,6 +37,93 @@ export const CALL_TO_ACTION =
 // Newest first. The index renders them in this order.
 export const POSTS: Post[] = [
   {
+    slug: "walking-and-strength",
+    title: "“I walk most days, isn’t that enough?”",
+    metaTitle: "Walking vs Strength Work After 40 | Curated Fit",
+    metaDescription:
+      "Walking is worth doing and it isn’t strength work. Where one stops and the other begins.",
+    excerpt:
+      "Walking is worth doing and it isn’t strength work. Where one stops and the other begins.",
+    date: "2026-08-28",
+    dateLabel: "28 August 2026",
+    readingTime: "3 min read",
+    kind: "Curated Fit Journal",
+    image: "/journal/walking-and-strength.jpg",
+    imageAlt: "A woman walking a waterfront path at dusk, with the Auckland skyline behind her.",
+    body: [
+      {
+        type: "p",
+        text: "The short answer is that walking is genuinely worth doing and it isn’t a substitute for strength work. Those two things are both true and they definitely don’t cancel each other out.",
+      },
+      { type: "h2", text: "What walking is very good at" },
+      {
+        type: "p",
+        text: "It’s the easiest thing in the world to keep doing, which is key. It’s good for your heart, it’s good for your head, it gets you outside and it costs nothing. If you walk most days you’ve already solved the problem many people never do, which is doing something regularly. None of the following is an argument for walking less.",
+      },
+      { type: "h2", text: "Where it stops" },
+      {
+        type: "p",
+        text: "Muscle only holds onto itself when something asks it to. The signal it responds to is effort near its limit - a load heavy enough that you couldn’t do many more repetitions.",
+      },
+      {
+        type: "p",
+        text: "Walking doesn’t provide that because well, it just can’t. Your legs are already comfortable carrying you, which is exactly what makes walking sustainable. The thing that makes it easy to keep doing is the same thing that stops it building anything. That’s the distinction - walking maintains the habit but it doesn’t maintain the muscle.",
+      },
+      { type: "h2", text: "Why that matters now" },
+      {
+        type: "p",
+        text: "From your mid-thirties onwards you lose muscle gradually if nothing intervenes - bone follows a similar pattern.",
+      },
+      {
+        type: "p",
+        text: "You’d notice it as the stairs being slightly more of an issue, or getting up off the floor involving a couple of hands, or the suitcase being heavier than it was. Not dramatic, just a bit more effort for the same things than there used to be.",
+      },
+      {
+        type: "p",
+        text: "Walking every day and still finding those things harder isn’t a sign you’re doing it wrong. It’s a sign you’re doing one thing well and a different thing not at all.",
+      },
+      { type: "h2", text: "How good is the evidence" },
+      {
+        type: "p",
+        text: "It’s very strong (excuse the pun) and unusually clear-cut for this field. Walking and other low-intensity activity have well-documented benefits but they don’t reliably build or preserve muscle mass - resistance work does.",
+      },
+      {
+        type: "p",
+        text: "Where it gets less clear is dose - exactly how much resistance work, at what intensity, for a specific person. The general finding is solid, the personal prescription isn’t so much unfortunately.",
+      },
+      { type: "h2", text: "What to add in terms of exercise" },
+      {
+        type: "p",
+        text: "You don’t need a gym and you don’t need to slog it out for an hour. What you need is enough load that the last few repetitions are hard, which is the part that’s difficult to get right on your own - most people going it alone stay comfortable, and comfortable is the one thing that doesn’t work here.",
+      },
+      { type: "h2", text: "Where that leaves you" },
+      {
+        type: "p",
+        text: "Keep walking! It’s doing something real and it’s a great habit. Then add the thing walking can’t do, even just once a week, with someone who’ll help you do it well.",
+      },
+    ],
+    sources: [
+      {
+        note: "Muscle mass and strength declining with age if nothing intervenes",
+        citation:
+          "Sarcopenia, dynapenia, and the impact of advancing age on human skeletal muscle size and strength: a quantitative review",
+        url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3429036/",
+      },
+      {
+        note: "Bone following a similar pattern for women through midlife",
+        citation:
+          "Bone mineral density changes during the menopause transition in a multiethnic cohort of women (SWAN), 2008",
+        url: "https://pubmed.ncbi.nlm.nih.gov/18160467/",
+      },
+      {
+        note: "Resistance work building lean mass where endurance activity does not",
+        citation:
+          "Effects of resistance training, endurance training and whole-body vibration on lean body mass, muscle strength and physical performance in older people: a systematic review and network meta-analysis, Age and Ageing, 2018",
+        url: "https://academic.oup.com/ageing/article/47/3/367/4868620",
+      },
+    ],
+  },
+  {
     slug: "personal-trainer-cost-auckland",
     title: "What does a personal trainer actually cost in Auckland?",
     metaTitle: "Personal Trainer Cost Auckland | Curated Fit",
