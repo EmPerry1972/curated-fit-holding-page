@@ -37,6 +37,95 @@ export const CALL_TO_ACTION =
 // Newest first. The index renders them in this order.
 export const POSTS: Post[] = [
   {
+    slug: "not-about-longevity",
+    title: "This isn’t about longevity. It’s about today.",
+    metaTitle: "Strength Training for Women Over 40 | Curated Fit",
+    metaDescription:
+      "Not about what happens in thirty years. About whether today feels harder than it used to.",
+    excerpt:
+      "Not about what happens in thirty years. About whether today feels harder than it used to.",
+    date: "2026-08-31",
+    dateLabel: "31 August 2026",
+    readingTime: "2 min read",
+    kind: "Curated Fit Journal",
+    body: [
+      {
+        type: "p",
+        text: "Much of what gets written for women in their forties is written about a woman in her eighties. Healthspan, ageing well, adding “years to your life and life to your years”.",
+      },
+      {
+        type: "p",
+        text: "It’s not wrong, but it’s hard to relate to a statistic about your eighties. What you can feel is that the stairs are more of a chore than they used to be.",
+      },
+      { type: "h2", text: "What we’re talking about when we say “today”" },
+      {
+        type: "p",
+        text: "It’s about getting up off the floor without hands, carrying both bags in one trip, putting the case in the overhead locker yourself. It’s even about playing eighteen holes and being fine on Sunday, or gardening for three hours and not paying for it the next day.",
+      },
+      {
+        type: "p",
+        text: "That’s the list - it’s short, specific and every item is something you either can do easily now or you can’t. Nothing is about living longer. And ALL of it is about how this week goes.",
+      },
+      { type: "h2", text: "Why the long-term framing doesn’t work" },
+      {
+        type: "p",
+        text: "Nobody sustains a habit on that basis. The behavioural research on this is fairly consistent - distant, abstract rewards are poor motivators, and immediate, noticeable ones are better. Pretty inconvenient for an industry that often sells the distant kind.",
+      },
+      { type: "h2", text: "What you’ll actually notice, and when" },
+      {
+        type: "p",
+        text: "Once you start strength training today, things feel easier at four to six weeks, before anything looks different. That’s largely your nervous system getting better at using the muscle you already have, and it’s the first signal.",
+      },
+      {
+        type: "p",
+        text: "The stairs, the floor and the suitcase are the measures. They’re better than the mirror and much better than the scales, because they’re the things you actually use your body for.",
+      },
+      { type: "h2", text: "The part we’re not going to skip" },
+      {
+        type: "p",
+        text: "Strength work does have long-term effects, and they’re well evidenced. Muscle and bone both respond to being loaded and both matter later. We’re not pretending otherwise.",
+      },
+      {
+        type: "p",
+        text: "We’re just saying it’s not a great reason to start, because it’s a reason you can’t feel nowish. The long-term benefit arrives whether or not it’s what got you through the door - so we’d rather sell you the thing you’ll notice.",
+      },
+      { type: "h2", text: "Where that leaves you" },
+      {
+        type: "p",
+        text: "If you’re waiting to feel motivated by what happens in thirty years, you’ll wait. Start because the stairs are annoying you now. That’s a good enough reason and it’s the one that works.",
+      },
+    ],
+    sources: [
+      {
+        note: "Immediate rewards motivating better than distant ones",
+        citation: "Do immediate external rewards really enhance intrinsic motivation? Frontiers in Psychology, 2022",
+        url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9150741/",
+      },
+      {
+        note: "How that plays out in exercise behaviour specifically",
+        citation: "Temporal discounting rates and their relation to exercise behavior in older adults",
+        url: "https://pubmed.ncbi.nlm.nih.gov/26440317/",
+      },
+      {
+        note: "Muscle responding to being loaded",
+        citation:
+          "Effects of resistance training, endurance training and whole-body vibration on lean body mass, muscle strength and physical performance in older people: a systematic review and network meta-analysis, Age and Ageing, 2018",
+        url: "https://academic.oup.com/ageing/article/47/3/367/4868620",
+      },
+      {
+        note: "Bone responding to being loaded",
+        citation:
+          "Watson et al., LIFTMOR randomised controlled trial, Journal of Bone and Mineral Research, 2018",
+        url: "https://pubmed.ncbi.nlm.nih.gov/28975661/",
+      },
+      {
+        note: "Early gains being largely neural, before anything looks different",
+        citation: "Moritani and deVries, Neural factors versus hypertrophy, 1979",
+        url: "https://pubmed.ncbi.nlm.nih.gov/453338/",
+      },
+    ],
+  },
+  {
     slug: "walking-and-strength",
     title: "“I walk most days, isn’t that enough?”",
     metaTitle: "Walking vs Strength Work After 40 | Curated Fit",
