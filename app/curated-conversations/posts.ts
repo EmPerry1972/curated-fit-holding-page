@@ -49,7 +49,7 @@ export const POSTS: Post[] = [
     readingTime: "2 min read",
     kind: "Curated Fit Journal",
     image: "/journal/not-about-longevity.jpg",
-    imageAlt: "Two women talking in a studio, kettlebells on the shelves behind them.",
+    imageAlt: "A woman sitting in a chair with a notebook and pen, looking away in thought.",
     body: [
       {
         type: "p",
