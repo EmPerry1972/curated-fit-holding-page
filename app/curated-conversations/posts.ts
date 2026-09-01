@@ -46,6 +46,8 @@ export const POSTS: Post[] = [
   dateLabel: "1 September 2026",
   readingTime: "2 min read",
   kind: "Curated Fit Journal",
+        image: "/journal/should-exercise-change-after-40.jpg",
+        imageAlt: "Three women in tennis whites laughing together on a clay court, one sitting in the umpire's chair.",
         body: [
           { type: "p", text: "The Guardian investigates the popular claim that women over 40 should lift heavy, sprint and reduce moderate cardio. It presents both the case for female-specific training and the criticism that some prescriptions run ahead of the available evidence." },
           { type: "h2", text: "Do women need to exercise differently from men, and ease up on cardio after 40?" },
