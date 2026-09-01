@@ -54,7 +54,7 @@ export const POSTS: Post[] = [
         sources: [
           {
                     note: "The case for and against sex-specific training advice for women over 40",
-                    citation: "Do women need to exercise differently from men, and ease up on cardio after 40? The Guardian, May 2026",
+                            citation: "The Guardian, May 2026",
                     url: "https://www.theguardian.com/lifeandstyle/2026/may/07/do-women-need-to-exercise-differently-from-men-and-ease-up-on-cardio-after-40",
           },
               ],
