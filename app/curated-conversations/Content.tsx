@@ -98,7 +98,7 @@ export default function Content() {
         <div style={wrap}>
           <div style={{ ...sectionLabel, marginBottom: 16 }}>Stories, listening and reflection</div>
           <h1 style={h1}>Curated Conversations</h1>
-          <div style={lede}>The questions that usually go unasked, answered honestly.</div>
+          <div style={lede}>The CF Review<br/>Research, reporting and ideas selected from around the world.</div>
         </div>
       </section>
 
