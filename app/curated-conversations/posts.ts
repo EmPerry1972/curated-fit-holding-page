@@ -37,6 +37,31 @@ export const CALL_TO_ACTION =
 // Newest first. The index renders them in this order.
 export const POSTS: Post[] = [
   {
+        slug: "should-exercise-change-after-40",
+  title: "Should exercise change after 40?",
+  metaTitle: "Should Exercise Change After 40? | Curated Fit",
+  metaDescription: "The Guardian investigates whether women over 40 should train differently to men, and which of that advice is supported by evidence.",
+  excerpt: "The Guardian investigates the popular claim that women over 40 should lift heavy, sprint and reduce moderate cardio. We look at what is supported and what still depends on the individual.",
+  date: "2026-09-01",
+  dateLabel: "1 September 2026",
+  readingTime: "2 min read",
+  kind: "Curated Fit Journal",
+        body: [
+          { type: "p", text: "The Guardian investigates the popular claim that women over 40 should lift heavy, sprint and reduce moderate cardio. It presents both the case for female-specific training and the criticism that some prescriptions run ahead of the available evidence." },
+          { type: "h2", text: "Do women need to exercise differently from men, and ease up on cardio after 40?" },
+          { type: "p", text: "Good advice should make exercise more useful, not create another rigid set of rules. Which recommendations are supported, and which depend on the individual?" },
+              ],
+        sources: [
+          {
+                    note: "The case for and against sex-specific training advice for women over 40",
+                    citation: "Do women need to exercise differently from men, and ease up on cardio after 40? The Guardian, May 2026",
+                    url: "https://www.theguardian.com/lifeandstyle/2026/may/07/do-women-need-to-exercise-differently-from-men-and-ease-up-on-cardio-after-40",
+          },
+              ],
+  },
+  
+  {
+    
     slug: "not-about-longevity",
     title: "This isn’t about longevity. It’s about today.",
     metaTitle: "Strength Training for Women Over 40 | Curated Fit",
