@@ -46,6 +46,8 @@ export const POSTS: Post[] = [
             dateLabel: "27 August 2026",
         readingTime: "2 min read",
         kind: "Curated Fit Journal",
+            image: "/journal/D0_women_need_different_exercise_rules.jpg",
+            imageAlt: "Three women laughing together on a boat.",
         body: [
           { type: "p", text: "National Geographic examines whether hormone-specific training advice has become more complicated than the evidence supports. The reporting suggests that many of the fundamental principles governing strength and muscle development are similar for women and men." },
           { type: "h2", text: "Why strength training advice for women is mostly wrong" },
