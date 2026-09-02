@@ -42,8 +42,8 @@ export const POSTS: Post[] = [
         metaTitle: "Do Women Really Need Different Exercise Rules? | Curated Fit",
         metaDescription: "National Geographic examines whether hormone-specific advice for women has become more complicated than the evidence supports.",
         excerpt: "National Geographic examines whether hormone-specific training advice has become more complicated than the evidence supports. The reporting suggests that many of the fundamental principles governing strength and muscle development are similar for women and men.",
-        date: "2026-09-02",
-        dateLabel: "2 September 2026",
+        date: "2026-08-27",
+            dateLabel: "27 August 2026",
         readingTime: "2 min read",
         kind: "Curated Fit Journal",
         body: [
