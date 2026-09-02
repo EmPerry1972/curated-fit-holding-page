@@ -37,6 +37,29 @@ export const CALL_TO_ACTION =
 // Newest first. The index renders them in this order.
 export const POSTS: Post[] = [
   {
+        slug: "do-women-need-different-exercise-rules",
+        title: "Do women really need different exercise rules?",
+        metaTitle: "Do Women Really Need Different Exercise Rules? | Curated Fit",
+        metaDescription: "National Geographic examines whether hormone-specific advice for women has become more complicated than the evidence supports.",
+        excerpt: "National Geographic examines whether hormone-specific training advice has become more complicated than the evidence supports. The reporting suggests that many of the fundamental principles governing strength and muscle development are similar for women and men.",
+        date: "2026-09-02",
+        dateLabel: "2 September 2026",
+        readingTime: "2 min read",
+        kind: "Curated Fit Journal",
+        body: [
+          { type: "p", text: "National Geographic examines whether hormone-specific training advice has become more complicated than the evidence supports. The reporting suggests that many of the fundamental principles governing strength and muscle development are similar for women and men." },
+          { type: "h2", text: "Why strength training advice for women is mostly wrong" },
+          { type: "p", text: "Because women deserve to understand where personalisation is genuinely useful and where it may simply make exercise feel more confusing." },
+              ],
+        sources: [
+          {
+                    note: "The case for shared strength principles across men and women",
+                    citation: "National Geographic, June 2026",
+                    url: "https://www.nationalgeographic.com/health/article/women-strength-training-hormones-muscle-growth",
+          },
+              ],
+  },
+  {
         slug: "should-exercise-change-after-40",
   title: "Should exercise change after 40?",
   metaTitle: "Should Exercise Change After 40? | Curated Fit",
